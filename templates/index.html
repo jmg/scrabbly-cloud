@@ -5,12 +5,23 @@
         <script type='text/javascript' src='/static/js/redips-drag-min.js'></script>
         <script type="text/javascript" src="http://localhost:8080/application.js"></script>
         <script type="text/javascript">
-            var jug = new Juggernaut();
-            jug.subscribe('channel', function(data) {
-                alert('Got message: ' + data);
-            });
 
-            //setTimeout(function() { $.post("/send_message") }, 1000);
+            function generateTile(letter) {
+                var tile = $("<div>");
+                tile.attr("data-value", letter);
+                tile.addClass("tile");
+                tile.text(letter);
+                return tile;
+            }
+
+            var jug = new Juggernaut();
+            jug.subscribe('play', function(data) {
+
+                var letters = JSON.parse(data);
+                for (i in letters) {
+                    $("#box-" + letters[i].x + letters[i].y).append(generateTile(letters[i].letter));
+                }
+            });
         </script>
         <script>
             $(document).ready(function() {
@@ -69,7 +80,7 @@
                 {% for y in range(height) %}
                     <tr class="row">
                     {% for x in range(width) %}
-                        <td data-x="{{x}}" data-y="{{y}}" class="box {% if x == 7 and y == 7 %}central{% endif %}"></td>
+                        <td id="box-{{x}}{{y}}" data-x="{{x}}" data-y="{{y}}" class="box {% if x == 7 and y == 7 %}central{% endif %}"></td>
                     {% endfor %}
                     </tr>
                 {% endfor %}

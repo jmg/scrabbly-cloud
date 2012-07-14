@@ -34,20 +34,15 @@ def play():
 
     try:
         board.play(word)
+
+        jug = Juggernaut()
+        jug.publish('play', data)
+
         response = {"status": "ok"}
     except InvalidPlayError, e:
         response = {"status": "error", "message": unicode(e) }
 
     return json.dumps(response)
-
-
-@app.route("/send_message", methods=['POST'])
-def send_message():
-
-    jug = Juggernaut()
-    jug.publish('channel', 'Juggernaut Test')
-
-    return "ok"
 
 
 if __name__ == '__main__':
