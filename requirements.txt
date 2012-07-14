@@ -1,0 +1,3 @@
+flask
+juggernaut
+git+git://github.com/jmg/scrabbly.git

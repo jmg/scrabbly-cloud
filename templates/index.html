@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <script type='text/javascript' src='/static/js/jquery-1.7.1.min.js'></script>
+        <script type="text/javascript" src="http://localhost:8080/application.js"></script>
+        <script type="text/javascript">
+            var jug = new Juggernaut();
+            jug.subscribe('channel', function(data) {
+                alert('Got message: ' + data);
+            });
+
+            setTimeout(function() { $.post("/send_message") }, 1000);
+        </script>
+    </head>
+
+    <body>
+        <h1>Scrabbly Cloud!</h1>
+    </body>
+</html>
