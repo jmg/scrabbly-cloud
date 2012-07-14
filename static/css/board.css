@@ -1,0 +1,25 @@
+.tile {
+    height: 40px;
+    width: 40px;
+    border: 1px solid #EEEEEE;
+    background-color: #8DD5E7;
+    cursor: move;
+    padding: 10px;
+    font-size: 24px;
+    float: left;
+}
+.tiles-container {
+    margin-bottom: 50px;
+}
+.box {
+    height: 60px;
+    width: 60px;
+    border: 1px solid;
+    font-size: 24px;
+}
+.row {
+    clear: both;
+}
+.central {
+    background-color: red;
+}
