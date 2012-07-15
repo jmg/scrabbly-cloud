@@ -1,0 +1,12 @@
+<html>
+<body>
+<h2>Select the board</h2>
+
+<ul>
+    {% for board in boards %}
+        <li><a href="/boards/{{board.id}}/">{{board.id}}</a></li>
+    {% endfor %}
+</ul>
+
+</body>
+</html>

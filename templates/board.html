@@ -1,0 +1,106 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/css/board.css">
+        <script type='text/javascript' src='/static/js/jquery-1.7.1.min.js'></script>
+        <script type='text/javascript' src='/static/js/redips-drag-min.js'></script>
+        <script type="text/javascript" src="http://localhost:8080/application.js"></script>
+        <script type="text/javascript">
+
+            function generateTile(letter) {
+                var tile = $("<div>");
+                tile.attr("data-value", letter);
+                tile.addClass("tile");
+                tile.text(letter);
+                return tile;
+            }
+
+            function playEvent(data) {
+
+                var letters = JSON.parse(data);
+                for (i in letters) {
+                    var box = $("#box-" + letters[i].x + letters[i].y);
+                    if (box.children().length == 0) {
+                        box.append(generateTile(letters[i].letter));
+                    } else {
+                        box.children().first().removeClass("drag");
+                        box.children()[0].onmousedown = null;
+                    }
+                }
+            }
+
+            var jug = new Juggernaut();
+            jug.subscribe('play', playEvent);
+
+            /*var source = new EventSource('/board/update/');
+            source.addEventListener('message', playEvent);*/
+
+        </script>
+        <script>
+            var rd;
+
+            $(document).ready(function() {
+                rd = REDIPS.drag;
+                rd.init('play-area');
+
+                rd.drop_option = 'single';
+            });
+
+            function play() {
+
+                var tiles = $("#board .drag");
+                letters = [];
+                tiles.each(function(k, v) {
+                    var box = $(v);
+                    obj = {
+                        letter: box.attr("data-value"),
+                        x: box.parent().attr("data-x"),
+                        y: box.parent().attr("data-y")
+                    }
+                    letters.push(obj);
+                })
+
+                $.post("/board/play/", {letters: JSON.stringify(letters)}, function(response) {
+
+                    var response = JSON.parse(response);
+
+                    if (response.status == 'error') {
+                        alert(response.message);
+                    } else {
+                        alert("Good move!");
+                    }
+                });
+            }
+        </script>
+    </head>
+
+    <body>
+        <h1>Scrabbly Cloud!</h1>
+
+        <div id="play-area">
+            <div id="tiles-container" class="tiles-container">
+                <table>
+                    <tr>
+                    {% for letter in letters %}
+                        <td><div data-value="{{letter}}" class="drag tile">{{letter}}</div></td>
+                    {% endfor %}
+                    </tr>
+                </table>
+            </div>
+
+            <button onclick="play()">Play!</button>
+
+            <div id="board" class="board">
+                <table>
+                {% for y in range(height) %}
+                    <tr class="row">
+                    {% for x in range(width) %}
+                        <td id="box-{{x}}{{y}}" data-x="{{x}}" data-y="{{y}}" class="box {% if x == 7 and y == 7 %}central{% endif %}"></td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+        </div>
+
+    </body>
+</html>
