@@ -18,17 +18,16 @@ def index():
 @app.route("/boards/<board_id>/", methods=['GET'])
 def board(board_id):
 
-    size = (15, 15)
-    board = ScrabblyService().new(size, ["jm"])
-
     board_model = BoardService().get_or_404(board_id)
 
-    session["board"] = board
     session["board_model"] = board_model
+
+    board = session.get("board", ScrabblyService().new((15, 15), ["jm"], session))
 
     context = {}
     context["letters"] = ScrabblyService().letters()
-    context["width"], context["height"] = size
+    context["board"] = board_model
+    context["width"], context["height"] = board.height, board.width
     return render_template('board.html', **context)
 
 
@@ -44,3 +43,14 @@ def play():
     response = ScrabblyService().play(board, board_model, tiles, data, session)
 
     return json.dumps(response)
+
+
+@app.route("/board/restart/", methods=['POST'])
+def restart():
+
+    board_model = session["board_model"]
+    BoardService().empty(board_model)
+
+    ScrabblyService().new((15, 15), ["jm"], session)
+
+    return "ok"

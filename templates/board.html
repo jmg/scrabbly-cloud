@@ -45,6 +45,12 @@
                 rd.drop_option = 'single';
             });
 
+            function restart() {
+                $.post("/board/restart/", {}, function() {
+                    $("#board .tile").remove();
+                });
+            }
+
             function play() {
 
                 var tiles = $("#board .drag");
@@ -88,13 +94,14 @@
             </div>
 
             <button onclick="play()">Play!</button>
+            <button onclick="restart()">Restart Game</button>
 
             <div id="board" class="board">
                 <table>
                 {% for y in range(height) %}
                     <tr class="row">
                     {% for x in range(width) %}
-                        <td id="box-{{x}}{{y}}" data-x="{{x}}" data-y="{{y}}" class="box {% if x == 7 and y == 7 %}central{% endif %}"></td>
+                        <td id="box-{{x}}{{y}}" data-x="{{x}}" data-y="{{y}}" class="box {% if x == 7 and y == 7 %}central{% endif %}">{{ board.get_tile(x, y)|safe }}</td>
                     {% endfor %}
                     </tr>
                 {% endfor %}

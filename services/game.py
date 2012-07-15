@@ -10,9 +10,11 @@ class ScrabblyService(object):
 
         return sorted([letter.decode("utf-8") for letter in Dictionary.letters.keys()])
 
-    def new(self, size, players):
+    def new(self, size, players, session):
 
-        return Board(size, [Player(player) for player in players])
+        board = Board(size, [Player(player) for player in players])
+        session["board"] = board
+        return board
 
     def play(self, board, board_model, tiles, data, session):
 
