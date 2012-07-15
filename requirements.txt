@@ -1,3 +1,5 @@
 flask
 juggernaut
+flask-sqlalchemy
+flask-script
 git+git://github.com/jmg/scrabbly.git
