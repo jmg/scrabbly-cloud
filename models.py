@@ -12,12 +12,10 @@ tiles = db.Table('tiles',
     db.Column('board_id', db.Integer, db.ForeignKey('board.id'))
 )
 
-def save(self):
-    db.session.add(self)
-    db.session.commit()
-
-db.Model.save = save
-
+players = db.Table('players',
+    db.Column('player_id', db.Integer, db.ForeignKey('player.id')),
+    db.Column('board_id', db.Integer, db.ForeignKey('board.id'))
+)
 
 class Tile(db.Model):
 
@@ -26,10 +24,21 @@ class Tile(db.Model):
     y = db.Column(db.Integer)
     letter = db.Column(db.String(1))
 
+
+class Player(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500))
+
+
 class Board(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     tiles = db.relationship('Tile', secondary=tiles, backref=db.backref('tiles', lazy='dynamic'))
+    players = db.relationship('Player', secondary=players, backref=db.backref('players', lazy='dynamic'))
+
+    height = db.Column(db.Integer)
+    width = db.Column(db.Integer)
 
     def get_tile(self, x, y):
 

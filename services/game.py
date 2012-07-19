@@ -10,15 +10,19 @@ class ScrabblyService(object):
 
         return sorted([letter.decode("utf-8") for letter in Dictionary.letters.keys()])
 
-    def new(self, size, players):
+    def new(self, board_model):
 
-        board = Board(size, [Player(player) for player in players])
-        return board
+        players = [Player(player.name) for player in board_model.players]
+        size = (board_model.width, board_model.height)
+
+        return Board(size, players)
 
     def play(self, board_model, tiles, data):
 
-        board = Board((15,15), [Player("jm")])
-        board.matrix.update(dict([((tile.x, tile.y), Tile(tile.letter, (tile.x, tile.y))) for tile in board_model.tiles]))
+        board = self.new(board_model)
+
+        matrix = dict([((tile.x, tile.y), Tile(tile.letter, (tile.x, tile.y))) for tile in board_model.tiles])
+        board.matrix.update(matrix)
 
         word = Word([Tile(tile["letter"], (int(tile["x"]), int(tile["y"]))) for tile in tiles])        
 

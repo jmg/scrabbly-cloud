@@ -19,7 +19,7 @@ def index():
 def board(board_id):
 
     board_model = BoardService().get_or_404(board_id)
-    board = ScrabblyService().new((15, 15), ["jm"])
+    board = ScrabblyService().new(board_model)
 
     context = {}
     context["letters"] = ScrabblyService().letters()
