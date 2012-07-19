@@ -28,8 +28,12 @@
                 }
             }
 
-            var jug = new Juggernaut();
-            jug.subscribe('play', playEvent);
+            try {
+                var jug = new Juggernaut();
+                jug.subscribe('play', playEvent);
+            } catch(e) {
+                console.log("Warning: Real Time module disabled");
+            }
 
             /*var source = new EventSource('/board/update/');
             source.addEventListener('message', playEvent);*/
@@ -46,7 +50,7 @@
             });
 
             function restart() {
-                $.post("/board/restart/", {}, function() {
+                $.post("/board/restart/", {"board_id": "{{board.id}}"}, function() {
                     $("#board .tile").remove();
                 });
             }
@@ -54,7 +58,8 @@
             function play() {
 
                 var tiles = $("#board .drag");
-                letters = [];
+                var letters = [];
+                var boxes = [];
                 tiles.each(function(k, v) {
                     var box = $(v);
                     obj = {
@@ -63,9 +68,10 @@
                         y: box.parent().attr("data-y")
                     }
                     letters.push(obj);
+                    boxes.push(box);
                 })
 
-                $.post("/board/play/", {letters: JSON.stringify(letters)}, function(response) {
+                $.post("/board/play/", {letters: JSON.stringify(letters), "board_id": "{{board.id}}" }, function(response) {
 
                     var response = JSON.parse(response);
 
@@ -73,6 +79,11 @@
                         alert(response.message);
                     } else {
                         alert("Good move!");
+
+                        for (i in boxes) {
+                            boxes[i].removeClass("drag");
+                            boxes[i][0].onmousedown = null;
+                        }
                     }
                 });
             }

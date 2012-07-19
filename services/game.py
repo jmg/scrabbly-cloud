@@ -10,24 +10,23 @@ class ScrabblyService(object):
 
         return sorted([letter.decode("utf-8") for letter in Dictionary.letters.keys()])
 
-    def new(self, size, players, session):
+    def new(self, size, players):
 
         board = Board(size, [Player(player) for player in players])
-        session["board"] = board
         return board
 
-    def play(self, board, board_model, tiles, data, session):
+    def play(self, board_model, tiles, data):
 
-        word = Word([Tile(tile["letter"], (int(tile["x"]), int(tile["y"]))) for tile in tiles])
+        board = Board((15,15), [Player("jm")])
+        board.matrix.update(dict([((tile.x, tile.y), Tile(tile.letter, (tile.x, tile.y))) for tile in board_model.tiles]))
+
+        word = Word([Tile(tile["letter"], (int(tile["x"]), int(tile["y"]))) for tile in tiles])        
 
         try:
             board.play(word)
 
             BoardService().save(board_model, word)
             RealTimeService().publish('play', data)
-
-            session["board"] = board
-            session["board_model"] = board_model
 
             return {"status": "ok"}
 

@@ -19,10 +19,7 @@ def index():
 def board(board_id):
 
     board_model = BoardService().get_or_404(board_id)
-
-    session["board_model"] = board_model
-
-    board = session.get("board", ScrabblyService().new((15, 15), ["jm"], session))
+    board = ScrabblyService().new((15, 15), ["jm"])
 
     context = {}
     context["letters"] = ScrabblyService().letters()
@@ -37,10 +34,8 @@ def play():
     data = request.form["letters"]
     tiles = json.loads(data)
 
-    board = session["board"]
-    board_model = session["board_model"]
-
-    response = ScrabblyService().play(board, board_model, tiles, data, session)
+    board = BoardService().get(request.form["board_id"])
+    response = ScrabblyService().play(board, tiles, data)
 
     return json.dumps(response)
 
@@ -48,9 +43,7 @@ def play():
 @app.route("/board/restart/", methods=['POST'])
 def restart():
 
-    board_model = session["board_model"]
+    board_model = BoardService().get(request.form["board_id"])
     BoardService().empty(board_model)
-
-    ScrabblyService().new((15, 15), ["jm"], session)
 
     return "ok"
