@@ -3,4 +3,5 @@ juggernaut
 flask-sqlalchemy
 flask-script
 flask-admin
+flask-evolution
 git+git://github.com/jmg/scrabbly.git
