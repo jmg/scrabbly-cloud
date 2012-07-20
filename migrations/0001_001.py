@@ -10,9 +10,7 @@ db.metadata.bind = db.engine
 
 class Migration(BaseMigration):
     def up(self):
-    	
-        self.execute("ALTER TABLE board ADD COLUMN height integer ;")
-        self.execute("ALTER TABLE board ADD COLUMN width integer ;")
+
         # self.execute("ALTER TABLE table_name DROP COLUMN column_name;")
         # self.execute("CREATE INDEX column_name_idx ON table_name (column_name ASC NULLS LAST);")
         # MyModel.__table__.create()
