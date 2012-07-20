@@ -4,7 +4,6 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask import render_template
 from app import app
 
-app.config.update(SQLALCHEMY_DATABASE_URI="sqlite:////%s/base.sqlite" % os.getcwd())
 db = SQLAlchemy(app)
 
 tiles = db.Table('tiles',
