@@ -1,4 +1,5 @@
 flask
+simplejson
 juggernaut
 flask-sqlalchemy
 flask-script
