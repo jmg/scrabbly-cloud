@@ -19,3 +19,6 @@ app.config.update(configs[ENV])
 
 from admin import *
 from views import *
+
+if __name__ == '__main__':
+	app.run()
