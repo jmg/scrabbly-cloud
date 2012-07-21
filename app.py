@@ -5,6 +5,7 @@ app = Flask(__name__)
 
 ENV = os.environ.get("ENV", "LOCAL")
 DEBUG = True
+ENABLE_REAL_TIME = ENV != "PROD"
 
 configs = {
 	"PROD": {

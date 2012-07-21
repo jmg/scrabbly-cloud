@@ -1,4 +1,5 @@
 from juggernaut import Juggernaut
+from app import ENABLE_REAL_TIME
 
 
 class RealTimeService(object):
@@ -7,6 +8,9 @@ class RealTimeService(object):
 
     def publish(self, event, data):
 
+    	if not ENABLE_REAL_TIME:
+    		return 
+    		
     	try:
         	self.jug.publish(event, data)
         except:
