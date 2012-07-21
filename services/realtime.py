@@ -7,4 +7,7 @@ class RealTimeService(object):
 
     def publish(self, event, data):
 
-        self.jug.publish(event, data)
+    	try:
+        	self.jug.publish(event, data)
+        except:
+        	pass
