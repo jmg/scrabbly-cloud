@@ -20,14 +20,3 @@ class Board(models.Model):
 
     height = models.PositiveIntegerField()
     width = models.PositiveIntegerField()
-
-    def get_tile(self, x, y):
-
-        x, y = int(x), int(y)
-        for tile in self.tiles:
-            if tile.x == x and tile.y == y:
-                tem = render_template("_tile.html", letter=tile.letter)
-                return tem
-
-        return ""
-

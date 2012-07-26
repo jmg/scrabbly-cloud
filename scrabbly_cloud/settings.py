@@ -120,10 +120,9 @@ MIDDLEWARE_CLASSES = (
 
 )
 
-ROOT_URLCONF = 'scrabbly_cloud.urls'
+ROOT_URLCONF = 'urls'
 
-# Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'scrabbly_cloud.wsgi.application'
+ENABLE_REAL_TIME = True
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
