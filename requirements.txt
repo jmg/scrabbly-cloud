@@ -1,9 +1,3 @@
-flask
-psycopg2
-simplejson
-juggernaut
-flask-sqlalchemy
-flask-script
-flask-admin
-flask-evolution
-scrabbly
+django
+south
+pyfb

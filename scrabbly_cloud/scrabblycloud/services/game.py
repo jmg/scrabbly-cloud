@@ -8,14 +8,14 @@ class ScrabblyService(object):
 
     def letters(self):
 
-        return sorted([letter.decode("utf-8") for letter in Dictionary.letters.keys()])
+        return sorted([letter.decode("utf-8") for letter in Dictionary("spanish").letters.keys()])
 
     def new(self, board_model):
 
         players = [Player(player.name) for player in board_model.players.all()]
         size = (board_model.width, board_model.height)
 
-        return Board(size, players)
+        return Board(size, players, language="spanish")
 
     def play(self, board_model, tiles, data):
 
