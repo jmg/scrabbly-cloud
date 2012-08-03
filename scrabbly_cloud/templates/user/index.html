@@ -16,8 +16,9 @@
     function saveFacebookUser(accessToken, user, callback, csrf_token) {
 
         $.post("/user/facebookloginsuccess/", {"accessToken": accessToken, "csrfmiddlewaretoken": "{{csrf_token}}" },
-            function(html) {
-                $("#user_bar").html(html);
+            function(response) {
+                var response = JSON.parse(response);
+                location.href = response.url;
             }
         );
     }
@@ -48,20 +49,9 @@
 <body>
 
 <div id="user_bar">
-{% if not request.user.is_authenticated %}
 <button onclick="getLoginStatus(FB)">Facebook Login</button>
-{% else %}
-Hi {{request.user.username}} <img src="{{request.user.get_profile.picture}}">
-{% endif %}
+
 </div>
-
-<h2>Select the board</h2>
-
-<ul>
-    {% for board in boards %}
-        <li><a href="/boards/{{board.id}}/">{{board.id}}</a></li>
-    {% endfor %}
-</ul>
 
 </body>
 </html>

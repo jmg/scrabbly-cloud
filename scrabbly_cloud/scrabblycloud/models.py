@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Tile(models.Model):
@@ -10,7 +11,14 @@ class Tile(models.Model):
 
 class Player(models.Model):
 
+    user = models.ForeignKey(User)
+
     name = models.CharField(max_length=500)
+    remote_id = models.CharField(max_length=100)
+
+    def picture(self):
+
+        return "https://graph.facebook.com/%s/picture" % self.remote_id
 
 
 class PlayerBoard(models.Model):

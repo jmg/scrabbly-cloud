@@ -1,19 +1,19 @@
 .tile {
-    height: 40px;
-    width: 40px;
+    height: 30px;
+    width: 30px;
     border: 1px solid #EEEEEE;
     background-color: #8DD5E7;
     cursor: move;
-    padding: 10px;
+    padding: 2px;
     font-size: 24px;
     float: left;
 }
 .tiles-container {
-    margin-bottom: 50px;
+    margin-bottom: 20px;
 }
 .box {
-    height: 60px;
-    width: 60px;
+    height: 35px;
+    width: 35px;
     border: 1px solid;
     font-size: 24px;
 }

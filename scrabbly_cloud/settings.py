@@ -3,6 +3,7 @@ import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+ENV = os.environ.get("ENV", "LOCAL")
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -93,6 +94,12 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+AUTHENTICATION_BACKENDS = (    
+    'django.contrib.auth.backends.ModelBackend',
+    'scrabblycloud.auth.DummyAuthBackend',
+)
+
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
@@ -120,6 +127,28 @@ MIDDLEWARE_CLASSES = (
 
 )
 
+FACEBOOK_CONFIGS = {
+    "PROD": {
+        "id": "263252800457144",
+        "key": "be8fbb08493547ca4dfc51f01b5420f5",
+    },
+    "LOCAL": {
+        "id": "273101169462617",
+        "key": "f6d98a1b3990e5eee7af275e97f5c8f9",
+    }
+}
+
+HOSTS = {
+    "PROD": "http://www.scrabblycloud.com",
+    "LOCAL": "http://www.scrabblycloud.local",
+}
+
+HOST = HOSTS[ENV]
+
+FACEBOOK_CONFIG = FACEBOOK_CONFIGS[ENV]
+
+AUTH_PROFILE_MODULE = "scrabblycloud.Player"
+
 ROOT_URLCONF = 'urls'
 
 ENABLE_REAL_TIME = True
@@ -130,6 +159,8 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(SITE_ROOT, 'templates')
 )
+
+USE_TZ = False
 
 INSTALLED_APPS = (
     'django.contrib.auth',

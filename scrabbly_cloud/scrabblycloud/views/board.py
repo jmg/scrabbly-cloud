@@ -5,13 +5,12 @@ from scrabblycloud.services.board import BoardService
 from scrabblycloud.services.game import ScrabblyService
 
 
-class IndexView(BaseView):
+class BoardsView(BaseView):    
 
-    template_name = 'board/boards.html'
-    url = r"^$"
+    url = "^boards$"
 
     def render_to_response(self, context):
-
+        
         context["boards"] = BoardService().all()
         return BaseView.render_to_response(self, context)
 

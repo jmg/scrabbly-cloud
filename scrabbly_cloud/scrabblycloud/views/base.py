@@ -7,6 +7,8 @@ from django.template import Context
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 
+from settings import HOST, FACEBOOK_CONFIG
+
 
 class BaseView(TemplateView):
 
@@ -47,6 +49,12 @@ class BaseView(TemplateView):
         for param in params:
             dict_params[param] = data.get(param)
         return dict_params
+
+    def render_to_response(self, context):
+
+        context["FB_APP_ID"] = FACEBOOK_CONFIG["id"]
+        context["HOST"] = HOST
+        return TemplateView.render_to_response(self, context)
 
 
 class AjaxBaseView(BaseView):
