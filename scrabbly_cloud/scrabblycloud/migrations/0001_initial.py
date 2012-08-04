@@ -30,7 +30,7 @@ class Migration(SchemaMigration):
         db.create_table('scrabblycloud_playerboard', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('player', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['scrabblycloud.Player'])),
-            ('Board', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['scrabblycloud.Board'])),
+            ('board', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['scrabblycloud.Board'])),
             ('points', self.gf('django.db.models.fields.PositiveIntegerField')()),
         ))
         db.send_create_signal('scrabblycloud', ['PlayerBoard'])
@@ -122,7 +122,7 @@ class Migration(SchemaMigration):
             'height': ('django.db.models.fields.PositiveIntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'players': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['scrabblycloud.Player']", 'through': "orm['scrabblycloud.PlayerBoard']", 'symmetrical': 'False'}),
-            'tiles': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['scrabblycloud.Tile']", 'symmetrical': 'False'}),
+            'tiles': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['scrabblycloud.Tile']", 'null': 'True', 'blank': 'True'}),
             'width': ('django.db.models.fields.PositiveIntegerField', [], {})
         },
         'scrabblycloud.player': {
@@ -133,12 +133,12 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'scrabblycloud.playerboard': {
-            'Board': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['scrabblycloud.Board']"}),
             'Meta': {'object_name': 'PlayerBoard'},
+            'board': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['scrabblycloud.Board']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'player': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['scrabblycloud.Player']"}),
             'points': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'tiles': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['scrabblycloud.Tile']", 'symmetrical': 'False'})
+            'tiles': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['scrabblycloud.Tile']", 'null': 'True', 'blank': 'True'})
         },
         'scrabblycloud.tile': {
             'Meta': {'object_name': 'Tile'},

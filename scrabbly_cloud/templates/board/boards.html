@@ -59,7 +59,23 @@ Hi {{request.user.username}} <img src="{{request.user.get_profile.picture}}">
 
 <ul>
     {% for board in boards %}
-        <li><a href="/boards/{{board.id}}/">{{board.id}}</a></li>
+        {% if board.players.count <= 2 %}
+            <li><a href="/boards/{{board.id}}/">{{board.id}} 
+            Players: 
+            {% for player in board.players.all %}
+                {% if not forloop.first %} - {% endif %}
+                {{ player.user.username }}
+            {% endfor %}
+            </a></li>
+        {% else %}
+            <li>{{board.id}} 
+            Players: 
+            {% for player in board.players.all %}
+                {% if not forloop.first %} - {% endif %}
+                {{ player.user.username }}
+            {% endfor %}
+            </li>
+        {% endif %}
     {% endfor %}
 </ul>
 

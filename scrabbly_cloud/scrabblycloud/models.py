@@ -24,15 +24,15 @@ class Player(models.Model):
 class PlayerBoard(models.Model):
 
     player = models.ForeignKey("Player")
-    Board = models.ForeignKey("Board")
+    board = models.ForeignKey("Board")
 
-    points = models.PositiveIntegerField()
-    tiles = models.ManyToManyField("Tile")
+    points = models.PositiveIntegerField(default=0)
+    tiles = models.ManyToManyField("Tile", null=True, blank=True)
 
 
 class Board(models.Model):
 
-    tiles = models.ManyToManyField('Tile')
+    tiles = models.ManyToManyField('Tile', null=True, blank=True)
     players = models.ManyToManyField('Player', through="PlayerBoard")
 
     height = models.PositiveIntegerField()

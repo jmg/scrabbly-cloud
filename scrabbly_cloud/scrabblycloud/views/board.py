@@ -22,7 +22,7 @@ class BoardView(BaseView):
     def render_to_response(self, context):
 
         board_model = BoardService().get_object_or_404(id=self.kwargs["board_id"])
-        board = ScrabblyService().new(board_model)
+        board = ScrabblyService().new(board_model, self.request)
 
         context = {}
         context["letters"] = ScrabblyService().letters()
@@ -40,7 +40,7 @@ class PlayView(BaseView):
         tiles = json.loads(data)
 
         board = BoardService().get(id=self.request.POST["board_id"])
-        response = ScrabblyService().play(board, tiles, data)
+        response = ScrabblyService().play(board, tiles, data, self.request)
 
         return self.json_response(response)
 

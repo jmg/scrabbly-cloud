@@ -79,7 +79,7 @@
                         alert(response.message);
                     } else {
                         alert("Good move!");
-                        response.points
+                        $("#points-" + {{request.user.get_profile.remote_id}}).html(response.points);
 
                         for (i in boxes) {
                             boxes[i].removeClass("drag");
@@ -105,8 +105,8 @@
             </div>
 
             <div class="players">
-            {% for player in players %}
-                <div>{{player.name}}: <span>{{player.points}}</span></div>
+            {% for player_board in board.playerboard_set.all %}
+                <div><img src="{{player_board.player.picture}}">{{player_board.player.user.username}}: <span id="points-{{player_board.player.remote_id}}">{{player_board.points}}</span></div>
             {% endfor %}
             </div>
 

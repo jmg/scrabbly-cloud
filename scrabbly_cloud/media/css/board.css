@@ -26,6 +26,8 @@
 
 .players {
     margin-bottom: 30px;
+    position: absolute;
+    right: 100px;
 }
 
 .players div {
