@@ -1,3 +1,4 @@
+from django.db.models import Q
 from scrabblycloud.models import Board, Tile
 
 from base import BaseService
@@ -6,7 +7,7 @@ class BoardService(BaseService):
 
     entity = Board
 
-    def save(self, board, word):
+    def save(self, board, word, current_player):
 
         for tile in word.tiles:
 
@@ -15,7 +16,13 @@ class BoardService(BaseService):
 
             board.tiles.add(tile)
 
+        board.turn = self._get_next_player(board, current_player)
         board.save()
+
+    def _get_next_player(self, board, current_player):
+
+        players = board.players.filter(~Q(remote_id=current_player.remote_id))
+        return players[0]
 
     def _get_tile(self, x, y, tiles):
 

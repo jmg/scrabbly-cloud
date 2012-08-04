@@ -14,7 +14,7 @@ class Player(models.Model):
     user = models.ForeignKey(User)
 
     name = models.CharField(max_length=500)
-    remote_id = models.CharField(max_length=100)
+    remote_id = models.CharField(max_length=100)    
 
     def picture(self):
 
@@ -24,7 +24,7 @@ class Player(models.Model):
 class PlayerBoard(models.Model):
 
     player = models.ForeignKey("Player")
-    board = models.ForeignKey("Board")
+    board = models.ForeignKey("Board")    
 
     points = models.PositiveIntegerField(default=0)
     tiles = models.ManyToManyField("Tile", null=True, blank=True)
@@ -37,3 +37,4 @@ class Board(models.Model):
 
     height = models.PositiveIntegerField()
     width = models.PositiveIntegerField()
+    turn = models.ForeignKey("Player", null=True, blank=True, related_name="player_turn")

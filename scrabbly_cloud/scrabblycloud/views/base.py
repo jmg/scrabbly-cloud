@@ -56,6 +56,10 @@ class BaseView(TemplateView):
         context["HOST"] = HOST
         return TemplateView.render_to_response(self, context)
 
+    def get_current_player(self):
+
+        return self.request.user.get_profile()
+
 
 class AjaxBaseView(BaseView):
 
