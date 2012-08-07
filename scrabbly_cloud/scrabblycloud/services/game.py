@@ -63,7 +63,13 @@ class ScrabblyService(object):
         matrix = dict([((tile.x, tile.y), Tile(tile.letter, (tile.x, tile.y))) for tile in board_model.tiles.all()])
         board.matrix.update(matrix)
 
-        word = Word([Tile(tile["letter"], (int(tile["x"]), int(tile["y"]))) for tile in tiles])
+        word_tiles = []
+        for tile in tiles:
+            tile_model = TileService().get(id=tile["id"])
+            word_tiles.append(Tile(tile_model.letter, (int(tile["x"]), int(tile["y"]))))
+            tile_model.delete()
+        
+        word = Word(word_tiles)
 
         try:
             points = board.play(word)

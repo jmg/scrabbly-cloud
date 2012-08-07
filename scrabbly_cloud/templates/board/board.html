@@ -72,7 +72,7 @@
                 tiles.each(function(k, v) {
                     var box = $(v);
                     obj = {
-                        letter: box.attr("data-value"),
+                        id: box.attr("data-id"),
                         x: box.parent().attr("data-x"),
                         y: box.parent().attr("data-y")
                     }
@@ -108,7 +108,7 @@
                 <table>
                     <tr>
                     {% for tile in player_board.tiles.all %}
-                        <td><div data-value="{{tile.letter}}" class="drag tile">{{tile.letter}}</div></td>
+                        <td><div data-id="{{tile.id}}" class="drag tile">{{tile.letter}}</div></td>
                     {% endfor %}
                     </tr>
                 </table>
