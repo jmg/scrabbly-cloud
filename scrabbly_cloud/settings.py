@@ -162,6 +162,10 @@ TEMPLATE_DIRS = (
 
 USE_TZ = False
 
+SCRABBLE_RULES = {
+    "max_tiles_per_player": 7
+}
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -18,6 +18,7 @@ class BoardService(BaseService):
 
         board.turn = self._get_next_player(board, current_player)
         board.save()
+        return board
 
     def _get_next_player(self, board, current_player):
 
@@ -51,3 +52,7 @@ class BoardService(BaseService):
 
         for tile in board.tiles.all():
             tile.delete()
+
+    def is_player_turn(self, current_player, board):
+
+        return current_player.id == board.turn.id

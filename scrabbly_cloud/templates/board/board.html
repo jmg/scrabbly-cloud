@@ -55,6 +55,15 @@
                 });
             }
 
+            function update_player_state(response) {
+
+                $("#points-" + {{request.user.get_profile.remote_id}}).html(response.points);
+
+                $("#next_player_name").html(response.next_player);
+                $("#next_player").show();
+                $("#play_button").hide();
+            }
+
             function play() {
 
                 var tiles = $("#board .drag");
@@ -79,7 +88,8 @@
                         alert(response.message);
                     } else {
                         alert("Good move!");
-                        $("#points-" + {{request.user.get_profile.remote_id}}).html(response.points);
+
+                        update_player_state(response)
 
                         for (i in boxes) {
                             boxes[i].removeClass("drag");
@@ -97,8 +107,8 @@
             <div id="tiles-container" class="tiles-container">
                 <table>
                     <tr>
-                    {% for letter in letters %}
-                        <td><div data-value="{{letter}}" class="drag tile">{{letter}}</div></td>
+                    {% for tile in player_board.tiles.all %}
+                        <td><div data-value="{{tile.letter}}" class="drag tile">{{tile.letter}}</div></td>
                     {% endfor %}
                     </tr>
                 </table>
@@ -110,7 +120,15 @@
             {% endfor %}
             </div>
 
-            <button onclick="play()">Play!</button>
+            
+            <span id="play_button" class="{% if not is_player_turn %}hide{% endif %}">
+                <button onclick="play()">Play!</button>
+            </span>
+
+            <span id="next_player" class="{% if is_player_turn %}hide{% endif %}">
+                Wating for <span id="next_player_name">{{board.turn.user.username}}</span> to play...
+            </span>
+
             <button onclick="restart()">Restart Game</button>
 
             <div id="board" class="board">
