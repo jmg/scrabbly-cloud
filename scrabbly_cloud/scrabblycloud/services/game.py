@@ -53,7 +53,7 @@ class ScrabblyService(object):
 
         return board, player_board
 
-    def play(self, board_model, tiles, data, current_player):
+    def play(self, board_model, tiles, current_player):
 
         if board_model.turn.id != current_player.id:
             return {"status": "error", "message": "Is not your turn!" }
@@ -64,10 +64,13 @@ class ScrabblyService(object):
         board.matrix.update(matrix)
 
         word_tiles = []
+        tiles_model = []
+
         for tile in tiles:
+                    
             tile_model = TileService().get(id=tile["id"])
+            tiles_model.append(tile_model)
             word_tiles.append(Tile(tile_model.letter, (int(tile["x"]), int(tile["y"]))))
-            tile_model.delete()
         
         word = Word(word_tiles)
 
@@ -76,9 +79,14 @@ class ScrabblyService(object):
 
             total_points = PlayerBoardService().update_board_state(board_model, points, current_player)
             board_model = BoardService().save(board_model, word, current_player)
-            RealTimeService().publish('play', data)
 
-            return {"status": "ok", "points": total_points, "next_player": board_model.turn.user.username }
+            for tile, tile_model in zip(tiles, tiles_model):
+                tile["letter"] = tile_model.letter
+                tile_model.delete()
+
+            RealTimeService().publish('play', tiles=tiles, player=current_player.remote_id, points=total_points)
+
+            return {"status": "ok", "points": total_points, "next_player": board_model.turn.user.username}
 
         except InvalidPlayError, e:
 

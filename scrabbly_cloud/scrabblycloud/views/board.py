@@ -44,7 +44,7 @@ class PlayView(BaseBoardView):
         tiles = json.loads(data)
 
         board = self.service.get(id=self.request.POST["board_id"])
-        response = ScrabblyService().play(board, tiles, data, self.get_current_player())
+        response = ScrabblyService().play(board, tiles, self.get_current_player())
 
         return self.json_response(response)
 

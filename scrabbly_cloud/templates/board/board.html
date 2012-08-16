@@ -16,16 +16,18 @@
 
             function playEvent(data) {
 
-                var letters = JSON.parse(data);
-                for (i in letters) {
-                    var box = $("#box-" + letters[i].x + letters[i].y);
+                var data = JSON.parse(data);
+                for (i in data.tiles) {
+                    var box = $("#box-" + data.tiles[i].x + data.tiles[i].y);
                     if (box.children().length == 0) {
-                        box.append(generateTile(letters[i].letter));
+                        box.append(generateTile(data.tiles[i].letter));
                     } else {
                         box.children().first().removeClass("drag");
                         box.children()[0].onmousedown = null;
                     }
                 }
+
+                update_play_state(data);
             }
 
             try {
@@ -55,13 +57,21 @@
                 });
             }
 
-            function update_player_state(response) {
+            function update_played_state(response) {
 
                 $("#points-" + {{request.user.get_profile.remote_id}}).html(response.points);
 
                 $("#next_player_name").html(response.next_player);
                 $("#next_player").show();
                 $("#play_button").hide();
+            }
+
+            function update_play_state(response) {
+
+                $("#points-" + response.player).html(response.points);
+
+                $("#play_button").show();
+                $("#next_player").hide();                
             }
 
             function play() {
@@ -89,7 +99,7 @@
                     } else {
                         alert("Good move!");
 
-                        update_player_state(response)
+                        update_played_state(response)
 
                         for (i in boxes) {
                             boxes[i].removeClass("drag");
