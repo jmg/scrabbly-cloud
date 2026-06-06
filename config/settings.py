@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -73,10 +74,12 @@ else:
         "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
     }
 
+# SQLite by default; DATABASE_DIR lets a container keep the file on a volume.
+DATABASE_DIR = os.environ.get("DATABASE_DIR", str(BASE_DIR))
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.path.join(DATABASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -98,6 +101,32 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# WhiteNoise serves static files (works under ASGI/Daphne too). Use the
+# hashed+compressed manifest storage in production; plain storage in DEBUG so
+# runserver doesn't require a collectstatic manifest.
+if DEBUG:
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
+else:
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
+
+# Production hardening (only enforced when DEBUG is off). HTTPS-related options
+# default off so the plain-HTTP docker-compose works; enable them via env when
+# the site is served over TLS.
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = os.environ.get("SECURE_COOKIES", "1") == "1"
+    CSRF_COOKIE_SECURE = os.environ.get("SECURE_COOKIES", "1") == "1"
+    SECURE_SSL_REDIRECT = os.environ.get("SSL_REDIRECT", "0") == "1"
+    SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SECONDS", "0"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

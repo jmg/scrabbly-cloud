@@ -1,0 +1,32 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "0"
+      SECRET_KEY: "${SECRET_KEY:-change-me-in-production}"
+      ALLOWED_HOSTS: "${ALLOWED_HOSTS:-*}"
+      CSRF_TRUSTED_ORIGINS: "${CSRF_TRUSTED_ORIGINS:-}"
+      # Redis channel layer so multiple workers share realtime state.
+      REDIS_URL: "redis://redis:6379/0"
+      # Cookies require HTTPS by default in production; relax for local compose.
+      SECURE_COOKIES: "0"
+      # Keep the SQLite file on the persistent volume.
+      DATABASE_DIR: "/app/data"
+    depends_on:
+      - redis
+    volumes:
+      # Persist the SQLite database across restarts (swap for Postgres in prod).
+      - db-data:/app/data
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             daphne -b 0.0.0.0 -p 8000 config.asgi:application"
+
+volumes:
+  db-data:

@@ -53,6 +53,19 @@
     {% endif %}
 
     <h2>Partidas abiertas</h2>
+    <form method="get" class="filters">
+      <select name="lang">
+        <option value="">Idioma: todos</option>
+        <option value="es" {% if f_lang == 'es' %}selected{% endif %}>Español</option>
+        <option value="en" {% if f_lang == 'en' %}selected{% endif %}>English</option>
+      </select>
+      <select name="rated">
+        <option value="">Rating: todas</option>
+        <option value="1" {% if f_rated == '1' %}selected{% endif %}>Con rating</option>
+        <option value="0" {% if f_rated == '0' %}selected{% endif %}>Sin rating</option>
+      </select>
+      <button class="btn-small" type="submit">Filtrar</button>
+    </form>
     {% if waiting %}
     <ul class="game-list">
       {% for g in waiting %}
@@ -68,8 +81,15 @@
       </li>
       {% endfor %}
     </ul>
+    {% if waiting.has_other_pages %}
+    <div class="pager">
+      {% if waiting.has_previous %}<a href="?wpage={{ waiting.previous_page_number }}&lang={{ f_lang }}&rated={{ f_rated }}">← Anterior</a>{% endif %}
+      <span>Página {{ waiting.number }} de {{ waiting.paginator.num_pages }}</span>
+      {% if waiting.has_next %}<a href="?wpage={{ waiting.next_page_number }}&lang={{ f_lang }}&rated={{ f_rated }}">Siguiente →</a>{% endif %}
+    </div>
+    {% endif %}
     {% else %}
-    <p class="muted">No hay partidas abiertas. ¡Creá una!</p>
+    <p class="muted">No hay partidas abiertas con esos filtros. ¡Creá una!</p>
     {% endif %}
 
     <h2>En vivo <span class="muted">(espectar)</span></h2>
@@ -86,6 +106,30 @@
     </ul>
     {% else %}
     <p class="muted">Ninguna partida en curso.</p>
+    {% endif %}
+
+    <h2>Partidas recientes</h2>
+    {% if recent %}
+    <ul class="game-list">
+      {% for g in recent %}
+      <li>
+        <a href="{% url 'game_detail' g.id %}">
+          #{{ g.id }} —
+          {% for s in g.seats %}{{ s.player.display_name }} ({{ s.score }}){% if not forloop.last %} vs {% endif %}{% endfor %}
+          {% if g.winner_id %}<em class="result-win">▸ {{ g.winner.display_name }}</em>{% else %}<em class="muted">empate</em>{% endif %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if recent.has_other_pages %}
+    <div class="pager">
+      {% if recent.has_previous %}<a href="?fpage={{ recent.previous_page_number }}">← Anterior</a>{% endif %}
+      <span>Página {{ recent.number }} de {{ recent.paginator.num_pages }}</span>
+      {% if recent.has_next %}<a href="?fpage={{ recent.next_page_number }}">Siguiente →</a>{% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <p class="muted">Todavía no terminó ninguna partida.</p>
     {% endif %}
   </section>
 

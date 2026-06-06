@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import get_user_model
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -14,11 +15,22 @@ User = get_user_model()
 
 
 def lobby(request):
+    # Optional filters for the open-games list.
+    f_lang = request.GET.get("lang", "")
+    f_rated = request.GET.get("rated", "")
+
     waiting = (
         Game.objects.filter(status=Game.WAITING)
         .exclude(players__player=request.user)
         .prefetch_related("players__player")
     )
+    if f_lang in ("es", "en"):
+        waiting = waiting.filter(language=f_lang)
+    if f_rated in ("1", "0"):
+        waiting = waiting.filter(rated=(f_rated == "1"))
+
+    waiting_page = Paginator(waiting, 15).get_page(request.GET.get("wpage"))
+
     active = (
         Game.objects.filter(status=Game.ACTIVE)
         .prefetch_related("players__player")[:30]
@@ -30,9 +42,18 @@ def lobby(request):
         .prefetch_related("players__player")
         .distinct()
     )
+    recent = (
+        Game.objects.filter(status=Game.FINISHED)
+        .select_related("winner")
+        .prefetch_related("players__player")
+    )
+    recent_page = Paginator(recent, 12).get_page(request.GET.get("fpage"))
+
     leaders = User.objects.filter(is_guest=False).order_by("-rating")[:10]
     return render(request, "game/lobby.html", {
-        "waiting": waiting, "active": active, "mine": mine, "leaders": leaders,
+        "waiting": waiting_page, "active": active, "mine": mine,
+        "recent": recent_page, "leaders": leaders,
+        "f_lang": f_lang, "f_rated": f_rated,
     })
 
 

@@ -39,15 +39,32 @@ necesidad de registrarse (cuentas de invitado).
   sonidos opcionales, aviso de turno (notificación + título de pestaña) y
   persistencia de las fichas que estás colocando ante recargas.
 
-## Puesta en marcha
+- **Lobby**: filtros por idioma y rating, paginación de partidas abiertas y
+  listado paginado de partidas recientes (terminadas).
+
+## Puesta en marcha (desarrollo)
 
 ```bash
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver        # dev (HTTP + WS in-memory channel layer)
-# o, para ASGI/WebSockets en producción:
+# o, para ASGI/WebSockets:
 daphne config.asgi:application
 ```
+
+## Deploy (Docker)
+
+```bash
+docker compose up --build
+# Sirve en http://localhost:8000 con Daphne (ASGI), Redis como channel layer
+# y los estáticos servidos por WhiteNoise.
+```
+
+El contenedor corre migraciones al iniciar y hace `collectstatic` en el build.
+En producción configurá al menos `SECRET_KEY`, `ALLOWED_HOSTS`,
+`CSRF_TRUSTED_ORIGINS` y `REDIS_URL`; para TLS activá `SSL_REDIRECT=1` y
+`HSTS_SECONDS`. Con varios procesos web, `REDIS_URL` es obligatorio para que el
+tiempo real funcione entre ellos.
 
 ### Configuración (variables de entorno)
 

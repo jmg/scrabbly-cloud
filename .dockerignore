@@ -1,0 +1,10 @@
+.git
+.gitignore
+__pycache__/
+*.py[cod]
+db.sqlite3
+*.sqlite3
+staticfiles/
+.venv/
+venv/
+*.md

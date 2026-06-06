@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
 from .engine import (
     DISTRIBUTIONS,
@@ -242,6 +242,51 @@ class FinishTests(TestCase):
             self.game.players.get(player=resigner).result, GamePlayer.LOSS)
         self.assertEqual(
             self.game.players.get(player=opponent).result, GamePlayer.WIN)
+
+
+class ConsumerTests(TransactionTestCase):
+    """Integration tests for the live game WebSocket."""
+
+    def _make_game(self):
+        from accounts.models import User
+        from game import services
+        u1 = User.objects.create(username="w1")
+        u2 = User.objects.create(username="w2")
+        g = services.create_game(u1, rated=False)
+        return services.join_game(g, u2)
+
+    async def _connect(self, game_id):
+        from channels.routing import URLRouter
+        from channels.testing import WebsocketCommunicator
+        from game.routing import websocket_urlpatterns
+        app = URLRouter(websocket_urlpatterns)
+        comm = WebsocketCommunicator(app, f"/ws/game/{game_id}/")
+        connected, _ = await comm.connect()
+        self.assertTrue(connected)
+        return comm
+
+    async def test_connect_pushes_initial_state(self):
+        from channels.db import database_sync_to_async
+        game = await database_sync_to_async(self._make_game)()
+        comm = await self._connect(game.pk)
+        msg = await comm.receive_json_from(timeout=2)
+        self.assertEqual(msg["type"], "state")
+        self.assertEqual(msg["state"]["id"], game.pk)
+        self.assertEqual(len(msg["state"]["players"]), 2)
+        await comm.disconnect()
+
+    async def test_update_is_broadcast_to_watchers(self):
+        from channels.db import database_sync_to_async
+        from asgiref.sync import sync_to_async
+        from game.realtime import notify_update
+        game = await database_sync_to_async(self._make_game)()
+        comm = await self._connect(game.pk)
+        await comm.receive_json_from(timeout=2)  # initial state
+        # A server-side notify should push a fresh state to the socket.
+        await sync_to_async(notify_update)(game.pk)
+        msg = await comm.receive_json_from(timeout=2)
+        self.assertEqual(msg["type"], "state")
+        await comm.disconnect()
 
 
 class RatingTests(TestCase):

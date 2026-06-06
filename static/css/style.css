@@ -72,6 +72,9 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .lang-badge { color: var(--blue); font-style: normal; font-size: 11px; border: 1px solid var(--blue); padding: 0 4px; border-radius: 3px; }
 .lang-pick { display: flex; gap: 18px; justify-content: center; margin-bottom: 14px; color: var(--text-strong); }
 .lang-pick label { cursor: pointer; }
+.filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.filters select { padding: 5px 8px; background: var(--bg); color: var(--text-strong); border: 1px solid var(--line); border-radius: 4px; }
+.pager { display: flex; gap: 12px; align-items: center; justify-content: center; margin: 8px 0 16px; color: var(--muted); font-size: 13px; }
 .leaderboard { padding-left: 20px; }
 .leaderboard li { display: flex; justify-content: space-between; padding: 4px 0; }
 .lobby-side { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; height: fit-content; }
