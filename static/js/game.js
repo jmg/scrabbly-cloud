@@ -26,11 +26,6 @@
   var PREMIUM_CLASS = { T: "tw", D: "dw", t: "tl", d: "dl" };
   var PREMIUM_LABEL = { T: "3P", D: "2P", t: "3L", d: "2L", "*": "★" };
 
-  var POINTS = {
-    A:1,B:3,C:3,D:2,E:1,F:4,G:2,H:4,I:1,J:8,L:1,M:3,N:1,"Ñ":8,O:1,
-    P:3,Q:5,R:1,S:1,T:1,U:1,V:4,X:8,Y:4,Z:10
-  };
-
   var layout = document.querySelector(".game-layout");
   var gameId = layout.dataset.gameId;
   var meId = parseInt(layout.dataset.meId, 10);
@@ -47,6 +42,8 @@
 
   var state = JSON.parse(document.getElementById("bootstrap-state").textContent);
   var rack = JSON.parse(document.getElementById("bootstrap-rack").textContent);
+  // Letter point values for the game's language (sent in the state payload).
+  var POINTS = state.points || {};
 
   // pending[idx] -> {row, col, letter, isBlank} for tiles placed this turn.
   var pending = [];
@@ -286,6 +283,7 @@
       if (data.type === "state") {
         var prevStatus = state.status;
         state = data.state;
+        POINTS = state.points || POINTS;
         rack = data.rack;
         // Drop pending tiles that are no longer ours to place.
         pending = pending.filter(function (p) { return p.rackIdx < rack.length; });

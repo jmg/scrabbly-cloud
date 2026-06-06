@@ -14,8 +14,11 @@ class Game(models.Model):
         (ABORTED, "Abortada"),
     ]
 
+    LANGUAGE_CHOICES = [("es", "Español"), ("en", "English")]
+
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=WAITING)
     rated = models.BooleanField(default=True)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="es")
     max_players = models.PositiveSmallIntegerField(default=2)
 
     board = models.JSONField(default=dict, blank=True)   # engine Board.serialize()

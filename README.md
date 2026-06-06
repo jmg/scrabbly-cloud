@@ -14,6 +14,12 @@ necesidad de registrarse (cuentas de invitado).
 
 ## Funcionalidades
 
+- **Multi-idioma**: Scrabble en **español** e **inglés**, cada uno con su
+  distribución de fichas, valores de letras y diccionario propios. El idioma
+  se elige al crear/emparejar partida (el emparejamiento rápido respeta el
+  idioma elegido).
+- **Validación con diccionario**: las jugadas se validan contra listas de
+  palabras por idioma (ver `dictionaries/`).
 - **Lobby / emparejamiento**: partida rápida (quick pairing), crear/unirse a
   partidas abiertas, lista de partidas en vivo.
 - **Cuentas de invitado**: cualquier visitante puede jugar al instante; al
@@ -38,8 +44,17 @@ daphne config.asgi:application
 - `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`
 - `REDIS_URL`: si se define, usa un channel layer Redis (requiere
   `channels-redis`); si no, usa el layer en memoria (single-process).
-- `SCRABBLE_DICTIONARY_PATH`: ruta a una lista de palabras válidas (una por
-  línea, UTF-8). Sin ella, la validación de palabras queda deshabilitada.
+- `SCRABBLE_DICTIONARY_DIR`: directorio con los diccionarios por idioma,
+  llamados `<lang>.txt` o `<lang>.txt.gz` (una palabra por línea, UTF-8).
+  Por defecto `dictionaries/`. Si falta el archivo de un idioma, la
+  validación de palabras para ese idioma queda deshabilitada.
+
+## Diccionarios
+
+Los diccionarios viven en `dictionaries/` como archivos gzip por idioma
+(`es.txt.gz`, `en.txt.gz`). Las palabras se normalizan en mayúsculas y sin
+acentos (la `Ñ` se conserva). Para regenerarlos o usar otra fuente, basta con
+dejar un archivo `<lang>.txt` o `<lang>.txt.gz` con una palabra por línea.
 
 ## Tests
 

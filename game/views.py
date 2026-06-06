@@ -36,16 +36,21 @@ def lobby(request):
     })
 
 
+def _language(request):
+    lang = request.POST.get("language", "es")
+    return lang if lang in ("es", "en") else "es"
+
+
 @require_POST
 def create_game(request):
     rated = request.POST.get("rated", "1") == "1"
-    game = services.create_game(request.user, rated=rated)
+    game = services.create_game(request.user, rated=rated, language=_language(request))
     return redirect("game_detail", game_id=game.pk)
 
 
 @require_POST
 def quick_pair(request):
-    game = services.quick_pair(request.user)
+    game = services.quick_pair(request.user, language=_language(request))
     notify_update(game.pk)
     return redirect("game_detail", game_id=game.pk)
 

@@ -5,12 +5,18 @@
   <section class="lobby-main">
     <div class="play-cta">
       <h1>Jugar al Scrabble online</h1>
-      <form method="post" action="{% url 'quick_pair' %}">
+      <div class="lang-pick">
+        <label><input type="radio" name="lang" value="es" form="quickform" checked> Español</label>
+        <label><input type="radio" name="lang" value="en" form="quickform"> English</label>
+      </div>
+      <form id="quickform" method="post" action="{% url 'quick_pair' %}">
         {% csrf_token %}
+        <input type="hidden" name="language" value="es" class="lang-field">
         <button class="btn-primary" type="submit">Partida rápida</button>
       </form>
       <form method="post" action="{% url 'create_game' %}" class="create-form">
         {% csrf_token %}
+        <input type="hidden" name="language" value="es" class="lang-field">
         <label><input type="checkbox" name="rated" value="1" checked> Con rating</label>
         <button class="btn-secondary" type="submit">Crear partida</button>
       </form>
@@ -37,6 +43,7 @@
       {% for g in waiting %}
       <li class="open-game">
         <span>#{{ g.id }} — {{ g.seats.0.player.display_name }} ({{ g.seats.0.player.rating }})
+          <em class="lang-badge">{{ g.get_language_display }}</em>
           {% if g.rated %}<em class="rated">rated</em>{% endif %}</span>
         <form method="post" action="{% url 'join_game' g.id %}">
           {% csrf_token %}
@@ -77,4 +84,14 @@
     </ol>
   </aside>
 </div>
+<script>
+  // Keep both forms' hidden language field in sync with the language picker.
+  document.querySelectorAll('input[name="lang"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      document.querySelectorAll('.lang-field').forEach(function (f) {
+        f.value = radio.value;
+      });
+    });
+  });
+</script>
 {% endblock %}

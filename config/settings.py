@@ -101,6 +101,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Optional Scrabble dictionary (one word per line, UTF-8). If unset or missing,
-# word validation is disabled and any contiguous play is accepted.
-SCRABBLE_DICTIONARY_PATH = os.environ.get("SCRABBLE_DICTIONARY_PATH", "")
+# Per-language Scrabble dictionaries. Files live in SCRABBLE_DICTIONARY_DIR as
+# "<lang>.txt" or "<lang>.txt.gz" (one word per line, UTF-8). If a language's
+# file is missing, word validation for that language is disabled and any
+# contiguous play is accepted.
+SCRABBLE_DICTIONARY_DIR = os.environ.get(
+    "SCRABBLE_DICTIONARY_DIR", str(BASE_DIR / "dictionaries")
+)

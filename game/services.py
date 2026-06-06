@@ -11,28 +11,38 @@ from django.db import transaction
 from accounts.models import User
 
 from . import ratings
+import os
+
 from .engine import (
     BLANK,
+    DEFAULT_LANGUAGE,
     RACK_SIZE,
     Bag,
     Board,
     InvalidMove,
     Placement,
     WordList,
-    score_letter,
+    get_ruleset,
     validate_and_score,
 )
 from .models import Game, GamePlayer, Move
 
-_wordlist = None
+_wordlists = {}
 
 
-def get_wordlist():
-    global _wordlist
-    if _wordlist is None:
-        path = getattr(settings, "SCRABBLE_DICTIONARY_PATH", "")
-        _wordlist = WordList.from_file(path) if path else WordList()
-    return _wordlist
+def get_wordlist(language):
+    """Return the (cached) WordList for a language, loading from disk on first use."""
+    if language not in _wordlists:
+        directory = getattr(settings, "SCRABBLE_DICTIONARY_DIR", "")
+        wl = WordList()
+        if directory:
+            for candidate in (f"{language}.txt.gz", f"{language}.txt"):
+                path = os.path.join(directory, candidate)
+                if os.path.exists(path):
+                    wl = WordList.from_file(path)
+                    break
+        _wordlists[language] = wl
+    return _wordlists[language]
 
 
 def _draw_for(game, seat, bag):
@@ -41,12 +51,12 @@ def _draw_for(game, seat, bag):
         seat.rack = list(seat.rack) + bag.draw(need)
 
 
-def create_game(user, rated=True, max_players=2):
+def create_game(user, rated=True, max_players=2, language=DEFAULT_LANGUAGE):
     with transaction.atomic():
-        bag = Bag()
+        bag = get_ruleset(language).new_bag()
         game = Game.objects.create(
             status=Game.WAITING, rated=rated, max_players=max_players,
-            board=Board().serialize(), bag=bag.letters,
+            language=language, board=Board().serialize(), bag=bag.letters,
         )
         seat = GamePlayer.objects.create(game=game, player=user, seat=0)
         _draw_for(game, seat, bag)
@@ -77,19 +87,19 @@ def join_game(game, user):
     return game
 
 
-def quick_pair(user, rated=True):
-    """Join the oldest waiting game with a free seat, or open a new one."""
+def quick_pair(user, rated=True, language=DEFAULT_LANGUAGE):
+    """Join the oldest waiting game (same language) with a free seat, or open one."""
     with transaction.atomic():
         candidate = (
             Game.objects.select_for_update(skip_locked=True)
-            .filter(status=Game.WAITING, rated=rated)
+            .filter(status=Game.WAITING, rated=rated, language=language)
             .exclude(players__player=user)
             .order_by("created_at")
             .first()
         )
     if candidate:
         return join_game(candidate, user)
-    return create_game(user, rated=rated)
+    return create_game(user, rated=rated, language=language)
 
 
 def _consume_from_rack(rack, placements):
@@ -125,8 +135,11 @@ def make_play(game, user, placements_data):
             )
             for d in placements_data
         ]
+        ruleset = get_ruleset(game.language)
         board = Board.deserialize(game.board)
-        result = validate_and_score(board, placements, get_wordlist())
+        result = validate_and_score(
+            board, placements, get_wordlist(game.language), ruleset
+        )
 
         seat.rack = _consume_from_rack(seat.rack, placements)
         board.apply(placements)
@@ -223,19 +236,20 @@ def _record_move(game, user, kind, placements, words, points):
     )
 
 
-def _rack_value(rack):
-    return sum(score_letter(letter, letter == BLANK) for letter in rack)
+def _rack_value(rack, ruleset):
+    return sum(ruleset.letter_points(letter, letter == BLANK) for letter in rack)
 
 
 def _finish(game, last_seat=None, loser=None):
     """Apply end-of-game scoring and rating changes, then mark finished."""
     seats = list(game.players.all())
+    ruleset = get_ruleset(game.language)
 
     # Endgame tile adjustment: each player loses their remaining rack value; if
     # someone emptied their rack, they also gain the sum of everyone else's.
     leftover_total = 0
     for seat in seats:
-        value = _rack_value(seat.rack)
+        value = _rack_value(seat.rack, ruleset)
         seat.score -= value
         leftover_total += value
     if last_seat is not None:
@@ -314,10 +328,13 @@ def _update_stats(seat):
 def public_state(game):
     board = Board.deserialize(game.board)
     current = game.current_seat
+    ruleset = get_ruleset(game.language)
     return {
         "id": game.pk,
         "status": game.status,
         "rated": game.rated,
+        "language": game.language,
+        "points": ruleset.points,
         "turn_user_id": current.player_id if current and game.status == Game.ACTIVE else None,
         "bag_count": len(game.bag),
         "winner_id": game.winner_id,

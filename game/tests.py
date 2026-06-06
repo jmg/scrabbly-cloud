@@ -1,11 +1,13 @@
 from django.test import TestCase
 
 from .engine import (
+    DISTRIBUTIONS,
     Bag,
     Board,
     InvalidMove,
     Placement,
     WordList,
+    get_ruleset,
     validate_and_score,
 )
 from . import ratings
@@ -63,6 +65,43 @@ class EngineTests(TestCase):
         drawn = bag.draw(7)
         self.assertEqual(len(drawn), 7)
         self.assertEqual(len(bag), 93)
+
+
+class LanguageTests(TestCase):
+    def test_both_distributions_have_100_tiles(self):
+        for code, dist in DISTRIBUTIONS.items():
+            self.assertEqual(sum(c for c, _ in dist.values()), 100, code)
+
+    def test_english_scoring_differs_from_spanish(self):
+        # H is worth 4 in Spanish but 4 in English too; use C (3 es / 3 en) ->
+        # use W which only exists in English (4 points).
+        en = get_ruleset("en")
+        es = get_ruleset("es")
+        self.assertEqual(en.points["W"], 4)
+        self.assertNotIn("W", es.points)
+        self.assertEqual(es.points["Ñ"], 8)
+        self.assertNotIn("Ñ", en.points)
+
+    def test_english_word_scored_with_english_values(self):
+        board = Board()
+        ruleset = get_ruleset("en")
+        # WORD across center: W(7,6) O(7,7)* R(7,8) D(7,9) = (4+1+1+2)*2 = 16
+        placements = [Placement("W", 7, 6), Placement("O", 7, 7),
+                      Placement("R", 7, 8), Placement("D", 7, 9)]
+        result = validate_and_score(board, placements, ruleset=ruleset)
+        self.assertEqual(result.points, 16)
+        self.assertEqual(result.words[0][0], "WORD")
+
+    def test_gzip_dictionary_validates(self):
+        from django.conf import settings
+        from .services import get_wordlist
+        get_wordlist.__globals__["_wordlists"] = {}  # reset cache
+        wl_en = get_wordlist("en")
+        if wl_en.enabled:  # dictionaries shipped
+            self.assertTrue(wl_en.is_valid("WORD"))
+            self.assertFalse(wl_en.is_valid("ZZZZZ"))
+            wl_es = get_wordlist("es")
+            self.assertTrue(wl_es.is_valid("CASA"))
 
 
 class RatingTests(TestCase):

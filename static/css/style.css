@@ -69,6 +69,9 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .status-active { color: var(--accent); }
 .status-waiting { color: var(--blue); }
 .rated { color: var(--accent); font-style: normal; font-size: 11px; border: 1px solid var(--accent); padding: 0 4px; border-radius: 3px; }
+.lang-badge { color: var(--blue); font-style: normal; font-size: 11px; border: 1px solid var(--blue); padding: 0 4px; border-radius: 3px; }
+.lang-pick { display: flex; gap: 18px; justify-content: center; margin-bottom: 14px; color: var(--text-strong); }
+.lang-pick label { cursor: pointer; }
 .leaderboard { padding-left: 20px; }
 .leaderboard li { display: flex; justify-content: space-between; padding: 4px 0; }
 .lobby-side { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; height: fit-content; }

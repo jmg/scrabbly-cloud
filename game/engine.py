@@ -21,9 +21,11 @@ RACK_SIZE = 7
 BINGO_BONUS = 50
 BLANK = "?"
 
-# Modern Spanish distribution without digraphs (100 tiles). The 3 historical
-# digraph tiles (CH, LL, RR) are folded into C, L and R. (count, points)
-TILE_DISTRIBUTION = {
+# Per-language tile distributions. Each maps letter -> (count, points).
+
+# Modern Spanish without digraphs (100 tiles). The 3 historical digraph tiles
+# (CH, LL, RR) are folded into C, L and R.
+SPANISH_DISTRIBUTION = {
     "A": (12, 1), "B": (2, 3), "C": (5, 3), "D": (5, 2), "E": (12, 1),
     "F": (1, 4), "G": (2, 2), "H": (2, 4), "I": (6, 1), "J": (1, 8),
     "L": (5, 1), "M": (2, 3), "N": (5, 1), "Ñ": (1, 8), "O": (9, 1),
@@ -32,7 +34,46 @@ TILE_DISTRIBUTION = {
     BLANK: (2, 0),
 }
 
+# Standard English distribution (100 tiles).
+ENGLISH_DISTRIBUTION = {
+    "A": (9, 1), "B": (2, 3), "C": (2, 3), "D": (4, 2), "E": (12, 1),
+    "F": (2, 4), "G": (3, 2), "H": (2, 4), "I": (9, 1), "J": (1, 8),
+    "K": (1, 5), "L": (4, 1), "M": (2, 3), "N": (6, 1), "O": (8, 1),
+    "P": (2, 3), "Q": (1, 10), "R": (6, 1), "S": (4, 1), "T": (6, 1),
+    "U": (4, 1), "V": (2, 4), "W": (2, 4), "X": (1, 8), "Y": (2, 4),
+    "Z": (1, 10), BLANK: (2, 0),
+}
+
+DISTRIBUTIONS = {"es": SPANISH_DISTRIBUTION, "en": ENGLISH_DISTRIBUTION}
+LANGUAGES = ("es", "en")
+LANGUAGE_NAMES = {"es": "Español", "en": "English"}
+DEFAULT_LANGUAGE = "es"
+
+# Back-compat alias: the default (Spanish) distribution and its point values.
+TILE_DISTRIBUTION = SPANISH_DISTRIBUTION
 LETTER_POINTS = {letter: points for letter, (count, points) in TILE_DISTRIBUTION.items()}
+
+
+class Ruleset:
+    """Language-specific tile rules: distribution, point values and bag."""
+
+    def __init__(self, code):
+        if code not in DISTRIBUTIONS:
+            code = DEFAULT_LANGUAGE
+        self.code = code
+        self.name = LANGUAGE_NAMES[code]
+        self.distribution = DISTRIBUTIONS[code]
+        self.points = {l: p for l, (c, p) in self.distribution.items()}
+
+    def new_bag(self, rng=None):
+        return Bag(distribution=self.distribution, rng=rng)
+
+    def letter_points(self, letter, is_blank):
+        return 0 if is_blank else self.points.get(letter, 0)
+
+
+def get_ruleset(code):
+    return Ruleset(code if code in DISTRIBUTIONS else DEFAULT_LANGUAGE)
 
 # Premium squares. "TW"=triple word, "DW"=double word, "TL"=triple letter,
 # "DL"=double letter. Defined for one quadrant + axes and mirrored to fill the
@@ -78,11 +119,12 @@ class InvalidMove(Exception):
 class Bag:
     """The tile bag. Stores letters as a shuffled list."""
 
-    def __init__(self, letters=None, rng=None):
+    def __init__(self, letters=None, rng=None, distribution=None):
         self.rng = rng or random.Random()
         if letters is None:
+            distribution = distribution or TILE_DISTRIBUTION
             letters = []
-            for letter, (count, _points) in TILE_DISTRIBUTION.items():
+            for letter, (count, _points) in distribution.items():
                 letters.extend([letter] * count)
             self.rng.shuffle(letters)
         self.letters = list(letters)
@@ -143,8 +185,11 @@ class MoveResult:
     words: list = field(default_factory=list)  # list of (word, points)
 
 
-def score_letter(letter, is_blank):
-    return 0 if is_blank else LETTER_POINTS.get(letter, 0)
+def score_letter(letter, is_blank, points=None):
+    if is_blank:
+        return 0
+    points = points if points is not None else LETTER_POINTS
+    return points.get(letter, 0)
 
 
 class WordList:
@@ -164,7 +209,12 @@ class WordList:
 
     @classmethod
     def from_file(cls, path):
+        """Load a word list. Supports plain UTF-8 or gzipped (.gz) files."""
         try:
+            if str(path).endswith(".gz"):
+                import gzip
+                with gzip.open(path, "rt", encoding="utf-8") as fh:
+                    return cls(fh.read().splitlines())
             with open(path, encoding="utf-8") as fh:
                 return cls(fh.read().splitlines())
         except OSError:
@@ -175,12 +225,15 @@ def _in_bounds(r, c):
     return 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE
 
 
-def validate_and_score(board: Board, placements, wordlist: WordList | None = None):
+def validate_and_score(board: Board, placements, wordlist: WordList | None = None,
+                       ruleset: "Ruleset | None" = None):
     """Validate a move against the board and return its MoveResult.
 
     Raises ``InvalidMove`` on any rule violation. Does not mutate the board.
+    ``ruleset`` selects the language-specific letter values (defaults to es).
     """
     wordlist = wordlist or WordList()
+    points = ruleset.points if ruleset is not None else LETTER_POINTS
     if not placements:
         raise InvalidMove("No colocaste ninguna ficha.")
 
@@ -245,7 +298,7 @@ def validate_and_score(board: Board, placements, wordlist: WordList | None = Non
         while _in_bounds(r, c) and (r, c) in temp:
             letter = temp[(r, c)]
             is_blank = (r, c) in blank_cells
-            base = score_letter(letter, is_blank)
+            base = score_letter(letter, is_blank, points)
             if (r, c) in placed_set:  # premiums only apply to freshly placed tiles
                 premium = PREMIUMS.get((r, c))
                 if premium == "DL":
