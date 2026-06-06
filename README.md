@@ -107,9 +107,11 @@ batería **incluidos los E2E de navegador**.
 ## SEO / Blog
 
 Hay un blog (`/blog/`) con artículos optimizados para SEO (editables en el
-admin), `sitemap.xml` (`django.contrib.sitemaps`) y `robots.txt`. Cada página
-incluye `meta description`, `canonical` y Open Graph; los posts agregan JSON-LD
-(`BlogPosting`). El dominio previsto es **scrabblycloud.com**.
+admin), `sitemap.xml` (`django.contrib.sitemaps`), `robots.txt` y **feed RSS**
+(`/blog/feed/`). Cada página incluye `meta description`, `canonical`, Open Graph
+y **hreflang es/en** (`?hl=es|en`); los posts agregan JSON-LD (`BlogPosting`) y
+una **imagen Open Graph generada dinámicamente** (`/blog/<slug>/og.png`, vía
+Pillow). El dominio previsto es **scrabblycloud.com**.
 - **Premium (suscripción)**: monetización estilo chess.com con dos niveles —
   **Gold** (temas, estadísticas avanzadas, insignia, partidas ilimitadas) y
   **Diamond** (todo lo de Gold + análisis post-partida). Incluye **prueba

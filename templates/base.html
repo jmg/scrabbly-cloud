@@ -6,8 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Scrabbly — {% trans "Scrabble online" %}{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{% trans "Jugá al Scrabble online gratis: partidas en tiempo real, contra la IA, torneos, puzzles y ranking ELO en español e inglés." %}{% endblock %}">
-  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <link rel="canonical" href="{{ seo_canonical }}">
+  <link rel="alternate" hreflang="es" href="{{ seo_es }}">
+  <link rel="alternate" hreflang="en" href="{{ seo_en }}">
+  <link rel="alternate" hreflang="x-default" href="{{ seo_canonical }}">
   <meta property="og:site_name" content="Scrabbly">
+  <meta property="og:url" content="{{ seo_canonical }}">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:title" content="{% block og_title %}Scrabbly{% endblock %}">
   <meta property="og:description" content="{% block og_description %}{% trans "Jugá al Scrabble online gratis." %}{% endblock %}">

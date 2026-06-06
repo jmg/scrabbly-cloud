@@ -40,3 +40,31 @@ class BlogTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Sitemap:")
         self.assertEqual(r["Content-Type"], "text/plain")
+
+    def test_more_posts_seeded(self):
+        self.assertGreaterEqual(Post.objects.filter(published=True).count(), 9)
+
+    def test_og_image_is_png(self):
+        post = Post.objects.first()
+        r = self.c.get(f"{post.get_absolute_url()}og.png")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r["Content-Type"], "image/png")
+        self.assertTrue(r.content[:8] == b"\x89PNG\r\n\x1a\n")
+
+    def test_post_has_og_image_and_hreflang(self):
+        post = Post.objects.first()
+        html = self.c.get(post.get_absolute_url()).content.decode()
+        self.assertIn("/og.png", html)
+        self.assertIn('hreflang="es"', html)
+        self.assertIn('hreflang="en"', html)
+        self.assertIn('twitter:card" content="summary_large_image"', html)
+
+    def test_rss_feed(self):
+        r = self.c.get("/blog/feed/")
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("application/rss+xml", r["Content-Type"])
+        self.assertContains(r, "Scrabbly")
+
+    def test_hl_query_switches_language(self):
+        r = self.c.get("/blog/?hl=en")
+        self.assertContains(r, "Scrabble Blog")

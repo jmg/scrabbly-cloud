@@ -8,3 +8,5 @@ channels-redis>=4.2
 psycopg[binary]>=3.1
 # Payments (Stripe). Mock provider is used when no STRIPE_SECRET_KEY is set.
 stripe>=9.0
+# Rendering social (Open Graph) share images for blog posts.
+Pillow>=10.0

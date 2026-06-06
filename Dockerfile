@@ -6,8 +6,10 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# gettext provides msgfmt for compiling translation catalogs (.po -> .mo).
-RUN apt-get update && apt-get install -y --no-install-recommends gettext \
+# gettext: msgfmt for compiling translations. fonts-dejavu-core: nicer text on
+# the generated Open Graph share images.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gettext fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies first to leverage Docker layer caching.

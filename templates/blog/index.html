@@ -3,6 +3,7 @@
 {% block title %}{% trans "Blog de Scrabble" %} · Scrabbly{% endblock %}
 {% block meta_description %}{% trans "Consejos, estrategias y trucos de Scrabble: cómo jugar, mejores palabras, y guías para mejorar tu juego." %}{% endblock %}
 {% block og_title %}{% trans "Blog de Scrabble" %}{% endblock %}
+{% block head_extra %}<link rel="alternate" type="application/rss+xml" title="Scrabbly Blog" href="{% url 'blog_feed' %}">{% endblock %}
 {% block content %}
 <div class="blog-index">
   <h1>{% trans "Blog de Scrabble" %}</h1>

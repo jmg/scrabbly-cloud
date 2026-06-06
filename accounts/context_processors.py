@@ -17,3 +17,13 @@ def social_badges(request):
         "nav_notifications": Notification.objects.filter(
             user=user, is_read=False).count(),
     }
+
+
+def seo(request):
+    """Canonical + per-language (hreflang) URLs for the current page."""
+    canonical = request.build_absolute_uri(request.path)
+    return {
+        "seo_canonical": canonical,
+        "seo_es": canonical + "?hl=es",
+        "seo_en": canonical + "?hl=en",
+    }
