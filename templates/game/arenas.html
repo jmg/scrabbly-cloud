@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Torneos" %} · Scrabbly{% endblock %}
+{% block content %}
+<div class="lobby">
+  <section class="lobby-main">
+    <h1>🏆 {% trans "Torneos Arena" %}</h1>
+
+    {% if live %}
+    <h2>🔴 {% trans "En vivo" %}</h2>
+    <ul class="game-list">
+      {% for a in live %}
+      <li><a href="{% url 'arena_detail' a.id %}">{{ a.name }}</a>
+        <em class="lang-badge">{{ a.get_language_display }}</em>
+        <em class="clock-badge">⏱ {{ a.clock_initial }}+{{ a.clock_increment }}</em></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if upcoming %}
+    <h2>🕐 {% trans "Próximos" %}</h2>
+    <ul class="game-list">
+      {% for a in upcoming %}
+      <li><a href="{% url 'arena_detail' a.id %}">{{ a.name }}</a> <span class="muted">{{ a.starts_at|date:"d/m H:i" }}</span></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if finished %}
+    <h2>{% trans "Finalizados" %}</h2>
+    <ul class="game-list">
+      {% for a in finished %}
+      <li><a href="{% url 'arena_detail' a.id %}">{{ a.name }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+
+  <aside class="lobby-side">
+    <h2>{% trans "Crear torneo" %}</h2>
+    {% if user.is_authenticated and not user.is_guest %}
+    <form method="post" action="{% url 'arena_create' %}" class="arena-form">
+      {% csrf_token %}
+      <label>{% trans "Nombre" %}<input type="text" name="name" maxlength="80" required></label>
+      <label>{% trans "Idioma" %}
+        <select name="language"><option value="es">{% trans "Español" %}</option><option value="en">English</option></select>
+      </label>
+      <label>{% trans "Reloj" %}
+        <select name="clock">
+          <option value="180,0">3 min</option>
+          <option value="300,0" selected>5 min</option>
+          <option value="300,5">5 min + 5s</option>
+          <option value="600,5">10 min + 5s</option>
+        </select>
+      </label>
+      <label>{% trans "Duración (min)" %}
+        <select name="duration"><option>15</option><option selected>30</option><option>45</option><option>60</option></select>
+      </label>
+      <label>{% trans "Empieza en (min)" %}
+        <select name="delay"><option value="0" selected>{% trans "ahora" %}</option><option value="5">5</option><option value="15">15</option></select>
+      </label>
+      <label><input type="checkbox" name="rated" value="1" checked> {% trans "Con rating" %}</label>
+      <button class="btn-primary" type="submit">{% trans "Crear" %}</button>
+    </form>
+    {% else %}
+    <p class="muted"><a href="{% url 'login' %}">{% trans "Entrá" %}</a> {% trans "para crear torneos." %}</p>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

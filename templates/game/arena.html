@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load avatars i18n %}
+{% block title %}{{ arena.name }} · Scrabbly{% endblock %}
+{% block content %}
+{% if state == 'active' %}<meta http-equiv="refresh" content="20">{% endif %}
+<div class="arena-page">
+  <h1>🏆 {{ arena.name }}</h1>
+  <p class="muted">
+    {{ arena.get_language_display }} · ⏱ {{ arena.clock_initial }}+{{ arena.clock_increment }}
+    {% if arena.rated %}· {% trans "con rating" %}{% endif %}
+    {% if state == 'pending' %}· {% blocktrans with t=arena.starts_at|date:"d/m H:i" %}empieza {{ t }}{% endblocktrans %}
+    {% elif state == 'active' %}· <b class="ok">{% trans "EN VIVO" %}</b> {% blocktrans with t=arena.ends_at|date:"H:i" %}hasta {{ t }}{% endblocktrans %}
+    {% else %}· {% trans "finalizado" %}{% endif %}
+  </p>
+
+  <div class="arena-actions">
+    {% if user.is_authenticated and not user.is_guest %}
+      {% if state != 'finished' and not joined %}
+      <form method="post" action="{% url 'arena_join' arena.id %}">{% csrf_token %}
+        <button class="btn-primary" type="submit">{% trans "Inscribirme" %}</button></form>
+      {% endif %}
+      {% if joined and state == 'active' %}
+      <a class="btn-primary" href="{% url 'arena_play' arena.id %}">▶ {% trans "Jugar siguiente partida" %}</a>
+      {% endif %}
+      {% if joined and state == 'pending' %}
+      <form method="post" action="{% url 'arena_leave' arena.id %}">{% csrf_token %}
+        <button class="btn-secondary" type="submit">{% trans "Salir del torneo" %}</button></form>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <h2>{% trans "Clasificación" %}</h2>
+  <ol class="leaderboard arena-standings">
+    {% for p in standings %}
+    <li>
+      <a href="{% url 'profile' p.user.username %}">{{ p.user.username|avatar:22 }} {{ p.user.display_name }}</a>
+      <span>{{ p.score }} {% trans "pts" %} · {{ p.games }} {% trans "PJ" %}</span>
+    </li>
+    {% empty %}
+    <li class="muted">{% trans "Nadie inscripto todavía." %}</li>
+    {% endfor %}
+  </ol>
+</div>
+{% endblock %}

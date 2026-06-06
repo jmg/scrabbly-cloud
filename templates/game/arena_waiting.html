@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Buscando rival" %} · Scrabbly{% endblock %}
+{% block content %}
+<meta http-equiv="refresh" content="3; url={% url 'arena_play' arena.id %}">
+<div class="auth-card center">
+  <h1>⏳ {% trans "Buscando rival…" %}</h1>
+  <p class="muted">{% trans "Te emparejaremos en cuanto haya otro jugador libre." %}</p>
+  <p><a href="{% url 'arena_detail' arena.id %}">{% trans "Volver al torneo" %}</a></p>
+</div>
+{% endblock %}

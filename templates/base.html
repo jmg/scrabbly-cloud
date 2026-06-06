@@ -11,6 +11,7 @@
   <header class="topbar">
     <a class="brand" href="{% url 'lobby' %}">♟ Scrabbly</a>
     <nav>
+      <a href="{% url 'arenas' %}">🏆 {% trans "Torneos" %}</a>
       <a href="{% url 'puzzles' %}">🧩 {% trans "Puzzles" %}</a>
       {% if user.is_authenticated and user.is_premium %}
         <a class="premium-link crown-{{ user.tier }}" href="{% url 'billing_manage' %}">👑 {{ user.tier|capfirst }}</a>

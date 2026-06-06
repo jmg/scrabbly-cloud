@@ -459,6 +459,74 @@ class AiTests(TestCase):
         )
 
 
+class ArenaTests(TestCase):
+    def _arena(self, **kw):
+        from datetime import timedelta
+        from django.utils import timezone
+        from game.models import Arena
+        defaults = dict(
+            name="Test", language="es", rated=False, clock_initial=300,
+            clock_increment=0, starts_at=timezone.now() - timedelta(minutes=1),
+            duration_min=30)
+        defaults.update(kw)
+        return Arena.objects.create(**defaults)
+
+    def test_pairing_creates_game_for_two_waiting(self):
+        from accounts.models import User
+        from game import services
+        from game.models import ArenaPlayer, Game
+        arena = self._arena()
+        a = User.objects.create_user("a", password="x")
+        b = User.objects.create_user("b", password="x")
+        ArenaPlayer.objects.create(arena=arena, user=a)
+        ArenaPlayer.objects.create(arena=arena, user=b)
+
+        kind, game = services.arena_next(arena, a)
+        self.assertEqual(kind, "waiting")  # nobody else queued yet
+        kind, game = services.arena_next(arena, b)
+        self.assertEqual(kind, "game")     # pairs with waiting a
+        self.assertEqual(game.arena_id, arena.id)
+        self.assertEqual(game.status, Game.ACTIVE)
+        self.assertEqual({s.player_id for s in game.seats}, {a.id, b.id})
+        # a now resolves to the same ongoing game
+        kind2, game2 = services.arena_next(arena, a)
+        self.assertEqual((kind2, game2.id), ("game", game.id))
+
+    def test_points_awarded_on_finish(self):
+        from accounts.models import User
+        from game import services
+        from game.models import ArenaPlayer
+        arena = self._arena()
+        a = User.objects.create_user("a", password="x")
+        b = User.objects.create_user("b", password="x")
+        ArenaPlayer.objects.create(arena=arena, user=a)
+        ArenaPlayer.objects.create(arena=arena, user=b)
+        services.arena_next(arena, a)
+        _, game = services.arena_next(arena, b)
+        # b resigns -> a wins (2 pts), b 0; both games count
+        services.resign(game, b)
+        ap_a = ArenaPlayer.objects.get(arena=arena, user=a)
+        ap_b = ArenaPlayer.objects.get(arena=arena, user=b)
+        self.assertEqual(ap_a.score, 2)
+        self.assertEqual(ap_b.score, 0)
+        self.assertEqual(ap_a.games, 1)
+        self.assertEqual(ap_b.games, 1)
+
+    def test_not_joined_and_closed(self):
+        from accounts.models import User
+        from datetime import timedelta
+        from django.utils import timezone
+        from game import services
+        a = User.objects.create_user("a", password="x")
+        arena = self._arena()
+        self.assertEqual(services.arena_next(arena, a)[0], "not_joined")
+        # finished arena is closed
+        past = self._arena(starts_at=timezone.now() - timedelta(hours=2), duration_min=30)
+        from game.models import ArenaPlayer
+        ArenaPlayer.objects.create(arena=past, user=a)
+        self.assertEqual(services.arena_next(past, a)[0], "closed")
+
+
 class PuzzleTests(TestCase):
     def _wl(self):
         from game.services import get_wordlist

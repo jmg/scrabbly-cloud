@@ -73,9 +73,10 @@ def _check_game_quota(user):
 
 
 def create_game(user, rated=True, max_players=2, language=DEFAULT_LANGUAGE,
-                clock_initial=0, clock_increment=0):
+                clock_initial=0, clock_increment=0, check_quota=True):
     with transaction.atomic():
-        _check_game_quota(user)
+        if check_quota:
+            _check_game_quota(user)
         bag = get_ruleset(language).new_bag()
         game = Game.objects.create(
             status=Game.WAITING, rated=rated, max_players=max_players,
@@ -99,7 +100,7 @@ def _start_clock(game):
         game.turn_started_at = timezone.now()
 
 
-def join_game(game, user):
+def join_game(game, user, check_quota=True):
     with transaction.atomic():
         game = Game.objects.select_for_update().get(pk=game.pk)
         existing = game.seat_for(user)
@@ -107,7 +108,8 @@ def join_game(game, user):
             return game
         if game.status != Game.WAITING or game.is_full:
             raise InvalidMove("La partida ya no admite jugadores.")
-        _check_game_quota(user)
+        if check_quota:
+            _check_game_quota(user)
         bag = Bag(letters=list(game.bag))
         seat = GamePlayer.objects.create(
             game=game, player=user, seat=game.players.count(),
@@ -445,6 +447,71 @@ def _finish(game, last_seat=None, loser=None, forced_draw=False):
 
     game.status = Game.FINISHED
     game.save()
+
+    if game.arena_id:
+        _award_arena_points(game, seats)
+
+
+def _award_arena_points(game, seats):
+    """Arena scoring: win=2, draw=1, loss=0; bump each entrant's game count."""
+    from .models import ArenaPlayer
+
+    for seat in seats:
+        ap = ArenaPlayer.objects.filter(arena_id=game.arena_id, user=seat.player).first()
+        if ap is None:
+            continue
+        ap.games += 1
+        if seat.result == GamePlayer.WIN:
+            ap.score += 2
+        elif seat.result == GamePlayer.DRAW:
+            ap.score += 1
+        ap.save(update_fields=["games", "score"])
+
+
+def arena_next(arena, user):
+    """Pair ``user`` for their next arena game.
+
+    Returns ("game", game), ("waiting", None), ("closed", None) or
+    ("not_joined", None).
+    """
+    from .models import Arena, ArenaPlayer
+
+    if arena.state != "active":
+        return ("closed", None)
+    if not ArenaPlayer.objects.filter(arena=arena, user=user).exists():
+        return ("not_joined", None)
+
+    ongoing = (
+        Game.objects.filter(arena=arena, status=Game.ACTIVE, players__player=user).first()
+    )
+    if ongoing:
+        return ("game", ongoing)
+
+    with transaction.atomic():
+        me = ArenaPlayer.objects.select_for_update().get(arena=arena, user=user)
+        opponent = (
+            ArenaPlayer.objects.select_for_update(skip_locked=True)
+            .filter(arena=arena, waiting=True).exclude(user=user)
+            .order_by("joined_at").first()
+        )
+        if opponent is None:
+            me.waiting = True
+            me.save(update_fields=["waiting"])
+            return ("waiting", None)
+        opponent.waiting = False
+        opponent.save(update_fields=["waiting"])
+        me.waiting = False
+        me.save(update_fields=["waiting"])
+
+    game = create_game(
+        user, rated=arena.rated, language=arena.language,
+        clock_initial=arena.clock_initial, clock_increment=arena.clock_increment,
+        check_quota=False,
+    )
+    game.arena = arena
+    game.save(update_fields=["arena"])
+    game = join_game(game, opponent.user, check_quota=False)
+    return ("game", game)
 
 
 def _apply_ratings(game, seats, loser_pk, forced_draw=False):

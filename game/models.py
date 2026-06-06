@@ -29,6 +29,10 @@ class Game(models.Model):
     # Set for games against the computer ("easy" | "medium" | "hard").
     ai_level = models.CharField(max_length=10, blank=True)
 
+    # Set when this game is part of an arena tournament.
+    arena = models.ForeignKey(
+        "Arena", null=True, blank=True, on_delete=models.SET_NULL, related_name="games")
+
     board = models.JSONField(default=dict, blank=True)   # engine Board.serialize()
     bag = models.JSONField(default=list, blank=True)     # remaining bag letters
     turn_index = models.PositiveSmallIntegerField(default=0)
@@ -211,3 +215,55 @@ class PuzzleSolve(models.Model):
 
     class Meta:
         unique_together = ("user", "puzzle")
+
+
+class Arena(models.Model):
+    """A time-boxed arena tournament: players are auto-paired while it's live
+    and earn points (win=2, draw=1) toward a live leaderboard."""
+
+    name = models.CharField(max_length=80)
+    language = models.CharField(max_length=5, default="es")
+    rated = models.BooleanField(default=True)
+    clock_initial = models.PositiveIntegerField(default=300)
+    clock_increment = models.PositiveIntegerField(default=0)
+    starts_at = models.DateTimeField()
+    duration_min = models.PositiveIntegerField(default=30)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL,
+        related_name="arenas_created")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-starts_at"]
+
+    @property
+    def ends_at(self):
+        from datetime import timedelta
+        return self.starts_at + timedelta(minutes=self.duration_min)
+
+    @property
+    def state(self):
+        from django.utils import timezone
+        now = timezone.now()
+        if now < self.starts_at:
+            return "pending"
+        if now < self.ends_at:
+            return "active"
+        return "finished"
+
+    def __str__(self):
+        return self.name
+
+
+class ArenaPlayer(models.Model):
+    arena = models.ForeignKey(Arena, on_delete=models.CASCADE, related_name="entrants")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="arena_entries")
+    score = models.IntegerField(default=0)
+    games = models.IntegerField(default=0)
+    waiting = models.BooleanField(default=False)  # queued for the next pairing
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("arena", "user")
+        ordering = ["-score", "games"]

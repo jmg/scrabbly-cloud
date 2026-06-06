@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 18:07+0000\n"
+"POT-Creation-Date: 2026-06-06 18:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr "Account created!"
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:130 game/views.py:231
+#: accounts/views.py:130 game/views.py:321
 msgid "No se encontró ese usuario."
 msgstr "User not found."
 
@@ -94,20 +94,28 @@ msgid ""
 "Premium para partidas ilimitadas."
 msgstr ""
 
-#: game/views.py:102 game/views.py:112
+#: game/views.py:108
+msgid "Arena"
+msgstr "Arena"
+
+#: game/views.py:172
+msgid "El torneo no está activo."
+msgstr "The tournament isn't active."
+
+#: game/views.py:191 game/views.py:201
 msgid "No se pudo generar el puzzle. Probá de nuevo."
 msgstr "Couldn't generate the puzzle. Try again."
 
-#: game/views.py:239
+#: game/views.py:329
 msgid "Desafío enviado."
 msgstr "Challenge sent."
 
-#: game/views.py:258
+#: game/views.py:348
 msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
 #: templates/accounts/friends.html:3 templates/accounts/friends.html:6
-#: templates/accounts/profile.html:27 templates/base.html:21
+#: templates/accounts/profile.html:27 templates/base.html:22
 msgid "Amigos"
 msgstr "Friends"
 
@@ -153,13 +161,12 @@ msgid "Solicitudes enviadas"
 msgstr "Requests sent"
 
 #: templates/accounts/friends.html:62 templates/game/lobby.html:89
-#| msgid "pago pendiente"
 msgid "pendiente"
 msgstr "pending"
 
 #: templates/accounts/login.html:3 templates/accounts/login.html:6
 #: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:26
+#: templates/base.html:27
 msgid "Entrar"
 msgstr "Log in"
 
@@ -253,7 +260,7 @@ msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:27
+#: templates/accounts/register.html:18 templates/base.html:28
 msgid "Crear cuenta"
 msgstr "Sign up"
 
@@ -274,20 +281,24 @@ msgstr "(optional, for receipts)"
 msgid "¿Ya tenés cuenta?"
 msgstr "Already have an account?"
 
-#: templates/base.html:14 templates/game/puzzles.html:3
+#: templates/base.html:14 templates/game/arenas.html:3
+msgid "Torneos"
+msgstr "Tournaments"
+
+#: templates/base.html:15 templates/game/puzzles.html:3
 #: templates/game/puzzles.html:6
 msgid "Puzzles"
 msgstr "Puzzles"
 
-#: templates/base.html:18
+#: templates/base.html:19
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:23
+#: templates/base.html:24
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:32
+#: templates/base.html:33 templates/game/arenas.html:45
 msgid "Idioma"
 msgstr "Language"
 
@@ -495,11 +506,11 @@ msgstr "Game"
 msgid "ver tablero"
 msgstr "view board"
 
-#: templates/game/analysis.html:12
+#: templates/game/analysis.html:12 templates/game/arena.html:37
 msgid "pts"
 msgstr "pts"
 
-#: templates/game/analysis.html:14 templates/game/game.html:42
+#: templates/game/analysis.html:14 templates/game/game.html:43
 msgid "Jugadas"
 msgstr "Moves"
 
@@ -535,6 +546,137 @@ msgstr "Get Premium"
 msgid "Volver a la partida"
 msgstr "Back to the game"
 
+#: templates/game/arena.html:10
+#| msgid "Con rating"
+msgid "con rating"
+msgstr "rated"
+
+#: templates/game/arena.html:11
+#, python-format
+msgid "empieza %(t)s"
+msgstr ""
+
+#: templates/game/arena.html:12
+msgid "EN VIVO"
+msgstr "LIVE"
+
+#: templates/game/arena.html:12
+#, python-format
+msgid "hasta %(t)s"
+msgstr ""
+
+#: templates/game/arena.html:13
+msgid "finalizado"
+msgstr "finished"
+
+#: templates/game/arena.html:20
+msgid "Inscribirme"
+msgstr "Join"
+
+#: templates/game/arena.html:23
+msgid "Jugar siguiente partida"
+msgstr "Play next game"
+
+#: templates/game/arena.html:27
+msgid "Salir del torneo"
+msgstr "Leave tournament"
+
+#: templates/game/arena.html:32
+msgid "Clasificación"
+msgstr "Standings"
+
+#: templates/game/arena.html:37
+msgid "PJ"
+msgstr "GP"
+
+#: templates/game/arena.html:40
+msgid "Nadie inscripto todavía."
+msgstr "No one has joined yet."
+
+#: templates/game/arena_waiting.html:3
+#| msgid "Esperando rival"
+msgid "Buscando rival"
+msgstr "Finding opponent"
+
+#: templates/game/arena_waiting.html:7
+#| msgid "Esperando rival"
+msgid "Buscando rival…"
+msgstr "Finding opponent…"
+
+#: templates/game/arena_waiting.html:8
+msgid "Te emparejaremos en cuanto haya otro jugador libre."
+msgstr "We'll pair you as soon as another player is free."
+
+#: templates/game/arena_waiting.html:9
+#| msgid "Volver al lobby"
+msgid "Volver al torneo"
+msgstr "Back to tournament"
+
+#: templates/game/arenas.html:7
+msgid "Torneos Arena"
+msgstr "Arena tournaments"
+
+#: templates/game/arenas.html:10 templates/game/game.html:15
+#: templates/game/game.html:17 templates/game/lobby.html:172
+msgid "En vivo"
+msgstr "Live"
+
+#: templates/game/arenas.html:21
+msgid "Próximos"
+msgstr "Upcoming"
+
+#: templates/game/arenas.html:30
+msgid "Finalizados"
+msgstr "Finished"
+
+#: templates/game/arenas.html:40
+msgid "Crear torneo"
+msgstr "Create tournament"
+
+#: templates/game/arenas.html:44
+msgid "Nombre"
+msgstr "Name"
+
+#: templates/game/arenas.html:46 templates/game/lobby.html:10
+#: templates/game/lobby.html:136
+msgid "Español"
+msgstr "Spanish"
+
+#: templates/game/arenas.html:48
+#| msgid "Reloj:"
+msgid "Reloj"
+msgstr "Clock"
+
+#: templates/game/arenas.html:56
+msgid "Duración (min)"
+msgstr "Duration (min)"
+
+#: templates/game/arenas.html:59
+msgid "Empieza en (min)"
+msgstr "Starts in (min)"
+
+#: templates/game/arenas.html:60
+msgid "ahora"
+msgstr "now"
+
+#: templates/game/arenas.html:62 templates/game/lobby.html:36
+#: templates/game/lobby.html:141
+msgid "Con rating"
+msgstr "Rated"
+
+#: templates/game/arenas.html:63
+msgid "Crear"
+msgstr "Create"
+
+#: templates/game/arenas.html:66
+#| msgid "Entrar"
+msgid "Entrá"
+msgstr "Log in"
+
+#: templates/game/arenas.html:66
+msgid "para crear torneos."
+msgstr "to create tournaments."
+
 #: templates/game/error.html:3
 msgid "Error"
 msgstr "Error"
@@ -560,11 +702,6 @@ msgstr "Start"
 #: templates/game/lobby.html:203
 msgid "Anterior"
 msgstr "Previous"
-
-#: templates/game/game.html:15 templates/game/game.html:17
-#: templates/game/lobby.html:172
-msgid "En vivo"
-msgstr "Live"
 
 #: templates/game/game.html:16 templates/game/lobby.html:165
 #: templates/game/lobby.html:205
@@ -611,11 +748,16 @@ msgstr "Copy link"
 msgid "Fichas en la bolsa:"
 msgstr "Tiles in the bag:"
 
-#: templates/game/game.html:45
+#: templates/game/game.html:41
+#| msgid "Ninguna partida en curso."
+msgid "Siguiente partida del torneo"
+msgstr "Next tournament game"
+
+#: templates/game/game.html:46
 msgid "Chat"
 msgstr "Chat"
 
-#: templates/game/game.html:48
+#: templates/game/game.html:49
 msgid "Mensaje…"
 msgstr "Message…"
 
@@ -626,10 +768,6 @@ msgstr "Lobby"
 #: templates/game/lobby.html:8
 msgid "Jugar al Scrabble online"
 msgstr "Play Scrabble online"
-
-#: templates/game/lobby.html:10 templates/game/lobby.html:136
-msgid "Español"
-msgstr "Spanish"
 
 #: templates/game/lobby.html:11 templates/game/lobby.html:137
 msgid "English"
@@ -670,10 +808,6 @@ msgstr "30 min"
 #: templates/game/lobby.html:30
 msgid "Partida rápida"
 msgstr "Quick match"
-
-#: templates/game/lobby.html:36 templates/game/lobby.html:141
-msgid "Con rating"
-msgstr "Rated"
 
 #: templates/game/lobby.html:37
 msgid "Crear partida"
@@ -716,7 +850,6 @@ msgid "Desafíos enviados"
 msgstr "Challenges sent"
 
 #: templates/game/lobby.html:87
-#| msgid "Volver a la partida"
 msgid "Ir a la partida"
 msgstr "Go to game"
 
@@ -802,7 +935,6 @@ msgid "Puzzle"
 msgstr "Puzzle"
 
 #: templates/game/puzzle.html:12
-#| msgid "mejor jugada"
 msgid "Enviar jugada"
 msgstr "Submit move"
 
@@ -815,7 +947,6 @@ msgid "Otro puzzle"
 msgstr "Another puzzle"
 
 #: templates/game/puzzle.html:20
-#| msgid "mejor jugada"
 msgid "Encontrá la mejor jugada"
 msgstr "Find the best move"
 
@@ -842,12 +973,10 @@ msgid "El mismo para todos, cada día."
 msgstr "The same for everyone, every day."
 
 #: templates/game/puzzles.html:14
-#| msgid "Jugar"
 msgid "Jugar (ES)"
 msgstr "Play (ES)"
 
 #: templates/game/puzzles.html:15
-#| msgid "Jugar"
 msgid "Jugar (EN)"
 msgstr "Play (EN)"
 

@@ -112,6 +112,11 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 .puzzle-miss { background: var(--panel2); border-radius: 8px; padding: 12px; margin-top: 12px; }
 .rack-tile.used { opacity: .3; pointer-events: none; }
 .rack-tile.selected { outline: 2px solid var(--accent); }
+.arena-form label { display: block; margin-bottom: 8px; }
+.arena-form input[type=text], .arena-form select { width: 100%; }
+.arena-actions { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+.arena-standings li span { color: var(--muted); font-size: 13px; }
+.arena-link { margin: 8px 0; font-size: 14px; }
 .premium-link { color: #f0b428 !important; font-weight: 600; }
 .pricing { max-width: 760px; margin: 0 auto; text-align: center; }
 .pricing .perks { list-style: none; padding: 0; display: inline-flex; flex-direction: column; gap: 8px; text-align: left; margin: 16px auto 24px; }

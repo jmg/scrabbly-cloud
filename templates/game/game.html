@@ -38,6 +38,7 @@
     <div id="offer-box" class="offer-box" hidden></div>
     <ul id="players" class="players"></ul>
     <div class="bag-info">{% trans "Fichas en la bolsa:" %} <span id="bag-count">–</span></div>
+    {% if game.arena_id %}<div class="arena-link">🏆 <a href="{% url 'arena_play' game.arena_id %}">{% trans "Siguiente partida del torneo" %} →</a></div>{% endif %}
 
     <h3>{% trans "Jugadas" %}</h3>
     <ol id="moves" class="moves"></ol>

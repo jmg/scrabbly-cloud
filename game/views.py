@@ -86,6 +86,95 @@ def lobby(request):
     })
 
 
+def arenas(request):
+    from .models import Arena
+    now_list = list(Arena.objects.all()[:40])
+    live = [a for a in now_list if a.state == "active"]
+    upcoming = [a for a in now_list if a.state == "pending"]
+    finished = [a for a in now_list if a.state == "finished"][:10]
+    return render(request, "game/arenas.html", {
+        "live": live, "upcoming": upcoming, "finished": finished,
+    })
+
+
+@require_POST
+@ACTION_LIMIT
+def arena_create(request):
+    from datetime import timedelta
+    from django.utils import timezone
+    from .models import Arena
+    if not request.user.is_authenticated or request.user.is_guest:
+        return redirect("login")
+    name = (request.POST.get("name") or "").strip()[:80] or _("Arena")
+    try:
+        duration = max(5, min(180, int(request.POST.get("duration", "30"))))
+        delay = max(0, min(60, int(request.POST.get("delay", "0"))))
+    except ValueError:
+        duration, delay = 30, 0
+    initial, increment = _clock(request)
+    arena = Arena.objects.create(
+        name=name, language=_language(request),
+        rated=request.POST.get("rated") == "1",
+        clock_initial=initial or 300, clock_increment=increment,
+        starts_at=timezone.now() + timedelta(minutes=delay),
+        duration_min=duration, created_by=request.user,
+    )
+    return redirect("arena_detail", arena_id=arena.pk)
+
+
+def arena_detail(request, arena_id):
+    from .models import Arena, ArenaPlayer
+    arena = get_object_or_404(Arena, pk=arena_id)
+    standings = list(
+        ArenaPlayer.objects.filter(arena=arena).select_related("user"))
+    joined = False
+    if request.user.is_authenticated:
+        joined = any(p.user_id == request.user.pk for p in standings)
+    return render(request, "game/arena.html", {
+        "arena": arena, "standings": standings, "state": arena.state,
+        "joined": joined,
+    })
+
+
+@require_POST
+@ACTION_LIMIT
+def arena_join(request, arena_id):
+    from .models import Arena, ArenaPlayer
+    arena = get_object_or_404(Arena, pk=arena_id)
+    if not request.user.is_authenticated or request.user.is_guest:
+        return redirect("login")
+    if arena.state != "finished":
+        ArenaPlayer.objects.get_or_create(arena=arena, user=request.user)
+    return redirect("arena_detail", arena_id=arena.pk)
+
+
+@require_POST
+@ACTION_LIMIT
+def arena_leave(request, arena_id):
+    from .models import ArenaPlayer
+    ArenaPlayer.objects.filter(arena_id=arena_id, user=request.user, games=0).delete()
+    return redirect("arena_detail", arena_id=arena_id)
+
+
+@ACTION_LIMIT
+def arena_play(request, arena_id):
+    from .models import Arena
+    arena = get_object_or_404(Arena, pk=arena_id)
+    if not request.user.is_authenticated or request.user.is_guest:
+        return redirect("login")
+    kind, game = services.arena_next(arena, request.user)
+    if kind == "game":
+        notify_update(game.pk)
+        return redirect("game_detail", game_id=game.pk)
+    if kind == "not_joined":
+        return redirect("arena_detail", arena_id=arena.pk)
+    if kind == "closed":
+        messages.info(request, _("El torneo no está activo."))
+        return redirect("arena_detail", arena_id=arena.pk)
+    # waiting: this page auto-retries pairing until an opponent appears.
+    return render(request, "game/arena_waiting.html", {"arena": arena})
+
+
 def puzzles_index(request):
     from .models import PuzzleSolve
     solved = 0
