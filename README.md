@@ -41,9 +41,12 @@ necesidad de registrarse (cuentas de invitado).
 
 - **Lobby**: filtros por idioma y rating, paginación de partidas abiertas y
   listado paginado de partidas recientes (terminadas).
-- **Rival IA**: jugá contra la computadora en tres niveles (fácil/media/difícil).
-  El bot genera jugadas legales (hooks, extensiones y plays a través de fichas
-  existentes) con un motor propio y presupuesto de tiempo por jugada.
+- **Rival IA**: jugá contra la computadora en cinco niveles (principiante,
+  fácil, media, difícil y experta). El motor usa un **DAWG** (autómata de
+  palabras minimizado) y generación con *cross-checks* tipo Appel-Jacobson:
+  encuentra **todas** las jugadas legales del tablero —hooks, extensiones,
+  through-plays y jugadas paralelas— en fracciones de segundo. El nivel experto
+  rankea por *equity* (puntaje + heurística de fichas que quedan en el atril).
 - **Modo correspondencia**: partidas sin reloj jugables a lo largo del tiempo,
   con la sección «Te toca jugar» que lista las partidas que esperan tu turno.
 - **Perfiles y avatares**: avatares identicon generados (sin subidas), perfil

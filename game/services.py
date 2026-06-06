@@ -568,11 +568,13 @@ def rack_for(game, user):
 
 
 BOT_USERNAMES = {
+    "beginner": "IA-Principiante",
     "easy": "IA-Fácil",
     "medium": "IA-Media",
     "hard": "IA-Difícil",
+    "expert": "IA-Experta",
 }
-BOT_RATINGS = {"easy": 1000, "medium": 1400, "hard": 1800}
+BOT_RATINGS = {"beginner": 700, "easy": 1000, "medium": 1400, "hard": 1800, "expert": 2100}
 
 
 def get_bot_user(level):

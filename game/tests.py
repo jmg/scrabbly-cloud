@@ -403,6 +403,31 @@ class AiTests(TestCase):
         self.assertIsNotNone(move)
         self.assertTrue(all({"letter", "row", "col"} <= set(p) for p in move))
 
+    def test_finds_parallel_plays_and_levels_differ(self):
+        from game.engine import Board, get_ruleset, Placement, validate_and_score
+        from game.services import get_wordlist
+        from game import ai
+        wl = get_wordlist("es")
+        if not wl.enabled:
+            self.skipTest("dictionary not bundled")
+        rs = get_ruleset("es")
+        board = Board(grid={(7, 6): "C", (7, 7): "A", (7, 8): "S", (7, 9): "A"})
+        moves = ai.generate(board, list("RETOSIN"), rs, wl, "es")
+        self.assertGreater(len(moves), 500)
+        # At least one play places all its tiles off row 7 (a parallel play).
+        self.assertTrue(any(all(p["row"] != 7 for p in data)
+                            for (_pts, data, _ml, _lv) in moves.values()))
+
+        def score(level):
+            m = ai.choose_move(board, list("AEIORST"), rs, wl, "es", level)
+            res = validate_and_score(
+                board, [Placement(p["letter"], p["row"], p["col"], p["is_blank"]) for p in m],
+                wl, rs)
+            return res.points
+
+        # The strong level never scores below the beginner level here.
+        self.assertGreaterEqual(score("hard"), score("beginner"))
+
     def test_ai_game_bot_moves_after_human(self):
         from accounts.models import User
         from game import services
