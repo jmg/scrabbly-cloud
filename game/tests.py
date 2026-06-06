@@ -289,6 +289,35 @@ class ConsumerTests(TransactionTestCase):
         await comm.disconnect()
 
 
+class LobbyTests(TestCase):
+    def test_correspondence_split_your_move_vs_waiting(self):
+        from django.test import Client
+        from accounts.models import User
+        from game import services
+
+        c1, c2 = Client(), Client()
+        c1.get("/")
+        c2.get("/")
+        u1 = User.objects.get(pk=c1.session["_auth_user_id"])
+        gid = c1.post("/game/quick/", {"clock": "0,0"}).url.split("/")[-2]
+        c2.post("/game/quick/", {"clock": "0,0"})
+
+        # Seat 0 (the creator, u1) is on the move.
+        r1 = c1.get("/")
+        self.assertEqual(len(r1.context["my_turn"]), 1)
+        self.assertEqual(len(r1.context["my_waiting"]), 0)
+        # The opponent is waiting, not on the move.
+        r2 = c2.get("/")
+        self.assertEqual(len(r2.context["my_turn"]), 0)
+        self.assertEqual(len(r2.context["my_waiting"]), 1)
+
+        # After u1 passes, it flips: now the opponent is on the move.
+        from game.models import Game
+        services.make_pass(Game.objects.get(pk=gid), u1)
+        self.assertEqual(len(c1.get("/").context["my_turn"]), 0)
+        self.assertEqual(len(c2.get("/").context["my_turn"]), 1)
+
+
 class RatingTests(TestCase):
     def test_winner_gains_loser_loses(self):
         new = ratings.compute_updates([

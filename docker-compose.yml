@@ -1,4 +1,19 @@
 services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-scrabbly}"
+      POSTGRES_USER: "${POSTGRES_USER:-scrabbly}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-scrabbly}"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scrabbly}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:7-alpine
     restart: unless-stopped
@@ -15,15 +30,18 @@ services:
       CSRF_TRUSTED_ORIGINS: "${CSRF_TRUSTED_ORIGINS:-}"
       # Redis channel layer so multiple workers share realtime state.
       REDIS_URL: "redis://redis:6379/0"
+      # Postgres connection.
+      POSTGRES_DB: "${POSTGRES_DB:-scrabbly}"
+      POSTGRES_USER: "${POSTGRES_USER:-scrabbly}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-scrabbly}"
+      POSTGRES_HOST: "db"
       # Cookies require HTTPS by default in production; relax for local compose.
       SECURE_COOKIES: "0"
-      # Keep the SQLite file on the persistent volume.
-      DATABASE_DIR: "/app/data"
     depends_on:
-      - redis
-    volumes:
-      # Persist the SQLite database across restarts (swap for Postgres in prod).
-      - db-data:/app/data
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     command: >
       sh -c "python manage.py migrate --noinput &&
              daphne -b 0.0.0.0 -p 8000 config.asgi:application"

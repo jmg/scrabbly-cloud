@@ -74,14 +74,28 @@ else:
         "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
     }
 
-# SQLite by default; DATABASE_DIR lets a container keep the file on a volume.
-DATABASE_DIR = os.environ.get("DATABASE_DIR", str(BASE_DIR))
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(DATABASE_DIR, "db.sqlite3"),
+# Postgres when POSTGRES_DB is configured (production), else SQLite for dev.
+# DATABASE_DIR lets a SQLite container keep the file on a persistent volume.
+if os.environ.get("POSTGRES_DB"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ["POSTGRES_DB"],
+            "USER": os.environ.get("POSTGRES_USER", "postgres"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+            "HOST": os.environ.get("POSTGRES_HOST", "db"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+            "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
+        }
     }
-}
+else:
+    DATABASE_DIR = os.environ.get("DATABASE_DIR", str(BASE_DIR))
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(DATABASE_DIR, "db.sqlite3"),
+        }
+    }
 
 AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "/login/"

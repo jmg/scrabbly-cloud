@@ -42,6 +42,14 @@ def lobby(request):
         .prefetch_related("players__player")
         .distinct()
     )
+    # Correspondence-style split: games awaiting my move vs. the opponent's.
+    my_turn, my_waiting = [], []
+    for g in mine:
+        seat = g.current_seat
+        if g.status == Game.ACTIVE and seat and seat.player_id == request.user.pk:
+            my_turn.append(g)
+        else:
+            my_waiting.append(g)
     recent = (
         Game.objects.filter(status=Game.FINISHED)
         .select_related("winner")
@@ -51,7 +59,8 @@ def lobby(request):
 
     leaders = User.objects.filter(is_guest=False).order_by("-rating")[:10]
     return render(request, "game/lobby.html", {
-        "waiting": waiting_page, "active": active, "mine": mine,
+        "waiting": waiting_page, "active": active,
+        "my_turn": my_turn, "my_waiting": my_waiting,
         "recent": recent_page, "leaders": leaders,
         "f_lang": f_lang, "f_rated": f_rated,
     })

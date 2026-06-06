@@ -4,3 +4,5 @@ daphne>=4.0
 whitenoise>=6.0
 # Enable a Redis channel layer in production by setting REDIS_URL.
 channels-redis>=4.2
+# Postgres driver (used when POSTGRES_DB is configured).
+psycopg[binary]>=3.1

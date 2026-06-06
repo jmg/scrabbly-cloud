@@ -37,10 +37,26 @@
       </form>
     </div>
 
-    {% if mine %}
-    <h2>Tus partidas</h2>
+    {% if my_turn %}
+    <h2>Te toca jugar <span class="turn-count">{{ my_turn|length }}</span></h2>
     <ul class="game-list">
-      {% for g in mine %}
+      {% for g in my_turn %}
+      <li class="my-turn-game">
+        <a href="{% url 'game_detail' g.id %}">
+          <span class="status status-yourmove">tu turno</span>
+          #{{ g.id }} —
+          {% for s in g.seats %}{{ s.player.display_name }} ({{ s.score }}){% if not forloop.last %} vs {% endif %}{% endfor %}
+          <em class="clock-badge">⏱ {{ g.clock_label }}</em>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if my_waiting %}
+    <h2>Esperando rival</h2>
+    <ul class="game-list">
+      {% for g in my_waiting %}
       <li>
         <a href="{% url 'game_detail' g.id %}">
           <span class="status status-{{ g.status }}">{{ g.get_status_display }}</span>

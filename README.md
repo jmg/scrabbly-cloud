@@ -41,6 +41,8 @@ necesidad de registrarse (cuentas de invitado).
 
 - **Lobby**: filtros por idioma y rating, paginación de partidas abiertas y
   listado paginado de partidas recientes (terminadas).
+- **Modo correspondencia**: partidas sin reloj jugables a lo largo del tiempo,
+  con la sección «Te toca jugar» que lista las partidas que esperan tu turno.
 
 ## Puesta en marcha (desarrollo)
 
@@ -60,11 +62,15 @@ docker compose up --build
 # y los estáticos servidos por WhiteNoise.
 ```
 
-El contenedor corre migraciones al iniciar y hace `collectstatic` en el build.
+El `docker compose` levanta **Postgres**, **Redis** y la app (Daphne). El
+contenedor corre migraciones al iniciar y hace `collectstatic` en el build.
 En producción configurá al menos `SECRET_KEY`, `ALLOWED_HOSTS`,
-`CSRF_TRUSTED_ORIGINS` y `REDIS_URL`; para TLS activá `SSL_REDIRECT=1` y
-`HSTS_SECONDS`. Con varios procesos web, `REDIS_URL` es obligatorio para que el
-tiempo real funcione entre ellos.
+`CSRF_TRUSTED_ORIGINS`, `REDIS_URL` y las variables `POSTGRES_*`; para TLS
+activá `SSL_REDIRECT=1` y `HSTS_SECONDS`. Con varios procesos web, `REDIS_URL`
+es obligatorio para que el tiempo real funcione entre ellos.
+
+Sin `POSTGRES_DB`, la app usa SQLite (ideal para desarrollo); `DATABASE_DIR`
+permite ubicar el archivo SQLite en un volumen.
 
 ### Configuración (variables de entorno)
 
