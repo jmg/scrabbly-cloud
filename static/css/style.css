@@ -15,6 +15,12 @@
   --tile-text: #3a2d12;
 }
 
+/* Premium board themes (override themeable board/tile variables) */
+body[data-theme="wood"]     { --tile: #e8c98a; --tile-text: #3a2a12; --board-bg: #6b4f2a; --cell-bg: #7a5d35; }
+body[data-theme="midnight"] { --tile: #cdd6f4; --tile-text: #1e1e2e; --board-bg: #11111b; --cell-bg: #313244; }
+body[data-theme="forest"]   { --tile: #d8e8c0; --tile-text: #1b2a14; --board-bg: #16331f; --cell-bg: #2c4a32; }
+body[data-theme="contrast"] { --tile: #ffffff; --tile-text: #000000; --board-bg: #000000; --cell-bg: #2a2a2a; }
+
 * { box-sizing: border-box; }
 body {
   margin: 0;
@@ -70,6 +76,33 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 
 /* Player avatar in the live game sidebar (initials, generated client-side) */
 .p-av { width: 26px; height: 26px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; margin-right: 6px; flex: 0 0 auto; }
+
+/* Premium */
+.crown { color: #f0b428; }
+.premium-link { color: #f0b428 !important; font-weight: 600; }
+.pricing { max-width: 760px; margin: 0 auto; text-align: center; }
+.pricing .perks { list-style: none; padding: 0; display: inline-flex; flex-direction: column; gap: 8px; text-align: left; margin: 16px auto 24px; }
+.plan-cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.plan-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 24px; min-width: 220px; position: relative; }
+.plan-card.featured { border-color: #f0b428; box-shadow: 0 0 0 1px #f0b428; }
+.badge-save { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #f0b428; color: #1a1a1a; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 10px; }
+.plan-price { font-size: 34px; font-weight: 700; color: var(--text-strong); margin: 10px 0 16px; }
+.plan-price span { font-size: 14px; color: var(--muted); font-weight: 400; }
+.already-premium { background: var(--panel2); border: 1px solid #f0b428; border-radius: 8px; padding: 16px; }
+.small { font-size: 12px; }
+.center { text-align: center; }
+.center .btn-primary { display: inline-block; margin: 12px 0; }
+
+.premium-panel { background: var(--panel2); border: 1px solid #f0b428; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+.rating-curve { display: flex; flex-direction: column; gap: 4px; }
+.theme-picker { margin-bottom: 16px; }
+.analysis-cta a { color: #f0b428; }
+.analysis-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+.analysis-card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 240px; }
+.kv { list-style: none; padding: 0; }
+.kv li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line); }
+.kv li span { color: var(--muted); }
 .messages { list-style: none; padding: 0 20px; max-width: 1100px; margin: 10px auto; }
 .messages li { padding: 8px 12px; border-radius: 4px; background: var(--panel); }
 .messages li.success { border-left: 3px solid var(--accent); }
@@ -118,10 +151,10 @@ button:disabled { opacity: .4; cursor: not-allowed; }
   grid-template-columns: repeat(15, 1fr);
   grid-template-rows: repeat(15, 1fr);
   width: 100%; max-width: 600px; aspect-ratio: 1 / 1;
-  gap: 2px; background: var(--line); padding: 2px; border-radius: 4px;
+  gap: 2px; background: var(--board-bg, var(--line)); padding: 2px; border-radius: 4px;
 }
 .cell {
-  background: var(--panel2); border-radius: 2px;
+  background: var(--cell-bg, var(--panel2)); border-radius: 2px;
   display: flex; align-items: center; justify-content: center;
   position: relative; cursor: pointer; user-select: none;
   font-size: clamp(8px, 2vw, 18px);

@@ -6,7 +6,7 @@
   <div class="profile-head">
     {{ profile_user.username|avatar:72 }}
     <div>
-      <h1>{{ profile_user.display_name }}</h1>
+      <h1>{{ profile_user.display_name }}{% if profile_user.is_premium %} <span class="crown" title="Premium">👑</span>{% endif %}</h1>
       <div class="rating-big">{{ profile_user.rating }}</div>
     </div>
   </div>
@@ -23,6 +23,44 @@
   <div class="form-row">
     <span class="muted">Racha:</span>
     {% for r in form %}<span class="dot dot-{{ r }}" title="{{ r }}"></span>{% endfor %}
+  </div>
+  {% endif %}
+
+  {% if advanced %}
+  <div class="premium-panel">
+    <h2>📈 Estadísticas avanzadas <span class="crown">👑</span></h2>
+    <div class="adv-grid">
+      <div class="stat"><b>{% if advanced.avg_play != None %}{{ advanced.avg_play }}{% else %}–{% endif %}</b><span>pts/jugada</span></div>
+      <div class="stat"><b>{{ advanced.total_plays }}</b><span>jugadas</span></div>
+      <div class="stat"><b>{% if advanced.best_score != None %}{{ advanced.best_score }}{% else %}–{% endif %}</b><span>mejor partida</span></div>
+      {% if advanced.best_word and advanced.best_word.0 %}
+      <div class="stat"><b>{{ advanced.best_word.1 }}</b><span>mejor jugada</span></div>
+      {% endif %}
+    </div>
+    {% if advanced.spark %}
+    <div class="rating-curve">
+      <span class="muted">Evolución de rating</span>
+      {{ advanced.spark }}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if themes %}
+  <div class="theme-picker">
+    <h2>🎨 Tema de tablero</h2>
+    <form method="post" action="{% url 'set_theme' %}" class="filters">
+      <select name="theme">
+        {% for t in themes %}
+        <option value="{{ t.code }}" {% if t.code == current_theme %}selected{% endif %}
+          {% if t.premium and not can_use_premium_themes %}disabled{% endif %}>
+          {{ t.name }}{% if t.premium %} 👑{% endif %}
+        </option>
+        {% endfor %}
+      </select>
+      <button class="btn-small" type="submit">Aplicar</button>
+      {% if not can_use_premium_themes %}<a class="muted small" href="{% url 'pricing' %}">Desbloqueá más temas con Premium</a>{% endif %}
+    </form>
   </div>
   {% endif %}
 

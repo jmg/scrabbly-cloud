@@ -52,9 +52,29 @@ def _draw_for(game, seat, bag):
         seat.rack = list(seat.rack) + bag.draw(need)
 
 
+def _check_game_quota(user):
+    """Free accounts may only have a limited number of games in progress."""
+    from accounts.models import FREE_CONCURRENT_GAMES
+
+    if getattr(user, "is_premium", False):
+        return
+    in_progress = (
+        Game.objects.filter(players__player=user)
+        .filter(status__in=[Game.WAITING, Game.ACTIVE])
+        .distinct()
+        .count()
+    )
+    if in_progress >= FREE_CONCURRENT_GAMES:
+        raise InvalidMove(
+            f"Las cuentas gratuitas pueden tener hasta {FREE_CONCURRENT_GAMES} "
+            "partidas a la vez. Pasate a Premium para partidas ilimitadas."
+        )
+
+
 def create_game(user, rated=True, max_players=2, language=DEFAULT_LANGUAGE,
                 clock_initial=0, clock_increment=0):
     with transaction.atomic():
+        _check_game_quota(user)
         bag = get_ruleset(language).new_bag()
         game = Game.objects.create(
             status=Game.WAITING, rated=rated, max_players=max_players,
@@ -86,6 +106,7 @@ def join_game(game, user):
             return game
         if game.status != Game.WAITING or game.is_full:
             raise InvalidMove("La partida ya no admite jugadores.")
+        _check_game_quota(user)
         bag = Bag(letters=list(game.bag))
         seat = GamePlayer.objects.create(
             game=game, player=user, seat=game.players.count(),
@@ -516,6 +537,7 @@ def public_state(game):
                 "user_id": s.player_id,
                 "name": s.player.display_name,
                 "rating": s.player.rating,
+                "premium": s.player.is_premium,
                 "seat": s.seat,
                 "score": s.score,
                 "tiles_left": len(s.rack),
@@ -542,3 +564,33 @@ def public_state(game):
 def rack_for(game, user):
     seat = game.seat_for(user)
     return list(seat.rack) if seat else []
+
+
+def game_analysis(game):
+    """Per-player breakdown of a finished game (premium feature)."""
+    stats = {}
+    for s in game.seats:
+        stats[s.player_id] = {
+            "name": s.player.display_name, "score": s.score,
+            "plays": 0, "points": 0, "bingos": 0,
+            "passes": 0, "exchanges": 0, "best": None,
+        }
+    for m in game.moves.all():
+        d = stats.get(m.player_id)
+        if d is None:
+            continue
+        if m.kind == Move.PLAY:
+            d["plays"] += 1
+            d["points"] += m.points
+            if len(m.placements or []) == RACK_SIZE:
+                d["bingos"] += 1
+            word = m.words[0][0] if m.words else ""
+            if d["best"] is None or m.points > d["best"][1]:
+                d["best"] = (word, m.points)
+        elif m.kind == Move.PASS:
+            d["passes"] += 1
+        elif m.kind == Move.EXCHANGE:
+            d["exchanges"] += 1
+    for d in stats.values():
+        d["avg"] = round(d["points"] / d["plays"], 1) if d["plays"] else 0
+    return list(stats.values())

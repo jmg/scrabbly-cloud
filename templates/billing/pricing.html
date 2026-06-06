@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Premium · Scrabbly{% endblock %}
+{% block content %}
+<div class="pricing">
+  <h1>Scrabbly <span class="crown">👑</span> Premium</h1>
+  <p class="muted">Mejorá tu juego y destacate. Cancelás cuando quieras.</p>
+
+  <ul class="perks">
+    <li>📊 Análisis post-partida de tus jugadas</li>
+    <li>🎨 Temas de tablero y fichas exclusivos</li>
+    <li>📈 Estadísticas avanzadas y evolución de rating</li>
+    <li>👑 Insignia premium y partidas simultáneas ilimitadas</li>
+  </ul>
+
+  {% if is_premium %}
+  <div class="already-premium">
+    Ya sos Premium 👑 — <a href="{% url 'billing_manage' %}">gestionar suscripción</a>
+  </div>
+  {% else %}
+  <div class="plan-cards">
+    {% for plan in plans %}
+    <div class="plan-card {% if plan.code == 'yearly' %}featured{% endif %}">
+      {% if plan.code == 'yearly' %}<span class="badge-save">2 meses gratis</span>{% endif %}
+      <h2>{{ plan.name }}</h2>
+      <div class="plan-price">{{ plan.price }}<span>/{{ plan.interval }}</span></div>
+      <form method="post" action="{% url 'billing_subscribe' %}">
+        {% csrf_token %}
+        <input type="hidden" name="plan" value="{{ plan.code }}">
+        <button class="btn-primary" type="submit">Suscribirme</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="muted small">Pagos procesados de forma segura. El cobro se renueva automáticamente hasta que canceles.</p>
+  {% endif %}
+</div>
+{% endblock %}

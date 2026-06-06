@@ -137,6 +137,18 @@ def game_detail(request, game_id):
     })
 
 
+def analysis(request, game_id):
+    """Premium-only post-game analysis."""
+    game = get_object_or_404(Game, pk=game_id)
+    if not (request.user.is_authenticated and request.user.is_premium):
+        return render(request, "game/analysis_locked.html", {"game": game}, status=200)
+    if game.status not in (Game.FINISHED, Game.ABORTED):
+        return redirect("game_detail", game_id=game.pk)
+    return render(request, "game/analysis.html", {
+        "game": game, "analysis": services.game_analysis(game),
+    })
+
+
 def game_state(request, game_id):
     """JSON bootstrap / polling fallback. Includes the caller's own rack."""
     game = get_object_or_404(Game, pk=game_id)

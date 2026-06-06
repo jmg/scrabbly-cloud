@@ -46,6 +46,25 @@ necesidad de registrarse (cuentas de invitado).
 - **Perfiles y avatares**: avatares identicon generados (sin subidas), perfil
   con estadísticas (% de victorias, racha de resultados, historial).
 - **Anti-spam**: rate-limiting por usuario en las acciones de juego.
+- **Premium (suscripción)**: monetización estilo chess.com con perks —
+  análisis post-partida, temas de tablero exclusivos, estadísticas avanzadas
+  (curva de rating), insignia 👑 y partidas simultáneas ilimitadas. Cobro vía
+  **Stripe Checkout** (con webhook); un proveedor *mock* activa la suscripción
+  al instante para desarrollo/demo cuando no hay claves de Stripe.
+
+## Premium / pagos
+
+La capa de cobro es agnóstica del proveedor:
+
+- Sin `STRIPE_SECRET_KEY`, se usa un proveedor **mock** que activa la
+  suscripción inmediatamente (ideal para dev/demo y tests).
+- Con `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` y `STRIPE_WEBHOOK_SECRET`,
+  se crea una **Stripe Checkout Session** (modo suscripción) y la activación
+  ocurre vía el webhook `POST /billing/stripe/webhook/`
+  (`checkout.session.completed` / `invoice.paid`).
+
+Los planes se definen en `billing/plans.py`. Las cuentas gratuitas tienen un
+tope de partidas simultáneas (`FREE_CONCURRENT_GAMES`); Premium es ilimitado.
 
 ## API pública (solo lectura, JSON)
 

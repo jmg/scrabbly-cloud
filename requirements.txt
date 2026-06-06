@@ -6,3 +6,5 @@ whitenoise>=6.0
 channels-redis>=4.2
 # Postgres driver (used when POSTGRES_DB is configured).
 psycopg[binary]>=3.1
+# Payments (Stripe). Mock provider is used when no STRIPE_SECRET_KEY is set.
+stripe>=9.0

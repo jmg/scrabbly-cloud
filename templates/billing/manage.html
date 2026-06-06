@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Suscripción · Scrabbly{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <h1>Tu suscripción</h1>
+  {% if is_premium %}
+    <p>Estado: <b class="ok">Premium activo 👑</b></p>
+    <p class="muted">Acceso hasta {{ premium_until|date:"d/m/Y H:i" }}</p>
+    {% if subscription %}
+      <p class="muted">Plan: {{ subscription.plan_code }} · {{ subscription.get_status_display }}</p>
+      {% if subscription.status == 'active' %}
+      <form method="post" action="{% url 'billing_cancel' %}">
+        {% csrf_token %}
+        <button class="btn-danger" type="submit">Cancelar renovación</button>
+      </form>
+      {% else %}
+      <p class="muted">No se renovará automáticamente.</p>
+      {% endif %}
+    {% endif %}
+  {% else %}
+    <p>No tenés una suscripción activa.</p>
+    <a class="btn-primary" href="{% url 'pricing' %}">Ver planes Premium</a>
+  {% endif %}
+</div>
+{% endblock %}

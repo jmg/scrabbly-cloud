@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Análisis · Partida #{{ game.id }}{% endblock %}
+{% block content %}
+<div class="analysis">
+  <h1>📊 Análisis <span class="crown">👑</span></h1>
+  <p class="muted">Partida #{{ game.id }} · <a href="{% url 'game_detail' game.id %}">ver tablero</a></p>
+
+  <div class="analysis-grid">
+    {% for p in analysis %}
+    <div class="analysis-card">
+      <h2>{{ p.name }} — {{ p.score }} pts</h2>
+      <ul class="kv">
+        <li><span>Jugadas</span><b>{{ p.plays }}</b></li>
+        <li><span>Promedio por jugada</span><b>{{ p.avg }}</b></li>
+        <li><span>Bingos (7 fichas)</span><b>{{ p.bingos }}</b></li>
+        <li><span>Pasos</span><b>{{ p.passes }}</b></li>
+        <li><span>Cambios</span><b>{{ p.exchanges }}</b></li>
+        {% if p.best %}<li><span>Mejor jugada</span><b>{{ p.best.0 }} (+{{ p.best.1 }})</b></li>{% endif %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}¡Gracias! · Scrabbly{% endblock %}
+{% block content %}
+<div class="auth-card center">
+  <h1>👑 ¡Listo!</h1>
+  <p>Gracias por apoyar Scrabbly. Disfrutá tus beneficios Premium.</p>
+  <a class="btn-primary" href="{% url 'lobby' %}">Ir a jugar</a>
+  <p class="muted"><a href="{% url 'billing_manage' %}">Gestionar suscripción</a></p>
+</div>
+{% endblock %}

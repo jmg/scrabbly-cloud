@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "channels",
     "accounts",
     "game",
+    "billing",
 ]
 
 MIDDLEWARE = [
@@ -156,6 +157,12 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Billing / premium. With Stripe keys set, real Stripe Checkout is used;
+# otherwise a mock provider activates subscriptions instantly (dev/demo).
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 # Per-language Scrabble dictionaries. Files live in SCRABBLE_DICTIONARY_DIR as
 # "<lang>.txt" or "<lang>.txt.gz" (one word per line, UTF-8). If a language's

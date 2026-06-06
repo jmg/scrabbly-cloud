@@ -311,7 +311,8 @@
         clock = '<span class="clock" data-uid="' + p.user_id + '">' +
           formatTime(liveTimeFor(p)) + "</span>";
       }
-      li.innerHTML = '<span class="pname">' + avatarTag(p.name) + esc(p.name) +
+      var crown = p.premium ? ' <span class="crown" title="Premium">👑</span>' : "";
+      li.innerHTML = '<span class="pname">' + avatarTag(p.name) + esc(p.name) + crown +
         " · " + p.rating + delta +
         "</span>" + clock + '<span class="pscore">' + p.score + '</span>' +
         '<span class="ptiles">' + p.tiles_left + " fichas</span>";
@@ -361,17 +362,19 @@
           '<button class="btn-small" id="o-draw-no">Rechazar</button></div>';
       }
     } else if (state.status === "finished" || state.status === "aborted") {
+      html += '<div class="offer analysis-cta">📊 <a href="/game/' + gameId +
+        '/analysis/">Ver análisis</a> <span class="crown">👑</span></div>';
       if (state.rematch && state.rematch.next_game_id) {
-        html = '<div class="offer">Revancha lista. ' +
+        html += '<div class="offer">Revancha lista. ' +
           '<a class="btn-small" href="/game/' + state.rematch.next_game_id + '/">Ir →</a></div>';
       } else if (amPlayer) {
         if (state.rematch && state.rematch.offer_by === meId) {
-          html = '<div class="offer">Esperando que el rival acepte la revancha…</div>';
+          html += '<div class="offer">Esperando que el rival acepte la revancha…</div>';
         } else if (state.rematch && state.rematch.offer_by) {
-          html = '<div class="offer">El rival quiere revancha ' +
+          html += '<div class="offer">El rival quiere revancha ' +
             '<button class="btn-small" id="o-rematch">Aceptar</button></div>';
         } else {
-          html = '<div class="offer"><button class="btn-small" id="o-rematch">Revancha</button></div>';
+          html += '<div class="offer"><button class="btn-small" id="o-rematch">Revancha</button></div>';
         }
       }
     }

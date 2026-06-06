@@ -7,12 +7,17 @@
   <title>{% block title %}Scrabbly{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
+<body data-theme="{{ user.effective_theme|default:'classic' }}">
   <header class="topbar">
     <a class="brand" href="{% url 'lobby' %}">♟ Scrabbly</a>
     <nav>
+      {% if user.is_authenticated and user.is_premium %}
+        <a class="premium-link" href="{% url 'billing_manage' %}">👑 Premium</a>
+      {% else %}
+        <a class="premium-link" href="{% url 'pricing' %}">👑 Premium</a>
+      {% endif %}
       {% if user.is_authenticated and not user.is_guest %}
-        <a class="me-link" href="{% url 'profile' user.username %}">{{ user.username|avatar:26 }} {{ user.display_name }} · {{ user.rating }}</a>
+        <a class="me-link" href="{% url 'profile' user.username %}">{{ user.username|avatar:26 }} {% if user.is_premium %}<span class="crown" title="Premium">👑</span>{% endif %}{{ user.display_name }} · {{ user.rating }}</a>
         <a href="{% url 'logout' %}">Salir</a>
       {% else %}
         <span class="guest">{{ user.display_name }} · {{ user.rating }}</span>
