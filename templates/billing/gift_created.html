@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}Código de regalo · Scrabbly{% endblock %}
 {% block content %}
 <div class="auth-card center">
-  <h1>🎁 ¡Regalo listo!</h1>
-  <p>Compartí este código con quien quieras:</p>
+  <h1>🎁 {% trans "¡Regalo listo!" %}</h1>
+  <p>{% trans "Compartí este código con quien quieras:" %}</p>
   <p class="gift-code">{{ gift.code }}</p>
-  <p class="muted">Da {{ gift.days }} días de {{ gift.tier|capfirst }}. También te lo enviamos por email si tenés uno cargado.</p>
-  <a class="btn-primary" href="{% url 'lobby' %}">Volver</a>
+  <p class="muted">{% trans "Da" %} {{ gift.days }} {% trans "días de" %} {{ gift.tier|capfirst }}. {% trans "También te lo enviamos por email si tenés uno cargado." %}</p>
+  <a class="btn-primary" href="{% url 'lobby' %}">{% trans "Volver" %}</a>
 </div>
 {% endblock %}

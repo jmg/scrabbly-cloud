@@ -1,0 +1,684 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-06 06:05+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: accounts/views.py:38
+msgid "¡Cuenta creada!"
+msgstr "Account created!"
+
+#: accounts/views.py:57
+msgid "Usuario o contraseña inválidos."
+msgstr "Invalid username or password."
+
+#: accounts/views.py:158
+msgid "Ese tema es exclusivo de Premium. 👑"
+msgstr "That theme is Premium-only. 👑"
+
+#: accounts/views.py:162
+msgid "Tema actualizado."
+msgstr "Theme updated."
+
+#: billing/views.py:52
+msgid "Creá una cuenta para suscribirte."
+msgstr "Create an account to subscribe."
+
+#: billing/views.py:62
+msgid "Cupón inválido o agotado."
+msgstr "Invalid or exhausted coupon."
+
+#: billing/views.py:79
+msgid "¡Bienvenido a Premium! 👑"
+msgstr "Welcome to Premium! 👑"
+
+#: billing/views.py:81
+msgid "Estamos confirmando tu pago…"
+msgstr "We're confirming your payment…"
+
+#: billing/views.py:108
+msgid ""
+"Tu suscripción no se renovará. Conservás Premium hasta el fin del período."
+msgstr ""
+
+#: billing/views.py:136
+#, python-format
+msgid "¡Canjeaste %(days)s días de %(tier)s! 👑"
+msgstr "You redeemed %(days)s days of %(tier)s! 👑"
+
+#: billing/views.py:138
+msgid "Código de regalo inválido o ya usado."
+msgstr "Invalid or already-used gift code."
+
+#: game/services.py:70
+#, python-format
+msgid ""
+"Las cuentas gratuitas pueden tener hasta %(n)s partidas a la vez. Pasate a "
+"Premium para partidas ilimitadas."
+msgstr ""
+
+#: templates/accounts/login.html:3 templates/accounts/login.html:6
+#: templates/accounts/login.html:11 templates/accounts/register.html:20
+#: templates/base.html:24
+msgid "Entrar"
+msgstr "Log in"
+
+#: templates/accounts/login.html:9 templates/accounts/register.html:12
+msgid "Usuario"
+msgstr "Username"
+
+#: templates/accounts/login.html:10 templates/accounts/register.html:14
+msgid "Contraseña"
+msgstr "Password"
+
+#: templates/accounts/login.html:13
+msgid "¿No tenés cuenta?"
+msgstr "Don't have an account?"
+
+#: templates/accounts/login.html:13
+msgid "Registrate"
+msgstr "Sign up"
+
+#: templates/accounts/profile.html:15
+msgid "partidas"
+msgstr "games"
+
+#: templates/accounts/profile.html:16
+msgid "victorias"
+msgstr "wins"
+
+#: templates/accounts/profile.html:17
+msgid "derrotas"
+msgstr "losses"
+
+#: templates/accounts/profile.html:18
+msgid "empates"
+msgstr "draws"
+
+#: templates/accounts/profile.html:19
+#, python-format
+msgid "%% victorias"
+msgstr "%% wins"
+
+#: templates/accounts/profile.html:24
+msgid "Racha:"
+msgstr "Streak:"
+
+#: templates/accounts/profile.html:31 templates/billing/pricing.html:28
+msgid "Estadísticas avanzadas"
+msgstr "Advanced stats"
+
+#: templates/accounts/profile.html:33
+msgid "pts/jugada"
+msgstr "pts/move"
+
+#: templates/accounts/profile.html:34
+msgid "jugadas"
+msgstr "moves"
+
+#: templates/accounts/profile.html:35
+msgid "mejor partida"
+msgstr "best game"
+
+#: templates/accounts/profile.html:37
+msgid "mejor jugada"
+msgstr "best move"
+
+#: templates/accounts/profile.html:42
+msgid "Evolución de rating"
+msgstr "Rating over time"
+
+#: templates/accounts/profile.html:51
+msgid "Tema de tablero"
+msgstr "Board theme"
+
+#: templates/accounts/profile.html:61
+msgid "Aplicar"
+msgstr "Apply"
+
+#: templates/accounts/profile.html:62
+msgid "Desbloqueá más temas con Premium"
+msgstr "Unlock more themes with Premium"
+
+#: templates/accounts/profile.html:67
+msgid "Historial"
+msgstr "History"
+
+#: templates/accounts/profile.html:78
+msgid "Sin partidas terminadas todavía."
+msgstr "No finished games yet."
+
+#: templates/accounts/register.html:3 templates/accounts/register.html:6
+#: templates/accounts/register.html:18 templates/base.html:25
+msgid "Crear cuenta"
+msgstr "Sign up"
+
+#: templates/accounts/register.html:8
+#, python-format
+msgid "Tu progreso como invitado (rating %(rating)s) se conservará."
+msgstr "Your guest progress (rating %(rating)s) will be kept."
+
+#: templates/accounts/register.html:13
+msgid "Email"
+msgstr "Email"
+
+#: templates/accounts/register.html:13
+msgid "(opcional, para recibos)"
+msgstr "(optional, for receipts)"
+
+#: templates/accounts/register.html:20
+msgid "¿Ya tenés cuenta?"
+msgstr "Already have an account?"
+
+#: templates/base.html:17
+msgid "Premium"
+msgstr "Premium"
+
+#: templates/base.html:21
+msgid "Salir"
+msgstr "Log out"
+
+#: templates/base.html:30
+msgid "Idioma"
+msgstr "Language"
+
+#: templates/billing/gift.html:6 templates/billing/pricing.html:53
+msgid "Regalar Premium"
+msgstr "Gift Premium"
+
+#: templates/billing/gift.html:7
+msgid "Comprá un código y regalalo a quien quieras."
+msgstr "Buy a code and gift it to anyone."
+
+#: templates/billing/gift.html:17
+msgid "Comprar regalo"
+msgstr "Buy gift"
+
+#: templates/billing/gift.html:24
+msgid "¿Tenés un código?"
+msgstr "Have a code?"
+
+#: templates/billing/gift.html:28
+msgid "Canjear"
+msgstr "Redeem"
+
+#: templates/billing/gift_created.html:6
+msgid "¡Regalo listo!"
+msgstr "Gift ready!"
+
+#: templates/billing/gift_created.html:7
+msgid "Compartí este código con quien quieras:"
+msgstr "Share this code with anyone:"
+
+#: templates/billing/gift_created.html:9
+msgid "Da"
+msgstr "Grants"
+
+#: templates/billing/gift_created.html:9
+msgid "días de"
+msgstr "days of"
+
+#: templates/billing/gift_created.html:9
+msgid "También te lo enviamos por email si tenés uno cargado."
+msgstr "We also emailed it to you if you have one on file."
+
+#: templates/billing/gift_created.html:10
+msgid "Volver"
+msgstr "Back"
+
+#: templates/billing/manage.html:6
+msgid "Tu suscripción"
+msgstr "Your subscription"
+
+#: templates/billing/manage.html:8
+msgid "Nivel:"
+msgstr "Level:"
+
+#: templates/billing/manage.html:9
+msgid "Acceso hasta"
+msgstr "Access until"
+
+#: templates/billing/manage.html:12
+msgid "Plan:"
+msgstr "Plan:"
+
+#: templates/billing/manage.html:13
+msgid "prueba gratis"
+msgstr "free trial"
+
+#: templates/billing/manage.html:14
+msgid "cupón"
+msgstr "coupon"
+
+#: templates/billing/manage.html:20
+msgid "Gestionar pago / facturas"
+msgstr "Manage payment / invoices"
+
+#: templates/billing/manage.html:26
+msgid "Cancelar renovación"
+msgstr "Cancel renewal"
+
+#: templates/billing/manage.html:29
+msgid "No se renovará automáticamente."
+msgstr "It won't renew automatically."
+
+#: templates/billing/manage.html:32
+msgid "Cambiar de plan"
+msgstr "Change plan"
+
+#: templates/billing/manage.html:35
+msgid "No tenés una suscripción activa."
+msgstr "You don't have an active subscription."
+
+#: templates/billing/manage.html:36
+msgid "Ver planes Premium"
+msgstr "See Premium plans"
+
+#: templates/billing/metrics.html:6
+msgid "Métricas de negocio"
+msgstr "Business metrics"
+
+#: templates/billing/metrics.html:10
+msgid "suscripciones activas"
+msgstr "active subscriptions"
+
+#: templates/billing/metrics.html:11
+msgid "conversión"
+msgstr "conversion"
+
+#: templates/billing/metrics.html:12
+msgid "churn (30d)"
+msgstr "churn (30d)"
+
+#: templates/billing/metrics.html:13
+msgid "premium / usuarios"
+msgstr "premium / users"
+
+#: templates/billing/metrics.html:16
+msgid "trials activos"
+msgstr "active trials"
+
+#: templates/billing/metrics.html:17
+msgid "pago pendiente"
+msgstr "past due"
+
+#: templates/billing/metrics.html:18
+msgid "regalos canjeados"
+msgstr "gifts redeemed"
+
+#: templates/billing/pricing.html:7
+msgid "Elegí tu nivel. Cancelás cuando quieras."
+msgstr "Choose your level. Cancel anytime."
+
+#: templates/billing/pricing.html:11
+msgid "Sos"
+msgstr "You're"
+
+#: templates/billing/pricing.html:11
+msgid "gestionar suscripción"
+msgstr "manage subscription"
+
+#: templates/billing/pricing.html:16
+msgid "¿Tenés un cupón?"
+msgstr "Have a coupon?"
+
+#: templates/billing/pricing.html:17
+msgid "CÓDIGO"
+msgstr "CODE"
+
+#: templates/billing/pricing.html:19
+#, python-format
+msgid "Probá %(trial_days)s días gratis"
+msgstr "Try %(trial_days)s days free"
+
+#: templates/billing/pricing.html:27
+msgid "Temas de tablero"
+msgstr "Board themes"
+
+#: templates/billing/pricing.html:29
+msgid "Insignia + partidas ilimitadas"
+msgstr "Badge + unlimited games"
+
+#: templates/billing/pricing.html:30 templates/game/analysis_locked.html:6
+msgid "Análisis post-partida"
+msgstr "Post-game analysis"
+
+#: templates/billing/pricing.html:37
+msgid "de por vida"
+msgstr "lifetime"
+
+#: templates/billing/pricing.html:46
+#, python-format
+msgid "Probar %(trial_days)s días gratis"
+msgstr "Try %(trial_days)s days free"
+
+#: templates/billing/pricing.html:52
+msgid ""
+"Pagos seguros vía Stripe. La suscripción se renueva automáticamente hasta "
+"que canceles."
+msgstr ""
+
+#: templates/billing/success.html:6
+msgid "¡Listo!"
+msgstr "Done!"
+
+#: templates/billing/success.html:7
+msgid "Gracias por apoyar Scrabbly. Disfrutá tus beneficios Premium."
+msgstr "Thanks for supporting Scrabbly. Enjoy your Premium perks."
+
+#: templates/billing/success.html:8
+msgid "Ir a jugar"
+msgstr "Go play"
+
+#: templates/billing/success.html:9
+msgid "Gestionar suscripción"
+msgstr "Manage subscription"
+
+#: templates/game/analysis.html:6
+msgid "Análisis"
+msgstr "Analysis"
+
+#: templates/game/analysis.html:7
+msgid "Partida"
+msgstr "Game"
+
+#: templates/game/analysis.html:7
+msgid "ver tablero"
+msgstr "view board"
+
+#: templates/game/analysis.html:12
+msgid "pts"
+msgstr "pts"
+
+#: templates/game/analysis.html:14 templates/game/game.html:42
+msgid "Jugadas"
+msgstr "Moves"
+
+#: templates/game/analysis.html:15
+msgid "Promedio por jugada"
+msgstr "Average per move"
+
+#: templates/game/analysis.html:16
+msgid "Bingos (7 fichas)"
+msgstr "Bingos (7 tiles)"
+
+#: templates/game/analysis.html:17
+msgid "Pasos"
+msgstr "Passes"
+
+#: templates/game/analysis.html:18
+msgid "Cambios"
+msgstr "Exchanges"
+
+#: templates/game/analysis.html:19
+msgid "Mejor jugada"
+msgstr "Best move"
+
+#: templates/game/analysis_locked.html:7
+msgid "El análisis detallado de tus jugadas es una función"
+msgstr "Detailed analysis of your moves is a"
+
+#: templates/game/analysis_locked.html:8
+msgid "Hacerme Premium"
+msgstr "Get Premium"
+
+#: templates/game/analysis_locked.html:9
+msgid "Volver a la partida"
+msgstr "Back to the game"
+
+#: templates/game/error.html:3
+msgid "Error"
+msgstr "Error"
+
+#: templates/game/error.html:6
+msgid "Ups"
+msgstr "Oops"
+
+#: templates/game/error.html:8
+msgid "Volver al lobby"
+msgstr "Back to lobby"
+
+#: templates/game/game.html:3
+#, python-format
+msgid "Partida #%(id)s"
+msgstr "Game #%(id)s"
+
+#: templates/game/game.html:13
+msgid "Inicio"
+msgstr "Start"
+
+#: templates/game/game.html:14 templates/game/lobby.html:116
+#: templates/game/lobby.html:156
+msgid "Anterior"
+msgstr "Previous"
+
+#: templates/game/game.html:15 templates/game/game.html:17
+#: templates/game/lobby.html:125
+msgid "En vivo"
+msgstr "Live"
+
+#: templates/game/game.html:16 templates/game/lobby.html:118
+#: templates/game/lobby.html:158
+msgid "Siguiente"
+msgstr "Next"
+
+#: templates/game/game.html:21 templates/game/lobby.html:50
+msgid "Jugar"
+msgstr "Play"
+
+#: templates/game/game.html:22
+msgid "Recoger"
+msgstr "Recall"
+
+#: templates/game/game.html:23
+msgid "Pasar"
+msgstr "Pass"
+
+#: templates/game/game.html:24
+msgid "Cambiar"
+msgstr "Exchange"
+
+#: templates/game/game.html:25
+msgid "Tablas"
+msgstr "Draw"
+
+#: templates/game/game.html:26
+msgid "Abandonar"
+msgstr "Resign"
+
+#: templates/game/game.html:33
+msgid "Conexión"
+msgstr "Connection"
+
+#: templates/game/game.html:34
+msgid "Sonido"
+msgstr "Sound"
+
+#: templates/game/game.html:35
+msgid "Copiar enlace"
+msgstr "Copy link"
+
+#: templates/game/game.html:40
+msgid "Fichas en la bolsa:"
+msgstr "Tiles in the bag:"
+
+#: templates/game/game.html:45
+msgid "Chat"
+msgstr "Chat"
+
+#: templates/game/game.html:48
+msgid "Mensaje…"
+msgstr "Message…"
+
+#: templates/game/lobby.html:3
+msgid "Lobby"
+msgstr "Lobby"
+
+#: templates/game/lobby.html:8
+msgid "Jugar al Scrabble online"
+msgstr "Play Scrabble online"
+
+#: templates/game/lobby.html:10 templates/game/lobby.html:89
+msgid "Español"
+msgstr "Spanish"
+
+#: templates/game/lobby.html:11 templates/game/lobby.html:90
+msgid "English"
+msgstr ""
+
+#: templates/game/lobby.html:14
+msgid "Reloj:"
+msgstr "Clock:"
+
+#: templates/game/lobby.html:16
+msgid "Sin reloj"
+msgstr "No clock"
+
+#: templates/game/lobby.html:17
+msgid "3 min"
+msgstr "3 min"
+
+#: templates/game/lobby.html:18
+msgid "5 min"
+msgstr "5 min"
+
+#: templates/game/lobby.html:19
+msgid "5 min + 5s"
+msgstr "5 min + 5s"
+
+#: templates/game/lobby.html:20
+msgid "10 min + 5s"
+msgstr "10 min + 5s"
+
+#: templates/game/lobby.html:21
+msgid "15 min + 10s"
+msgstr "15 min + 10s"
+
+#: templates/game/lobby.html:22
+msgid "30 min"
+msgstr "30 min"
+
+#: templates/game/lobby.html:30
+msgid "Partida rápida"
+msgstr "Quick match"
+
+#: templates/game/lobby.html:36 templates/game/lobby.html:94
+msgid "Con rating"
+msgstr "Rated"
+
+#: templates/game/lobby.html:37
+msgid "Crear partida"
+msgstr "Create game"
+
+#: templates/game/lobby.html:42
+msgid "Jugar vs IA:"
+msgstr "Play vs AI:"
+
+#: templates/game/lobby.html:44
+msgid "Principiante"
+msgstr "Beginner"
+
+#: templates/game/lobby.html:45
+msgid "Fácil"
+msgstr "Easy"
+
+#: templates/game/lobby.html:46
+msgid "Media"
+msgstr "Medium"
+
+#: templates/game/lobby.html:47
+msgid "Difícil"
+msgstr "Hard"
+
+#: templates/game/lobby.html:48
+msgid "Experta"
+msgstr "Expert"
+
+#: templates/game/lobby.html:55
+msgid "Te toca jugar"
+msgstr "Your move"
+
+#: templates/game/lobby.html:60
+msgid "tu turno"
+msgstr "your turn"
+
+#: templates/game/lobby.html:71
+msgid "Esperando rival"
+msgstr "Waiting for opponent"
+
+#: templates/game/lobby.html:85
+msgid "Partidas abiertas"
+msgstr "Open games"
+
+#: templates/game/lobby.html:88
+msgid "Idioma: todos"
+msgstr "Language: all"
+
+#: templates/game/lobby.html:93
+msgid "Rating: todas"
+msgstr "Rating: all"
+
+#: templates/game/lobby.html:95
+msgid "Sin rating"
+msgstr "Unrated"
+
+#: templates/game/lobby.html:97
+msgid "Filtrar"
+msgstr "Filter"
+
+#: templates/game/lobby.html:106
+msgid "rated"
+msgstr "rated"
+
+#: templates/game/lobby.html:109
+msgid "Unirse"
+msgstr "Join"
+
+#: templates/game/lobby.html:117 templates/game/lobby.html:157
+#, python-format
+msgid "Página %(num)s de %(total)s"
+msgstr "Page %(num)s of %(total)s"
+
+#: templates/game/lobby.html:122
+msgid "No hay partidas abiertas con esos filtros. ¡Creá una!"
+msgstr "No open games with those filters. Create one!"
+
+#: templates/game/lobby.html:125
+msgid "(espectar)"
+msgstr "(spectate)"
+
+#: templates/game/lobby.html:138
+msgid "Ninguna partida en curso."
+msgstr "No games in progress."
+
+#: templates/game/lobby.html:141
+msgid "Partidas recientes"
+msgstr "Recent games"
+
+#: templates/game/lobby.html:149
+msgid "empate"
+msgstr "draw"
+
+#: templates/game/lobby.html:162
+msgid "Todavía no terminó ninguna partida."
+msgstr "No games finished yet."
+
+#: templates/game/lobby.html:167
+msgid "Ranking"
+msgstr "Leaderboard"
+
+#: templates/game/lobby.html:172
+msgid "Sin jugadores aún."
+msgstr "No players yet."

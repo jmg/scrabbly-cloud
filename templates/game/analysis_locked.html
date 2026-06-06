@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}Análisis Premium · Scrabbly{% endblock %}
 {% block content %}
 <div class="auth-card center">
-  <h1>📊 Análisis post-partida</h1>
-  <p>El análisis detallado de tus jugadas es una función <b>Premium 👑</b>.</p>
-  <a class="btn-primary" href="{% url 'pricing' %}">Hacerme Premium</a>
-  <p class="muted"><a href="{% url 'game_detail' game.id %}">Volver a la partida</a></p>
+  <h1>📊 {% trans "Análisis post-partida" %}</h1>
+  <p>{% trans "El análisis detallado de tus jugadas es una función" %} <b>Premium 👑</b>.</p>
+  <a class="btn-primary" href="{% url 'pricing' %}">{% trans "Hacerme Premium" %}</a>
+  <p class="muted"><a href="{% url 'game_detail' game.id %}">{% trans "Volver a la partida" %}</a></p>
 </div>
 {% endblock %}

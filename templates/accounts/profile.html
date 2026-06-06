@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load avatars %}
+{% load avatars i18n %}
 {% block title %}{{ profile_user.display_name }} · Scrabbly{% endblock %}
 {% block content %}
 <div class="profile">
@@ -12,34 +12,34 @@
   </div>
 
   <div class="stat-grid">
-    <div class="stat"><b>{{ profile_user.games_played }}</b><span>partidas</span></div>
-    <div class="stat"><b>{{ profile_user.wins }}</b><span>victorias</span></div>
-    <div class="stat"><b>{{ profile_user.losses }}</b><span>derrotas</span></div>
-    <div class="stat"><b>{{ profile_user.draws }}</b><span>empates</span></div>
-    <div class="stat"><b>{% if win_rate != None %}{{ win_rate }}%{% else %}–{% endif %}</b><span>% victorias</span></div>
+    <div class="stat"><b>{{ profile_user.games_played }}</b><span>{% trans "partidas" %}</span></div>
+    <div class="stat"><b>{{ profile_user.wins }}</b><span>{% trans "victorias" %}</span></div>
+    <div class="stat"><b>{{ profile_user.losses }}</b><span>{% trans "derrotas" %}</span></div>
+    <div class="stat"><b>{{ profile_user.draws }}</b><span>{% trans "empates" %}</span></div>
+    <div class="stat"><b>{% if win_rate != None %}{{ win_rate }}%{% else %}–{% endif %}</b><span>{% trans "% victorias" %}</span></div>
   </div>
 
   {% if form %}
   <div class="form-row">
-    <span class="muted">Racha:</span>
+    <span class="muted">{% trans "Racha:" %}</span>
     {% for r in form %}<span class="dot dot-{{ r }}" title="{{ r }}"></span>{% endfor %}
   </div>
   {% endif %}
 
   {% if advanced %}
   <div class="premium-panel">
-    <h2>📈 Estadísticas avanzadas <span class="crown">👑</span></h2>
+    <h2>📈 {% trans "Estadísticas avanzadas" %} <span class="crown">👑</span></h2>
     <div class="adv-grid">
-      <div class="stat"><b>{% if advanced.avg_play != None %}{{ advanced.avg_play }}{% else %}–{% endif %}</b><span>pts/jugada</span></div>
-      <div class="stat"><b>{{ advanced.total_plays }}</b><span>jugadas</span></div>
-      <div class="stat"><b>{% if advanced.best_score != None %}{{ advanced.best_score }}{% else %}–{% endif %}</b><span>mejor partida</span></div>
+      <div class="stat"><b>{% if advanced.avg_play != None %}{{ advanced.avg_play }}{% else %}–{% endif %}</b><span>{% trans "pts/jugada" %}</span></div>
+      <div class="stat"><b>{{ advanced.total_plays }}</b><span>{% trans "jugadas" %}</span></div>
+      <div class="stat"><b>{% if advanced.best_score != None %}{{ advanced.best_score }}{% else %}–{% endif %}</b><span>{% trans "mejor partida" %}</span></div>
       {% if advanced.best_word and advanced.best_word.0 %}
-      <div class="stat"><b>{{ advanced.best_word.1 }}</b><span>mejor jugada</span></div>
+      <div class="stat"><b>{{ advanced.best_word.1 }}</b><span>{% trans "mejor jugada" %}</span></div>
       {% endif %}
     </div>
     {% if advanced.spark %}
     <div class="rating-curve">
-      <span class="muted">Evolución de rating</span>
+      <span class="muted">{% trans "Evolución de rating" %}</span>
       {{ advanced.spark }}
     </div>
     {% endif %}
@@ -48,7 +48,7 @@
 
   {% if themes %}
   <div class="theme-picker">
-    <h2>🎨 Tema de tablero</h2>
+    <h2>🎨 {% trans "Tema de tablero" %}</h2>
     <form method="post" action="{% url 'set_theme' %}" class="filters">
       <select name="theme">
         {% for t in themes %}
@@ -58,13 +58,13 @@
         </option>
         {% endfor %}
       </select>
-      <button class="btn-small" type="submit">Aplicar</button>
-      {% if not can_use_premium_themes %}<a class="muted small" href="{% url 'pricing' %}">Desbloqueá más temas con Premium</a>{% endif %}
+      <button class="btn-small" type="submit">{% trans "Aplicar" %}</button>
+      {% if not can_use_premium_themes %}<a class="muted small" href="{% url 'pricing' %}">{% trans "Desbloqueá más temas con Premium" %}</a>{% endif %}
     </form>
   </div>
   {% endif %}
 
-  <h2>Historial</h2>
+  <h2>{% trans "Historial" %}</h2>
   <ul class="game-list">
     {% for seat in seats %}
     <li>
@@ -75,7 +75,7 @@
       </a>
     </li>
     {% empty %}
-    <li class="muted">Sin partidas terminadas todavía.</li>
+    <li class="muted">{% trans "Sin partidas terminadas todavía." %}</li>
     {% endfor %}
   </ul>
 </div>

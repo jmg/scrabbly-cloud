@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -48,7 +49,7 @@ def subscribe(request):
     user = request.user
     plan_code = request.POST.get("plan", "")
     if user.is_guest:
-        messages.error(request, "Creá una cuenta para suscribirte.")
+        messages.error(request, _("Creá una cuenta para suscribirte."))
         return redirect("register")
     if get_plan(plan_code) is None:
         return HttpResponseBadRequest("Plan inválido")
@@ -58,7 +59,7 @@ def subscribe(request):
     if code:
         coupon = service.validate_coupon(code)
         if coupon is None:
-            messages.error(request, "Cupón inválido o agotado.")
+            messages.error(request, _("Cupón inválido o agotado."))
             return redirect("pricing")
 
     trial = request.POST.get("trial") == "1" and not user.has_used_trial
@@ -75,9 +76,9 @@ def subscribe(request):
 @login_required
 def success(request):
     if request.user.is_premium:
-        messages.success(request, "¡Bienvenido a Premium! 👑")
+        messages.success(request, _("¡Bienvenido a Premium! 👑"))
     else:
-        messages.info(request, "Estamos confirmando tu pago…")
+        messages.info(request, _("Estamos confirmando tu pago…"))
     return render(request, "billing/success.html", {})
 
 
@@ -104,7 +105,7 @@ def portal(request):
 @login_required
 def cancel(request):
     get_provider().cancel(request.user)
-    messages.info(request, "Tu suscripción no se renovará. Conservás Premium hasta el fin del período.")
+    messages.info(request, _("Tu suscripción no se renovará. Conservás Premium hasta el fin del período."))
     return redirect("billing_manage")
 
 
@@ -132,9 +133,9 @@ def gift_redeem(request):
     code = request.POST.get("code", "")
     g = service.redeem_gift(request.user, code)
     if g:
-        messages.success(request, f"¡Canjeaste {g.days} días de {g.tier.capitalize()}! 👑")
+        messages.success(request, _("¡Canjeaste %(days)s días de %(tier)s! 👑") % {"days": g.days, "tier": g.tier.capitalize()})
         return redirect("billing_manage")
-    messages.error(request, "Código de regalo inválido o ya usado.")
+    messages.error(request, _("Código de regalo inválido o ya usado."))
     return redirect("gift")
 
 

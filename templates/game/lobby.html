@@ -1,25 +1,25 @@
 {% extends "base.html" %}
-{% load avatars %}
-{% block title %}Lobby · Scrabbly{% endblock %}
+{% load avatars i18n %}
+{% block title %}{% trans "Lobby" %} · Scrabbly{% endblock %}
 {% block content %}
 <div class="lobby">
   <section class="lobby-main">
     <div class="play-cta">
-      <h1>Jugar al Scrabble online</h1>
+      <h1>{% trans "Jugar al Scrabble online" %}</h1>
       <div class="lang-pick">
-        <label><input type="radio" name="lang" value="es" checked> Español</label>
-        <label><input type="radio" name="lang" value="en"> English</label>
+        <label><input type="radio" name="lang" value="es" checked> {% trans "Español" %}</label>
+        <label><input type="radio" name="lang" value="en"> {% trans "English" %}</label>
       </div>
       <div class="clock-pick">
-        <label>Reloj:
+        <label>{% trans "Reloj:" %}
           <select id="clock-select">
-            <option value="0,0">Sin reloj</option>
-            <option value="180,0">3 min</option>
-            <option value="300,0">5 min</option>
-            <option value="300,5">5 min + 5s</option>
-            <option value="600,5">10 min + 5s</option>
-            <option value="900,10">15 min + 10s</option>
-            <option value="1800,0">30 min</option>
+            <option value="0,0">{% trans "Sin reloj" %}</option>
+            <option value="180,0">{% trans "3 min" %}</option>
+            <option value="300,0">{% trans "5 min" %}</option>
+            <option value="300,5">{% trans "5 min + 5s" %}</option>
+            <option value="600,5">{% trans "10 min + 5s" %}</option>
+            <option value="900,10">{% trans "15 min + 10s" %}</option>
+            <option value="1800,0">{% trans "30 min" %}</option>
           </select>
         </label>
       </div>
@@ -27,37 +27,37 @@
         {% csrf_token %}
         <input type="hidden" name="language" value="es" class="lang-field">
         <input type="hidden" name="clock" value="0,0" class="clock-field">
-        <button class="btn-primary" type="submit">Partida rápida</button>
+        <button class="btn-primary" type="submit">{% trans "Partida rápida" %}</button>
       </form>
       <form method="post" action="{% url 'create_game' %}" class="create-form">
         {% csrf_token %}
         <input type="hidden" name="language" value="es" class="lang-field">
         <input type="hidden" name="clock" value="0,0" class="clock-field">
-        <label><input type="checkbox" name="rated" value="1" checked> Con rating</label>
-        <button class="btn-secondary" type="submit">Crear partida</button>
+        <label><input type="checkbox" name="rated" value="1" checked> {% trans "Con rating" %}</label>
+        <button class="btn-secondary" type="submit">{% trans "Crear partida" %}</button>
       </form>
       <form method="post" action="{% url 'create_ai_game' %}" class="create-form">
         {% csrf_token %}
         <input type="hidden" name="language" value="es" class="lang-field">
-        <span>🤖 Jugar vs IA:</span>
+        <span>🤖 {% trans "Jugar vs IA:" %}</span>
         <select name="level">
-          <option value="beginner">Principiante</option>
-          <option value="easy">Fácil</option>
-          <option value="medium" selected>Media</option>
-          <option value="hard">Difícil</option>
-          <option value="expert">Experta</option>
+          <option value="beginner">{% trans "Principiante" %}</option>
+          <option value="easy">{% trans "Fácil" %}</option>
+          <option value="medium" selected>{% trans "Media" %}</option>
+          <option value="hard">{% trans "Difícil" %}</option>
+          <option value="expert">{% trans "Experta" %}</option>
         </select>
-        <button class="btn-secondary" type="submit">Jugar</button>
+        <button class="btn-secondary" type="submit">{% trans "Jugar" %}</button>
       </form>
     </div>
 
     {% if my_turn %}
-    <h2>Te toca jugar <span class="turn-count">{{ my_turn|length }}</span></h2>
+    <h2>{% trans "Te toca jugar" %} <span class="turn-count">{{ my_turn|length }}</span></h2>
     <ul class="game-list">
       {% for g in my_turn %}
       <li class="my-turn-game">
         <a href="{% url 'game_detail' g.id %}">
-          <span class="status status-yourmove">tu turno</span>
+          <span class="status status-yourmove">{% trans "tu turno" %}</span>
           #{{ g.id }} —
           {% for s in g.seats %}{{ s.player.display_name }} ({{ s.score }}){% if not forloop.last %} vs {% endif %}{% endfor %}
           <em class="clock-badge">⏱ {{ g.clock_label }}</em>
@@ -68,7 +68,7 @@
     {% endif %}
 
     {% if my_waiting %}
-    <h2>Esperando rival</h2>
+    <h2>{% trans "Esperando rival" %}</h2>
     <ul class="game-list">
       {% for g in my_waiting %}
       <li>
@@ -82,19 +82,19 @@
     </ul>
     {% endif %}
 
-    <h2>Partidas abiertas</h2>
+    <h2>{% trans "Partidas abiertas" %}</h2>
     <form method="get" class="filters">
       <select name="lang">
-        <option value="">Idioma: todos</option>
-        <option value="es" {% if f_lang == 'es' %}selected{% endif %}>Español</option>
-        <option value="en" {% if f_lang == 'en' %}selected{% endif %}>English</option>
+        <option value="">{% trans "Idioma: todos" %}</option>
+        <option value="es" {% if f_lang == 'es' %}selected{% endif %}>{% trans "Español" %}</option>
+        <option value="en" {% if f_lang == 'en' %}selected{% endif %}>{% trans "English" %}</option>
       </select>
       <select name="rated">
-        <option value="">Rating: todas</option>
-        <option value="1" {% if f_rated == '1' %}selected{% endif %}>Con rating</option>
-        <option value="0" {% if f_rated == '0' %}selected{% endif %}>Sin rating</option>
+        <option value="">{% trans "Rating: todas" %}</option>
+        <option value="1" {% if f_rated == '1' %}selected{% endif %}>{% trans "Con rating" %}</option>
+        <option value="0" {% if f_rated == '0' %}selected{% endif %}>{% trans "Sin rating" %}</option>
       </select>
-      <button class="btn-small" type="submit">Filtrar</button>
+      <button class="btn-small" type="submit">{% trans "Filtrar" %}</button>
     </form>
     {% if waiting %}
     <ul class="game-list">
@@ -103,26 +103,26 @@
         <span>#{{ g.id }} — {{ g.seats.0.player.display_name }} ({{ g.seats.0.player.rating }})
           <em class="lang-badge">{{ g.get_language_display }}</em>
           <em class="clock-badge">⏱ {{ g.clock_label }}</em>
-          {% if g.rated %}<em class="rated">rated</em>{% endif %}</span>
+          {% if g.rated %}<em class="rated">{% trans "rated" %}</em>{% endif %}</span>
         <form method="post" action="{% url 'join_game' g.id %}">
           {% csrf_token %}
-          <button class="btn-small" type="submit">Unirse</button>
+          <button class="btn-small" type="submit">{% trans "Unirse" %}</button>
         </form>
       </li>
       {% endfor %}
     </ul>
     {% if waiting.has_other_pages %}
     <div class="pager">
-      {% if waiting.has_previous %}<a href="?wpage={{ waiting.previous_page_number }}&lang={{ f_lang }}&rated={{ f_rated }}">← Anterior</a>{% endif %}
-      <span>Página {{ waiting.number }} de {{ waiting.paginator.num_pages }}</span>
-      {% if waiting.has_next %}<a href="?wpage={{ waiting.next_page_number }}&lang={{ f_lang }}&rated={{ f_rated }}">Siguiente →</a>{% endif %}
+      {% if waiting.has_previous %}<a href="?wpage={{ waiting.previous_page_number }}&lang={{ f_lang }}&rated={{ f_rated }}">← {% trans "Anterior" %}</a>{% endif %}
+      <span>{% with num=waiting.number total=waiting.paginator.num_pages %}{% blocktrans %}Página {{ num }} de {{ total }}{% endblocktrans %}{% endwith %}</span>
+      {% if waiting.has_next %}<a href="?wpage={{ waiting.next_page_number }}&lang={{ f_lang }}&rated={{ f_rated }}">{% trans "Siguiente" %} →</a>{% endif %}
     </div>
     {% endif %}
     {% else %}
-    <p class="muted">No hay partidas abiertas con esos filtros. ¡Creá una!</p>
+    <p class="muted">{% trans "No hay partidas abiertas con esos filtros. ¡Creá una!" %}</p>
     {% endif %}
 
-    <h2>En vivo <span class="muted">(espectar)</span></h2>
+    <h2>{% trans "En vivo" %} <span class="muted">{% trans "(espectar)" %}</span></h2>
     {% if active %}
     <ul class="game-list">
       {% for g in active %}
@@ -135,10 +135,10 @@
       {% endfor %}
     </ul>
     {% else %}
-    <p class="muted">Ninguna partida en curso.</p>
+    <p class="muted">{% trans "Ninguna partida en curso." %}</p>
     {% endif %}
 
-    <h2>Partidas recientes</h2>
+    <h2>{% trans "Partidas recientes" %}</h2>
     {% if recent %}
     <ul class="game-list">
       {% for g in recent %}
@@ -146,30 +146,30 @@
         <a href="{% url 'game_detail' g.id %}">
           #{{ g.id }} —
           {% for s in g.seats %}{{ s.player.display_name }} ({{ s.score }}){% if not forloop.last %} vs {% endif %}{% endfor %}
-          {% if g.winner_id %}<em class="result-win">▸ {{ g.winner.display_name }}</em>{% else %}<em class="muted">empate</em>{% endif %}
+          {% if g.winner_id %}<em class="result-win">▸ {{ g.winner.display_name }}</em>{% else %}<em class="muted">{% trans "empate" %}</em>{% endif %}
         </a>
       </li>
       {% endfor %}
     </ul>
     {% if recent.has_other_pages %}
     <div class="pager">
-      {% if recent.has_previous %}<a href="?fpage={{ recent.previous_page_number }}">← Anterior</a>{% endif %}
-      <span>Página {{ recent.number }} de {{ recent.paginator.num_pages }}</span>
-      {% if recent.has_next %}<a href="?fpage={{ recent.next_page_number }}">Siguiente →</a>{% endif %}
+      {% if recent.has_previous %}<a href="?fpage={{ recent.previous_page_number }}">← {% trans "Anterior" %}</a>{% endif %}
+      <span>{% with num=recent.number total=recent.paginator.num_pages %}{% blocktrans %}Página {{ num }} de {{ total }}{% endblocktrans %}{% endwith %}</span>
+      {% if recent.has_next %}<a href="?fpage={{ recent.next_page_number }}">{% trans "Siguiente" %} →</a>{% endif %}
     </div>
     {% endif %}
     {% else %}
-    <p class="muted">Todavía no terminó ninguna partida.</p>
+    <p class="muted">{% trans "Todavía no terminó ninguna partida." %}</p>
     {% endif %}
   </section>
 
   <aside class="lobby-side">
-    <h2>Ranking</h2>
+    <h2>{% trans "Ranking" %}</h2>
     <ol class="leaderboard">
       {% for u in leaders %}
       <li><a href="{% url 'profile' u.username %}">{{ u.username|avatar:22 }} {{ u.username }}</a> <span>{{ u.rating }}</span></li>
       {% empty %}
-      <li class="muted">Sin jugadores aún.</li>
+      <li class="muted">{% trans "Sin jugadores aún." %}</li>
       {% endfor %}
     </ol>
   </aside>

@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Entrar · Scrabbly{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Entrar" %} · Scrabbly{% endblock %}
 {% block content %}
 <div class="auth-card">
-  <h1>Entrar</h1>
+  <h1>{% trans "Entrar" %}</h1>
   <form method="post">
     {% csrf_token %}
-    <label>Usuario<input type="text" name="username" required></label>
-    <label>Contraseña<input type="password" name="password" required></label>
-    <button class="btn-primary" type="submit">Entrar</button>
+    <label>{% trans "Usuario" %}<input type="text" name="username" required></label>
+    <label>{% trans "Contraseña" %}<input type="password" name="password" required></label>
+    <button class="btn-primary" type="submit">{% trans "Entrar" %}</button>
   </form>
-  <p class="muted">¿No tenés cuenta? <a href="{% url 'register' %}">Registrate</a></p>
+  <p class="muted">{% blocktrans %}¿No tenés cuenta?{% endblocktrans %} <a href="{% url 'register' %}">{% trans "Registrate" %}</a></p>
 </div>
 {% endblock %}

@@ -1,38 +1,39 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}Suscripción · Scrabbly{% endblock %}
 {% block content %}
 <div class="auth-card">
-  <h1>Tu suscripción</h1>
+  <h1>{% trans "Tu suscripción" %}</h1>
   {% if is_premium %}
-    <p>Nivel: <b class="ok crown-{{ tier }}">{{ tier|capfirst }} 👑</b></p>
-    <p class="muted">Acceso hasta {{ premium_until|date:"d/m/Y H:i" }}</p>
+    <p>{% trans "Nivel:" %} <b class="ok crown-{{ tier }}">{{ tier|capfirst }} 👑</b></p>
+    <p class="muted">{% trans "Acceso hasta" %} {{ premium_until|date:"d/m/Y H:i" }}</p>
     {% if subscription %}
       <p class="muted">
-        Plan: {{ subscription.plan_code }} · {{ subscription.get_status_display }}
-        {% if subscription.is_trial %}· <b>prueba gratis</b>{% endif %}
-        {% if subscription.coupon_code %}· cupón {{ subscription.coupon_code }}{% endif %}
+        {% trans "Plan:" %} {{ subscription.plan_code }} · {{ subscription.get_status_display }}
+        {% if subscription.is_trial %}· <b>{% trans "prueba gratis" %}</b>{% endif %}
+        {% if subscription.coupon_code %}· {% trans "cupón" %} {{ subscription.coupon_code }}{% endif %}
       </p>
       <div class="manage-actions">
         {% if stripe %}
         <form method="post" action="{% url 'billing_portal' %}">
           {% csrf_token %}
-          <button class="btn-secondary" type="submit">Gestionar pago / facturas</button>
+          <button class="btn-secondary" type="submit">{% trans "Gestionar pago / facturas" %}</button>
         </form>
         {% endif %}
         {% if subscription.status == 'active' %}
         <form method="post" action="{% url 'billing_cancel' %}">
           {% csrf_token %}
-          <button class="btn-danger" type="submit">Cancelar renovación</button>
+          <button class="btn-danger" type="submit">{% trans "Cancelar renovación" %}</button>
         </form>
         {% else %}
-        <p class="muted">No se renovará automáticamente.</p>
+        <p class="muted">{% trans "No se renovará automáticamente." %}</p>
         {% endif %}
       </div>
-      <p class="muted small"><a href="{% url 'pricing' %}">Cambiar de plan</a></p>
+      <p class="muted small"><a href="{% url 'pricing' %}">{% trans "Cambiar de plan" %}</a></p>
     {% endif %}
   {% else %}
-    <p>No tenés una suscripción activa.</p>
-    <a class="btn-primary" href="{% url 'pricing' %}">Ver planes Premium</a>
+    <p>{% trans "No tenés una suscripción activa." %}</p>
+    <a class="btn-primary" href="{% url 'pricing' %}">{% trans "Ver planes Premium" %}</a>
   {% endif %}
 </div>
 {% endblock %}

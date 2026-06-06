@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from game.models import GamePlayer, Move
@@ -34,7 +35,7 @@ def register(request):
             login(request, user)
             from billing.emails import send_welcome
             send_welcome(user)
-            messages.success(request, "¡Cuenta creada!")
+            messages.success(request, _("¡Cuenta creada!"))
             return redirect("lobby")
     else:
         form = RegisterForm()
@@ -53,7 +54,7 @@ def login_view(request):
             if user is not None and not user.is_guest:
                 login(request, user)
                 return redirect("lobby")
-            messages.error(request, "Usuario o contraseña inválidos.")
+            messages.error(request, _("Usuario o contraseña inválidos."))
     else:
         form = LoginForm()
     return render(request, "accounts/login.html", {"form": form})
@@ -154,9 +155,9 @@ def set_theme(request):
     if theme not in THEME_CODES:
         theme = "classic"
     if theme in PREMIUM_THEMES and not request.user.has_perk("themes"):
-        messages.error(request, "Ese tema es exclusivo de Premium. 👑")
+        messages.error(request, _("Ese tema es exclusivo de Premium. 👑"))
         return redirect("pricing")
     request.user.board_theme = theme
     request.user.save(update_fields=["board_theme"])
-    messages.success(request, "Tema actualizado.")
+    messages.success(request, _("Tema actualizado."))
     return redirect("profile", username=request.user.username)

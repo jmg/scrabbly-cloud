@@ -1,21 +1,22 @@
 {% extends "base.html" %}
-{% block title %}Crear cuenta · Scrabbly{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Crear cuenta" %} · Scrabbly{% endblock %}
 {% block content %}
 <div class="auth-card">
-  <h1>Crear cuenta</h1>
+  <h1>{% trans "Crear cuenta" %}</h1>
   {% if user.is_authenticated and user.is_guest %}
-    <p class="muted">Tu progreso como invitado (rating {{ user.rating }}) se conservará.</p>
+    <p class="muted">{% blocktrans with rating=user.rating %}Tu progreso como invitado (rating {{ rating }}) se conservará.{% endblocktrans %}</p>
   {% endif %}
   <form method="post">
     {% csrf_token %}
-    <label>Usuario<input type="text" name="username" required></label>
-    <label>Email <span class="muted small">(opcional, para recibos)</span><input type="email" name="email"></label>
-    <label>Contraseña<input type="password" name="password" required minlength="4"></label>
+    <label>{% trans "Usuario" %}<input type="text" name="username" required></label>
+    <label>{% trans "Email" %} <span class="muted small">{% trans "(opcional, para recibos)" %}</span><input type="email" name="email"></label>
+    <label>{% trans "Contraseña" %}<input type="password" name="password" required minlength="4"></label>
     {% if form.errors %}<ul class="form-errors">
       {% for field, errors in form.errors.items %}{% for e in errors %}<li>{{ e }}</li>{% endfor %}{% endfor %}
     </ul>{% endif %}
-    <button class="btn-primary" type="submit">Crear cuenta</button>
+    <button class="btn-primary" type="submit">{% trans "Crear cuenta" %}</button>
   </form>
-  <p class="muted">¿Ya tenés cuenta? <a href="{% url 'login' %}">Entrar</a></p>
+  <p class="muted">{% blocktrans %}¿Ya tenés cuenta?{% endblocktrans %} <a href="{% url 'login' %}">{% trans "Entrar" %}</a></p>
 </div>
 {% endblock %}

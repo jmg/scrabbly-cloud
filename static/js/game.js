@@ -2,6 +2,15 @@
 (function () {
   "use strict";
 
+  // i18n: Django's JavaScriptCatalog defines window.gettext/interpolate; fall
+  // back to identity helpers so the client still works without the catalog.
+  var gettext = window.gettext || function (s) { return s; };
+  var interpolate = window.interpolate || function (fmt, obj, named) {
+    return fmt.replace(/%(?:\((\w+)\)s|s)/g, function (m, k) {
+      return String(named ? obj[k] : obj.shift());
+    });
+  };
+
   var BOARD_SIZE = 15;
   var BLANK = "?";
 
@@ -217,7 +226,7 @@
     var letter = rack[rackIdx];
     var isBlank = letter === BLANK;
     if (isBlank) {
-      var chosen = (prompt("Letra para la ficha comodín:") || "").toUpperCase();
+      var chosen = (prompt(gettext("Letra para la ficha comodín:")) || "").toUpperCase();
       if (!chosen || !POINTS.hasOwnProperty(chosen) || chosen === BLANK) return false;
       letter = chosen;
     }
@@ -328,21 +337,21 @@
       var desc;
       if (m.kind === "play") {
         desc = m.words.map(function (w) { return w[0]; }).join(", ") + " (+" + m.points + ")";
-      } else if (m.kind === "pass") { desc = "pasó";
-      } else if (m.kind === "exchange") { desc = "cambió fichas";
-      } else { desc = "abandonó"; }
+      } else if (m.kind === "pass") { desc = gettext("pasó");
+      } else if (m.kind === "exchange") { desc = gettext("cambió fichas");
+      } else { desc = gettext("abandonó"); }
       li.innerHTML = "<b>" + esc(m.player) + "</b> " + esc(desc);
       movesEl.appendChild(li);
     });
 
     var banner = "";
-    if (state.status === "waiting") banner = "Esperando rival…";
+    if (state.status === "waiting") banner = gettext("Esperando rival…");
     else if (state.status === "finished") {
       var w = state.players.find(function (p) { return p.user_id === state.winner_id; });
-      banner = w ? "Ganó " + esc(w.name) : "Empate";
-    } else if (state.status === "aborted") banner = "Partida abortada";
-    else if (state.turn_user_id === meId) banner = "¡Es tu turno!";
-    else banner = "Turno del rival";
+      banner = w ? interpolate(gettext("Ganó %s"), [esc(w.name)]) : gettext("Empate");
+    } else if (state.status === "aborted") banner = gettext("Partida abortada");
+    else if (state.turn_user_id === meId) banner = gettext("¡Es tu turno!");
+    else banner = gettext("Turno del rival");
     bannerEl.textContent = banner;
     bannerEl.className = "status-banner s-" + state.status;
 
@@ -356,26 +365,26 @@
     var amPlayer = isPlayer;
     if (state.status === "active" && state.draw_offer_by) {
       if (state.draw_offer_by === meId) {
-        html = '<div class="offer">Ofreciste tablas…</div>';
+        html = '<div class="offer">' + gettext("Ofreciste tablas…") + '</div>';
       } else if (amPlayer) {
-        html = '<div class="offer">El rival ofrece tablas ' +
-          '<button class="btn-small" id="o-draw-yes">Aceptar</button> ' +
-          '<button class="btn-small" id="o-draw-no">Rechazar</button></div>';
+        html = '<div class="offer">' + gettext("El rival ofrece tablas") + ' ' +
+          '<button class="btn-small" id="o-draw-yes">' + gettext("Aceptar") + '</button> ' +
+          '<button class="btn-small" id="o-draw-no">' + gettext("Rechazar") + '</button></div>';
       }
     } else if (state.status === "finished" || state.status === "aborted") {
       html += '<div class="offer analysis-cta">📊 <a href="/game/' + gameId +
-        '/analysis/">Ver análisis</a> <span class="crown">👑</span></div>';
+        '/analysis/">' + gettext("Ver análisis") + '</a> <span class="crown">👑</span></div>';
       if (state.rematch && state.rematch.next_game_id) {
-        html += '<div class="offer">Revancha lista. ' +
-          '<a class="btn-small" href="/game/' + state.rematch.next_game_id + '/">Ir →</a></div>';
+        html += '<div class="offer">' + gettext("Revancha lista.") + ' ' +
+          '<a class="btn-small" href="/game/' + state.rematch.next_game_id + '/">' + gettext("Ir") + ' →</a></div>';
       } else if (amPlayer) {
         if (state.rematch && state.rematch.offer_by === meId) {
-          html += '<div class="offer">Esperando que el rival acepte la revancha…</div>';
+          html += '<div class="offer">' + gettext("Esperando que el rival acepte la revancha…") + '</div>';
         } else if (state.rematch && state.rematch.offer_by) {
-          html += '<div class="offer">El rival quiere revancha ' +
-            '<button class="btn-small" id="o-rematch">Aceptar</button></div>';
+          html += '<div class="offer">' + gettext("El rival quiere revancha") + ' ' +
+            '<button class="btn-small" id="o-rematch">' + gettext("Aceptar") + '</button></div>';
         } else {
-          html += '<div class="offer"><button class="btn-small" id="o-rematch">Revancha</button></div>';
+          html += '<div class="offer"><button class="btn-small" id="o-rematch">' + gettext("Revancha") + '</button></div>';
         }
       }
     }
@@ -403,9 +412,10 @@
     historyBar.hidden = n === 0;
     if (n === 0) return;
     if (reviewIndex === null) {
-      hLabel.textContent = "En vivo";
+      hLabel.textContent = gettext("En vivo");
     } else {
-      hLabel.textContent = "Jugada " + (reviewIndex + 1) + " / " + n;
+      hLabel.textContent = interpolate(
+        gettext("Jugada %(n)s / %(t)s"), { n: reviewIndex + 1, t: n }, true);
     }
     document.getElementById("h-prev").disabled = reviewIndex === 0;
     document.getElementById("h-next").disabled = reviewIndex === null;
@@ -464,12 +474,13 @@
   // ---- "Your turn" notification & tab title ---------------------------------
   function notifyTurn() {
     if (document.hidden && "Notification" in window && Notification.permission === "granted") {
-      try { new Notification("Scrabbly", { body: "¡Es tu turno!" }); } catch (e) {}
+      try { new Notification("Scrabbly", { body: gettext("¡Es tu turno!") }); } catch (e) {}
     }
   }
   function updateTitle() {
     var myTurn = state.status === "active" && state.turn_user_id === meId;
-    document.title = (myTurn ? "🔔 Tu turno · " : "") + "Partida #" + gameId + " · Scrabbly";
+    document.title = (myTurn ? "🔔 " + gettext("Tu turno") + " · " : "") +
+      interpolate(gettext("Partida #%s"), [gameId]) + " · Scrabbly";
   }
 
   // ---- Pending placement persistence (survives reloads) --------------------
@@ -572,25 +583,25 @@
       return { letter: p.letter, row: p.row, col: p.col, is_blank: p.isBlank };
     });
     post("/game/" + gameId + "/play/", { placements: placements }).then(function (res) {
-      if (res.ok) { pending = []; localStorage.removeItem(PENDING_KEY); flash("Jugada enviada", false); }
-      else flash(res.j.error || "Jugada inválida", true);
+      if (res.ok) { pending = []; localStorage.removeItem(PENDING_KEY); flash(gettext("Jugada enviada"), false); }
+      else flash(res.j.error || gettext("Jugada inválida"), true);
     });
   }
 
   function doExchange() {
     if (!exchangeMode) {
       exchangeMode = true; exchangeSel = []; recall();
-      flash("Elegí fichas para cambiar y tocá «Cambiar» de nuevo.", false);
-      document.getElementById("btn-exchange").textContent = "Confirmar cambio";
+      flash(gettext("Elegí fichas para cambiar y tocá «Cambiar» de nuevo."), false);
+      document.getElementById("btn-exchange").textContent = gettext("Confirmar cambio");
       renderRack();
       return;
     }
     var letters = exchangeSel.map(function (i) { return rack[i]; });
     exchangeMode = false;
-    document.getElementById("btn-exchange").textContent = "Cambiar";
+    document.getElementById("btn-exchange").textContent = gettext("Cambiar");
     if (letters.length === 0) { renderRack(); return; }
     post("/game/" + gameId + "/exchange/", { letters: letters }).then(function (res) {
-      if (!res.ok) flash(res.j.error || "No se pudo cambiar", true);
+      if (!res.ok) flash(res.j.error || gettext("No se pudo cambiar"), true);
     });
   }
 
@@ -599,8 +610,8 @@
   var reconnectDelay = 1000;
   function setConn(stateName) {
     connEl.className = "conn " + stateName;
-    connEl.title = stateName === "online" ? "Conectado"
-      : stateName === "offline" ? "Reconectando…" : "Conectando…";
+    connEl.title = stateName === "online" ? gettext("Conectado")
+      : stateName === "offline" ? gettext("Reconectando…") : gettext("Conectando…");
   }
   function connect() {
     setConn("connecting");
@@ -724,17 +735,17 @@
   document.getElementById("btn-recall").addEventListener("click", recall);
   document.getElementById("btn-pass").addEventListener("click", function () {
     post("/game/" + gameId + "/pass/", {}).then(function (res) {
-      if (!res.ok) flash(res.j.error || "Error", true);
+      if (!res.ok) flash(res.j.error || gettext("Error"), true);
     });
   });
   document.getElementById("btn-exchange").addEventListener("click", doExchange);
   document.getElementById("btn-draw").addEventListener("click", function () {
     post(url("offer-draw"), {}).then(function (res) {
-      if (!res.ok) flash(res.j.error || "Error", true);
+      if (!res.ok) flash(res.j.error || gettext("Error"), true);
     });
   });
   document.getElementById("btn-resign").addEventListener("click", function () {
-    if (confirm("¿Abandonar la partida?")) post("/game/" + gameId + "/resign/", {});
+    if (confirm(gettext("¿Abandonar la partida?"))) post("/game/" + gameId + "/resign/", {});
   });
   document.getElementById("btn-sound").addEventListener("click", function () {
     muted = !muted;
@@ -745,8 +756,8 @@
   document.getElementById("btn-share").addEventListener("click", function () {
     var link = location.href;
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(link).then(function () { flash("Enlace copiado", false); });
-    } else { prompt("Copiá el enlace:", link); }
+      navigator.clipboard.writeText(link).then(function () { flash(gettext("Enlace copiado"), false); });
+    } else { prompt(gettext("Copiá el enlace:"), link); }
   });
 
   // Ask for notification permission once a player interacts with the page.

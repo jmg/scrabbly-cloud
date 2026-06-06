@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Partida #{{ game.id }} · Scrabbly{% endblock %}
+{% load i18n %}
+{% block title %}{% blocktrans with id=game.id %}Partida #{{ id }}{% endblocktrans %} · Scrabbly{% endblock %}
 {% block content %}
 <div class="game-layout"
      data-game-id="{{ game.id }}"
@@ -9,42 +10,42 @@
   <div class="board-wrap">
     <div id="board" class="board"></div>
     <div id="history-bar" class="history-bar" hidden>
-      <button id="h-first" title="Inicio">⏮</button>
-      <button id="h-prev" title="Anterior">◀</button>
-      <span id="h-label" class="h-label">En vivo</span>
-      <button id="h-next" title="Siguiente">▶</button>
-      <button id="h-live" title="En vivo">⏭</button>
+      <button id="h-first" title="{% trans 'Inicio' %}">⏮</button>
+      <button id="h-prev" title="{% trans 'Anterior' %}">◀</button>
+      <span id="h-label" class="h-label">{% trans "En vivo" %}</span>
+      <button id="h-next" title="{% trans 'Siguiente' %}">▶</button>
+      <button id="h-live" title="{% trans 'En vivo' %}">⏭</button>
     </div>
     <div id="rack" class="rack"></div>
     <div class="controls">
-      <button id="btn-play" class="btn-primary" disabled>Jugar</button>
-      <button id="btn-recall" class="btn-secondary" disabled>Recoger</button>
-      <button id="btn-pass" class="btn-secondary">Pasar</button>
-      <button id="btn-exchange" class="btn-secondary">Cambiar</button>
-      <button id="btn-draw" class="btn-secondary">Tablas</button>
-      <button id="btn-resign" class="btn-danger">Abandonar</button>
+      <button id="btn-play" class="btn-primary" disabled>{% trans "Jugar" %}</button>
+      <button id="btn-recall" class="btn-secondary" disabled>{% trans "Recoger" %}</button>
+      <button id="btn-pass" class="btn-secondary">{% trans "Pasar" %}</button>
+      <button id="btn-exchange" class="btn-secondary">{% trans "Cambiar" %}</button>
+      <button id="btn-draw" class="btn-secondary">{% trans "Tablas" %}</button>
+      <button id="btn-resign" class="btn-danger">{% trans "Abandonar" %}</button>
     </div>
     <p id="feedback" class="feedback"></p>
   </div>
 
   <aside class="game-side">
     <div class="side-head">
-      <span id="conn" class="conn" title="Conexión">●</span>
-      <button id="btn-sound" class="icon-btn" title="Sonido">🔊</button>
-      <button id="btn-share" class="icon-btn" title="Copiar enlace">🔗</button>
+      <span id="conn" class="conn" title="{% trans 'Conexión' %}">●</span>
+      <button id="btn-sound" class="icon-btn" title="{% trans 'Sonido' %}">🔊</button>
+      <button id="btn-share" class="icon-btn" title="{% trans 'Copiar enlace' %}">🔗</button>
     </div>
     <div id="status-banner" class="status-banner"></div>
     <div id="offer-box" class="offer-box" hidden></div>
     <ul id="players" class="players"></ul>
-    <div class="bag-info">Fichas en la bolsa: <span id="bag-count">–</span></div>
+    <div class="bag-info">{% trans "Fichas en la bolsa:" %} <span id="bag-count">–</span></div>
 
-    <h3>Jugadas</h3>
+    <h3>{% trans "Jugadas" %}</h3>
     <ol id="moves" class="moves"></ol>
 
-    <h3>Chat</h3>
+    <h3>{% trans "Chat" %}</h3>
     <div id="chat" class="chat"></div>
     <form id="chat-form" class="chat-form">
-      <input id="chat-input" type="text" maxlength="500" placeholder="Mensaje…" autocomplete="off">
+      <input id="chat-input" type="text" maxlength="500" placeholder="{% trans 'Mensaje…' %}" autocomplete="off">
     </form>
   </aside>
 </div>
@@ -56,5 +57,6 @@
 
 {% block scripts %}
 {% load static %}
+<script src="{% url 'javascript-catalog' %}"></script>
 <script src="{% static 'js/game.js' %}"></script>
 {% endblock %}

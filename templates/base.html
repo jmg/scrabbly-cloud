@@ -1,6 +1,6 @@
-{% load static %}{% load avatars %}
+{% load static %}{% load avatars %}{% load i18n %}{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,16 +14,26 @@
       {% if user.is_authenticated and user.is_premium %}
         <a class="premium-link crown-{{ user.tier }}" href="{% url 'billing_manage' %}">👑 {{ user.tier|capfirst }}</a>
       {% else %}
-        <a class="premium-link" href="{% url 'pricing' %}">👑 Premium</a>
+        <a class="premium-link" href="{% url 'pricing' %}">👑 {% trans "Premium" %}</a>
       {% endif %}
       {% if user.is_authenticated and not user.is_guest %}
         <a class="me-link" href="{% url 'profile' user.username %}">{{ user.username|avatar:26 }} {% if user.is_premium %}<span class="crown" title="Premium">👑</span>{% endif %}{{ user.display_name }} · {{ user.rating }}</a>
-        <a href="{% url 'logout' %}">Salir</a>
+        <a href="{% url 'logout' %}">{% trans "Salir" %}</a>
       {% else %}
         <span class="guest">{{ user.display_name }} · {{ user.rating }}</span>
-        <a href="{% url 'login' %}">Entrar</a>
-        <a class="btn-small" href="{% url 'register' %}">Crear cuenta</a>
+        <a href="{% url 'login' %}">{% trans "Entrar" %}</a>
+        <a class="btn-small" href="{% url 'register' %}">{% trans "Crear cuenta" %}</a>
       {% endif %}
+      <form action="{% url 'set_language' %}" method="post" class="lang-switch">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()" aria-label="{% trans 'Idioma' %}">
+          {% get_available_languages as LANGUAGES %}
+          {% for code, name in LANGUAGES %}
+            <option value="{{ code }}" {% if code == LANGUAGE_CODE %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </form>
     </nav>
   </header>
 

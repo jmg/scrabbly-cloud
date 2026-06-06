@@ -51,7 +51,26 @@ necesidad de registrarse (cuentas de invitado).
   con la sección «Te toca jugar» que lista las partidas que esperan tu turno.
 - **Perfiles y avatares**: avatares identicon generados (sin subidas), perfil
   con estadísticas (% de victorias, racha de resultados, historial).
+- **Interfaz multi-idioma (i18n)**: toda la UI es traducible con el framework
+  de i18n de Django; viene en **español** (por defecto) e **inglés**, con un
+  selector de idioma en la barra superior. El juego en vivo (JS) se traduce vía
+  `JavaScriptCatalog`.
 - **Anti-spam**: rate-limiting por usuario en las acciones de juego.
+
+## Traducciones (i18n)
+
+Los textos fuente están en español y se traducen al inglés en
+`locale/en/LC_MESSAGES/` (dominios `django` y `djangojs`). Para regenerar:
+
+```
+django-admin makemessages -l en --ignore=staticfiles --ignore=dictionaries
+django-admin makemessages -l en -d djangojs --ignore=staticfiles --ignore=dictionaries
+# editar los .po y luego compilar (requiere gettext):
+django-admin compilemessages -l en
+```
+
+El `Dockerfile` instala `gettext` y compila los catálogos en el build; los `.mo`
+también se versionan para que el inglés funcione sin gettext instalado.
 - **Premium (suscripción)**: monetización estilo chess.com con dos niveles —
   **Gold** (temas, estadísticas avanzadas, insignia, partidas ilimitadas) y
   **Diamond** (todo lo de Gold + análisis post-partida). Incluye **prueba

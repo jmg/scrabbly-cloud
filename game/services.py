@@ -65,9 +65,10 @@ def _check_game_quota(user):
         .count()
     )
     if in_progress >= FREE_CONCURRENT_GAMES:
+        from django.utils.translation import gettext as _
         raise InvalidMove(
-            f"Las cuentas gratuitas pueden tener hasta {FREE_CONCURRENT_GAMES} "
-            "partidas a la vez. Pasate a Premium para partidas ilimitadas."
+            _("Las cuentas gratuitas pueden tener hasta %(n)s partidas a la vez. "
+              "Pasate a Premium para partidas ilimitadas.") % {"n": FREE_CONCURRENT_GAMES}
         )
 
 

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}Regalar Premium · Scrabbly{% endblock %}
 {% block content %}
 <div class="pricing">
-  <h1>🎁 Regalar Premium</h1>
-  <p class="muted">Comprá un código y regalalo a quien quieras.</p>
+  <h1>🎁 {% trans "Regalar Premium" %}</h1>
+  <p class="muted">{% trans "Comprá un código y regalalo a quien quieras." %}</p>
 
   <div class="plan-cards">
     {% for plan in plans %}
@@ -13,18 +14,18 @@
       <form method="post" action="{% url 'gift_buy' %}">
         {% csrf_token %}
         <input type="hidden" name="plan" value="{{ plan.code }}">
-        <button class="btn-primary" type="submit">Comprar regalo</button>
+        <button class="btn-primary" type="submit">{% trans "Comprar regalo" %}</button>
       </form>
     </div>
     {% endfor %}
   </div>
 
   <div class="auth-card" style="margin-top:24px">
-    <h2>¿Tenés un código?</h2>
+    <h2>{% trans "¿Tenés un código?" %}</h2>
     <form method="post" action="{% url 'gift_redeem' %}" class="filters">
       {% csrf_token %}
       <input type="text" name="code" placeholder="GIFT-XXXXXXXX" required>
-      <button class="btn-secondary" type="submit">Canjear</button>
+      <button class="btn-secondary" type="submit">{% trans "Canjear" %}</button>
     </form>
   </div>
 </div>

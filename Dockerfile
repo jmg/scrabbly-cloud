@@ -6,14 +6,19 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
+# gettext provides msgfmt for compiling translation catalogs (.po -> .mo).
+RUN apt-get update && apt-get install -y --no-install-recommends gettext \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies first to leverage Docker layer caching.
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Collect static assets (hashed/compressed by WhiteNoise) at build time.
-RUN SECRET_KEY=build-only python manage.py collectstatic --noinput
+# Compile translations and collect static assets at build time.
+RUN SECRET_KEY=build-only python manage.py compilemessages \
+    && SECRET_KEY=build-only python manage.py collectstatic --noinput
 
 EXPOSE 8000
 

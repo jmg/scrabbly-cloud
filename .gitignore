@@ -29,6 +29,8 @@ pip-log.txt
 
 #Translations
 *.mo
+# ...but keep the project's compiled catalogs so English works without gettext.
+!locale/**/*.mo
 
 #Mr Developer
 .mr.developer.cfg

@@ -1,21 +1,22 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}Premium · Scrabbly{% endblock %}
 {% block content %}
 <div class="pricing">
   <h1>Scrabbly <span class="crown">👑</span> Premium</h1>
-  <p class="muted">Elegí tu nivel. Cancelás cuando quieras.</p>
+  <p class="muted">{% trans "Elegí tu nivel. Cancelás cuando quieras." %}</p>
 
   {% if is_premium %}
   <div class="already-premium">
-    Sos <b>{{ current_tier|capfirst }}</b> 👑 — <a href="{% url 'billing_manage' %}">gestionar suscripción</a>
+    {% trans "Sos" %} <b>{{ current_tier|capfirst }}</b> 👑 — <a href="{% url 'billing_manage' %}">{% trans "gestionar suscripción" %}</a>
   </div>
   {% endif %}
 
   <div class="coupon-row">
-    <label>¿Tenés un cupón?
-      <input type="text" id="coupon-input" placeholder="CÓDIGO" autocomplete="off">
+    <label>{% trans "¿Tenés un cupón?" %}
+      <input type="text" id="coupon-input" placeholder="{% trans 'CÓDIGO' %}" autocomplete="off">
     </label>
-    {% if trial_available %}<span class="trial-note">✨ Probá {{ trial_days }} días gratis</span>{% endif %}
+    {% if trial_available %}<span class="trial-note">✨ {% blocktrans %}Probá {{ trial_days }} días gratis{% endblocktrans %}</span>{% endif %}
   </div>
 
   <div class="tier-cards">
@@ -23,17 +24,17 @@
     <div class="tier-card tier-{{ tier.code }}">
       <h2>{{ tier.name }} <span class="crown crown-{{ tier.code }}">👑</span></h2>
       <ul class="perks">
-        <li>🎨 Temas de tablero</li>
-        <li>📈 Estadísticas avanzadas</li>
-        <li>👑 Insignia + partidas ilimitadas</li>
-        <li class="{% if 'analysis' in tier.perks %}on{% else %}off{% endif %}">📊 Análisis post-partida</li>
+        <li>🎨 {% trans "Temas de tablero" %}</li>
+        <li>📈 {% trans "Estadísticas avanzadas" %}</li>
+        <li>👑 {% trans "Insignia + partidas ilimitadas" %}</li>
+        <li class="{% if 'analysis' in tier.perks %}on{% else %}off{% endif %}">📊 {% trans "Análisis post-partida" %}</li>
       </ul>
       {% for plan in tier.plans %}
       <form method="post" action="{% url 'billing_subscribe' %}" class="plan-row">
         {% csrf_token %}
         <input type="hidden" name="plan" value="{{ plan.code }}">
         <input type="hidden" name="coupon" class="coupon-field" value="">
-        <button class="{% if plan.lifetime %}btn-secondary{% else %}btn-primary{% endif %}" type="submit">{{ plan.price }}<small>{% if plan.interval %}/{{ plan.interval }}{% else %} · de por vida{% endif %}</small></button>
+        <button class="{% if plan.lifetime %}btn-secondary{% else %}btn-primary{% endif %}" type="submit">{{ plan.price }}<small>{% if plan.interval %}/{{ plan.interval }}{% else %} · {% trans "de por vida" %}{% endif %}</small></button>
       </form>
       {% endfor %}
       {% if trial_available %}
@@ -42,14 +43,14 @@
         <input type="hidden" name="plan" value="{{ tier.code }}_monthly">
         <input type="hidden" name="trial" value="1">
         <input type="hidden" name="coupon" class="coupon-field" value="">
-        <button class="btn-secondary" type="submit">Probar {{ trial_days }} días gratis</button>
+        <button class="btn-secondary" type="submit">{% blocktrans %}Probar {{ trial_days }} días gratis{% endblocktrans %}</button>
       </form>
       {% endif %}
     </div>
     {% endfor %}
   </div>
-  <p class="muted small">Pagos seguros vía Stripe. La suscripción se renueva automáticamente hasta que canceles.</p>
-  <p><a href="{% url 'gift' %}">🎁 Regalar Premium</a></p>
+  <p class="muted small">{% trans "Pagos seguros vía Stripe. La suscripción se renueva automáticamente hasta que canceles." %}</p>
+  <p><a href="{% url 'gift' %}">🎁 {% trans "Regalar Premium" %}</a></p>
 </div>
 <script>
   // Mirror the coupon code into every form's hidden field before submit.

@@ -1,0 +1,167 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-06 06:05+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: static/js/game.js:229
+msgid "Letra para la ficha comodín:"
+msgstr "Letter for the blank tile:"
+
+#: static/js/game.js:340
+msgid "pasó"
+msgstr "passed"
+
+#: static/js/game.js:341
+msgid "cambió fichas"
+msgstr "exchanged tiles"
+
+#: static/js/game.js:342
+msgid "abandonó"
+msgstr "resigned"
+
+#: static/js/game.js:348
+msgid "Esperando rival…"
+msgstr "Waiting for opponent…"
+
+#: static/js/game.js:351
+#, javascript-format
+msgid "Ganó %s"
+msgstr "%s won"
+
+#: static/js/game.js:351
+msgid "Empate"
+msgstr "Draw"
+
+#: static/js/game.js:352
+msgid "Partida abortada"
+msgstr "Game aborted"
+
+#: static/js/game.js:353 static/js/game.js:477
+msgid "¡Es tu turno!"
+msgstr "It's your turn!"
+
+#: static/js/game.js:354
+msgid "Turno del rival"
+msgstr "Opponent's turn"
+
+#: static/js/game.js:368
+msgid "Ofreciste tablas…"
+msgstr "You offered a draw…"
+
+#: static/js/game.js:370
+msgid "El rival ofrece tablas"
+msgstr "Your opponent offers a draw"
+
+#: static/js/game.js:371 static/js/game.js:385
+msgid "Aceptar"
+msgstr "Accept"
+
+#: static/js/game.js:372
+msgid "Rechazar"
+msgstr "Decline"
+
+#: static/js/game.js:376
+msgid "Ver análisis"
+msgstr "View analysis"
+
+#: static/js/game.js:378
+msgid "Revancha lista."
+msgstr "Rematch ready."
+
+#: static/js/game.js:379
+msgid "Ir"
+msgstr "Go"
+
+#: static/js/game.js:382
+msgid "Esperando que el rival acepte la revancha…"
+msgstr "Waiting for your opponent to accept the rematch…"
+
+#: static/js/game.js:384
+msgid "El rival quiere revancha"
+msgstr "Your opponent wants a rematch"
+
+#: static/js/game.js:387
+msgid "Revancha"
+msgstr "Rematch"
+
+#: static/js/game.js:415
+msgid "En vivo"
+msgstr "Live"
+
+#: static/js/game.js:418
+msgid "Jugada %(n)s / %(t)s"
+msgstr "Move %(n)s / %(t)s"
+
+#: static/js/game.js:482
+msgid "Tu turno"
+msgstr "Your turn"
+
+#: static/js/game.js:483
+#, javascript-format
+msgid "Partida #%s"
+msgstr "Game #%s"
+
+#: static/js/game.js:586
+msgid "Jugada enviada"
+msgstr "Move sent"
+
+#: static/js/game.js:587
+msgid "Jugada inválida"
+msgstr "Invalid move"
+
+#: static/js/game.js:594
+msgid "Elegí fichas para cambiar y tocá «Cambiar» de nuevo."
+msgstr "Pick tiles to exchange and tap «Exchange» again."
+
+#: static/js/game.js:595
+msgid "Confirmar cambio"
+msgstr "Confirm exchange"
+
+#: static/js/game.js:601
+msgid "Cambiar"
+msgstr "Exchange"
+
+#: static/js/game.js:604
+msgid "No se pudo cambiar"
+msgstr "Couldn't exchange"
+
+#: static/js/game.js:613
+msgid "Conectado"
+msgstr "Connected"
+
+#: static/js/game.js:614
+msgid "Reconectando…"
+msgstr "Reconnecting…"
+
+#: static/js/game.js:614
+msgid "Conectando…"
+msgstr "Connecting…"
+
+#: static/js/game.js:738 static/js/game.js:744
+msgid "Error"
+msgstr "Error"
+
+#: static/js/game.js:748
+msgid "¿Abandonar la partida?"
+msgstr "Resign the game?"
+
+#: static/js/game.js:759
+msgid "Enlace copiado"
+msgstr "Link copied"
+
+#: static/js/game.js:760
+msgid "Copiá el enlace:"
+msgstr "Copy the link:"
