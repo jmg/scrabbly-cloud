@@ -50,6 +50,9 @@
   var selectedRackIdx = null;
   var exchangeMode = false;
   var exchangeSel = [];
+  var serverOffset = 0;   // serverNow - clientNow, to sync the countdown
+  var flagClaimed = false; // guard so we POST /flag/ at most once per timeout
+  var dragData = null;     // active drag-and-drop payload
 
   // ---- Board rendering -----------------------------------------------------
   var cells = {};
@@ -70,6 +73,9 @@
         cell.dataset.row = r;
         cell.dataset.col = c;
         cell.addEventListener("click", onCellClick);
+        cell.addEventListener("dragstart", onCellDragStart);
+        cell.addEventListener("dragover", function (e) { e.preventDefault(); });
+        cell.addEventListener("drop", onCellDrop);
         boardEl.appendChild(cell);
         cells[r + "," + c] = cell;
       }
@@ -84,7 +90,8 @@
   function renderBoard() {
     for (var key in cells) {
       var cell = cells[key];
-      cell.classList.remove("filled", "pending");
+      cell.classList.remove("filled", "pending", "drop-in");
+      cell.draggable = false;
       var lbl = cell.dataset.label;
       cell.innerHTML = lbl ? '<span class="premium-label">' + lbl + "</span>" : "";
     }
@@ -98,7 +105,8 @@
     pending.forEach(function (p) {
       var cell = cells[p.row + "," + p.col];
       if (cell) {
-        cell.classList.add("filled", "pending");
+        cell.classList.add("filled", "pending", "drop-in");
+        cell.draggable = true;
         cell.innerHTML = tileHTML(p.letter, p.isBlank);
       }
     });
@@ -122,6 +130,17 @@
       var display = letter === BLANK ? "·" : letter;
       tile.innerHTML = tileHTML(display, letter === BLANK);
       tile.addEventListener("click", function () { onRackClick(idx, used); });
+      if (!used && isPlayer && !exchangeMode) {
+        tile.draggable = true;
+        tile.addEventListener("dragstart", function (e) {
+          dragData = { source: "rack", rackIdx: idx };
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", "tile");
+          }
+        });
+        tile.addEventListener("dragend", function () { dragData = null; });
+      }
       rackEl.appendChild(tile);
     });
   }
@@ -138,35 +157,89 @@
     renderRack();
   }
 
+  function afterChange() {
+    refreshControls();
+    renderBoard();
+    renderRack();
+  }
+
+  function pendingIndexAt(row, col) {
+    return pending.findIndex(function (p) { return p.row === row && p.col === col; });
+  }
+
+  // Place a rack tile (by index) onto an empty cell. Returns true on success.
+  function placeFromRack(rackIdx, row, col) {
+    if (!isPlayer || exchangeMode) return false;
+    if (occupied(row, col)) return false;
+    if (pending.some(function (p) { return p.rackIdx === rackIdx; })) return false;
+    var letter = rack[rackIdx];
+    var isBlank = letter === BLANK;
+    if (isBlank) {
+      var chosen = (prompt("Letra para la ficha comodín:") || "").toUpperCase();
+      if (!chosen || !POINTS.hasOwnProperty(chosen) || chosen === BLANK) return false;
+      letter = chosen;
+    }
+    pending.push({ row: row, col: col, letter: letter, isBlank: isBlank, rackIdx: rackIdx });
+    return true;
+  }
+
   function onCellClick(e) {
     var cell = e.currentTarget;
     var row = parseInt(cell.dataset.row, 10);
     var col = parseInt(cell.dataset.col, 10);
 
     // Clicking a pending tile recalls it.
-    var existing = pending.findIndex(function (p) { return p.row === row && p.col === col; });
+    var existing = pendingIndexAt(row, col);
     if (existing !== -1) {
       pending.splice(existing, 1);
-      refreshControls();
-      renderBoard();
-      renderRack();
+      afterChange();
       return;
     }
-    if (selectedRackIdx === null || !isPlayer || exchangeMode) return;
-    if (occupied(row, col)) return;
-
-    var letter = rack[selectedRackIdx];
-    var isBlank = letter === BLANK;
-    if (isBlank) {
-      var chosen = (prompt("Letra para la ficha comodín:") || "").toUpperCase();
-      if (!chosen || !POINTS.hasOwnProperty(chosen)) return;
-      letter = chosen;
+    if (selectedRackIdx === null) return;
+    if (placeFromRack(selectedRackIdx, row, col)) {
+      selectedRackIdx = null;
+      afterChange();
     }
-    pending.push({ row: row, col: col, letter: letter, isBlank: isBlank, rackIdx: selectedRackIdx });
-    selectedRackIdx = null;
-    refreshControls();
-    renderBoard();
-    renderRack();
+  }
+
+  // ---- Drag & drop ---------------------------------------------------------
+  function onCellDragStart(e) {
+    var cell = e.currentTarget;
+    var row = parseInt(cell.dataset.row, 10);
+    var col = parseInt(cell.dataset.col, 10);
+    var idx = pendingIndexAt(row, col);
+    if (idx === -1) { e.preventDefault(); return; }
+    dragData = { source: "board", pendingIdx: idx };
+    if (e.dataTransfer) { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", "tile"); }
+  }
+
+  function onCellDrop(e) {
+    e.preventDefault();
+    var cell = e.currentTarget;
+    var row = parseInt(cell.dataset.row, 10);
+    var col = parseInt(cell.dataset.col, 10);
+    if (!dragData) return;
+    var changed = false;
+    if (dragData.source === "rack") {
+      if (placeFromRack(dragData.rackIdx, row, col)) { selectedRackIdx = null; changed = true; }
+    } else if (dragData.source === "board") {
+      var p = pending[dragData.pendingIdx];
+      if (p && !occupied(row, col)) { p.row = row; p.col = col; changed = true; }
+    }
+    dragData = null;
+    if (changed) afterChange();
+  }
+
+  function setupRackDropZone() {
+    rackEl.addEventListener("dragover", function (e) { e.preventDefault(); });
+    rackEl.addEventListener("drop", function (e) {
+      e.preventDefault();
+      if (dragData && dragData.source === "board") {
+        pending.splice(dragData.pendingIdx, 1);
+        afterChange();
+      }
+      dragData = null;
+    });
   }
 
   function recall() {
@@ -189,8 +262,13 @@
         var sign = p.rating_delta >= 0 ? "+" : "";
         delta = ' <em class="delta">(' + sign + p.rating_delta + ")</em>";
       }
+      var clock = "";
+      if (state.clock && state.clock.enabled && p.time_left_ms !== null) {
+        clock = '<span class="clock" data-uid="' + p.user_id + '">' +
+          formatTime(liveTimeFor(p)) + "</span>";
+      }
       li.innerHTML = '<span class="pname">' + esc(p.name) + " · " + p.rating + delta +
-        '</span><span class="pscore">' + p.score + '</span>' +
+        "</span>" + clock + '<span class="pscore">' + p.score + '</span>' +
         '<span class="ptiles">' + p.tiles_left + " fichas</span>";
       playersEl.appendChild(li);
     });
@@ -220,6 +298,51 @@
     else banner = "Turno del rival";
     bannerEl.textContent = banner;
     bannerEl.className = "status-banner s-" + state.status;
+  }
+
+  // ---- Clocks --------------------------------------------------------------
+  function liveTimeFor(p) {
+    var base = p.time_left_ms;
+    if (state.clock && state.clock.enabled &&
+        state.turn_user_id === p.user_id && state.clock.turn_started_at) {
+      var nowServer = Date.now() + serverOffset;
+      base = p.time_left_ms - (nowServer - state.clock.turn_started_at);
+    }
+    return Math.max(0, base);
+  }
+
+  function formatTime(ms) {
+    var total = Math.ceil(ms / 1000);
+    var m = Math.floor(total / 60);
+    var s = total % 60;
+    if (ms < 20000) {  // show tenths under 20s, like Lichess
+      var tenths = Math.floor((ms % 1000) / 100);
+      return m + ":" + (s < 10 ? "0" : "") + s + "." + tenths;
+    }
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  function syncClock() {
+    serverOffset = (state.clock && state.clock.server_now)
+      ? state.clock.server_now - Date.now() : 0;
+    flagClaimed = false;  // a fresh state means the previous timeout is moot
+  }
+
+  function tickClocks() {
+    if (!state.clock || !state.clock.enabled) return;
+    state.players.forEach(function (p) {
+      var el = playersEl.querySelector('.clock[data-uid="' + p.user_id + '"]');
+      if (!el) return;
+      var ms = liveTimeFor(p);
+      el.textContent = formatTime(ms);
+      var active = state.turn_user_id === p.user_id && state.status === "active";
+      el.classList.toggle("active", active);
+      el.classList.toggle("low", active && ms < 15000);
+      if (active && ms <= 0 && state.status === "active" && !flagClaimed) {
+        flagClaimed = true;  // claim the win on time (server is authoritative)
+        post("/game/" + gameId + "/flag/", {});
+      }
+    });
   }
 
   function refreshControls() {
@@ -285,6 +408,7 @@
         state = data.state;
         POINTS = state.points || POINTS;
         rack = data.rack;
+        syncClock();
         // Drop pending tiles that are no longer ours to place.
         pending = pending.filter(function (p) { return p.rackIdx < rack.length; });
         if (state.turn_user_id !== meId) { pending = []; }
@@ -332,7 +456,10 @@
 
   // ---- Init ----------------------------------------------------------------
   buildBoard();
+  setupRackDropZone();
+  syncClock();
   renderAll();
+  setInterval(tickClocks, 200);
   document.getElementById("btn-play").addEventListener("click", submitPlay);
   document.getElementById("btn-recall").addEventListener("click", recall);
   document.getElementById("btn-pass").addEventListener("click", function () {

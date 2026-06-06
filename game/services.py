@@ -7,6 +7,7 @@ share one source of truth.
 
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 
 from accounts.models import User
 
@@ -51,19 +52,30 @@ def _draw_for(game, seat, bag):
         seat.rack = list(seat.rack) + bag.draw(need)
 
 
-def create_game(user, rated=True, max_players=2, language=DEFAULT_LANGUAGE):
+def create_game(user, rated=True, max_players=2, language=DEFAULT_LANGUAGE,
+                clock_initial=0, clock_increment=0):
     with transaction.atomic():
         bag = get_ruleset(language).new_bag()
         game = Game.objects.create(
             status=Game.WAITING, rated=rated, max_players=max_players,
             language=language, board=Board().serialize(), bag=bag.letters,
+            clock_initial=clock_initial, clock_increment=clock_increment,
         )
-        seat = GamePlayer.objects.create(game=game, player=user, seat=0)
+        seat = GamePlayer.objects.create(
+            game=game, player=user, seat=0,
+            time_left_ms=clock_initial * 1000,
+        )
         _draw_for(game, seat, bag)
         seat.save()
         game.bag = bag.letters
         game.save(update_fields=["bag"])
     return game
+
+
+def _start_clock(game):
+    """Begin the active player's clock when the game becomes active."""
+    if game.has_clock:
+        game.turn_started_at = timezone.now()
 
 
 def join_game(game, user):
@@ -76,30 +88,38 @@ def join_game(game, user):
             raise InvalidMove("La partida ya no admite jugadores.")
         bag = Bag(letters=list(game.bag))
         seat = GamePlayer.objects.create(
-            game=game, player=user, seat=game.players.count()
+            game=game, player=user, seat=game.players.count(),
+            time_left_ms=game.clock_initial * 1000,
         )
         _draw_for(game, seat, bag)
         seat.save()
         game.bag = bag.letters
         if game.is_full:
             game.status = Game.ACTIVE
+            _start_clock(game)
         game.save()
     return game
 
 
-def quick_pair(user, rated=True, language=DEFAULT_LANGUAGE):
-    """Join the oldest waiting game (same language) with a free seat, or open one."""
+def quick_pair(user, rated=True, language=DEFAULT_LANGUAGE,
+               clock_initial=0, clock_increment=0):
+    """Join the oldest compatible waiting game, or open a new one.
+
+    Compatibility means same language and identical time control.
+    """
     with transaction.atomic():
         candidate = (
             Game.objects.select_for_update(skip_locked=True)
-            .filter(status=Game.WAITING, rated=rated, language=language)
+            .filter(status=Game.WAITING, rated=rated, language=language,
+                    clock_initial=clock_initial, clock_increment=clock_increment)
             .exclude(players__player=user)
             .order_by("created_at")
             .first()
         )
     if candidate:
         return join_game(candidate, user)
-    return create_game(user, rated=rated, language=language)
+    return create_game(user, rated=rated, language=language,
+                       clock_initial=clock_initial, clock_increment=clock_increment)
 
 
 def _consume_from_rack(rack, placements):
@@ -119,6 +139,25 @@ def _consume_from_rack(rack, placements):
 def _advance_turn(game):
     n = game.players.count()
     game.turn_index = (game.turn_index + 1) % n
+
+
+def _charge_clock(game, seat):
+    """Deduct the time the seat spent on the turn that just ended.
+
+    Adds the Fischer increment and restarts the clock for the next player.
+    Returns True if the seat ran out of time (flagged) during this turn.
+    """
+    if not game.has_clock or game.turn_started_at is None:
+        return False
+    now = timezone.now()
+    elapsed_ms = int((now - game.turn_started_at).total_seconds() * 1000)
+    seat.time_left_ms -= elapsed_ms
+    game.turn_started_at = now
+    if seat.time_left_ms <= 0:
+        seat.time_left_ms = 0
+        return True
+    seat.time_left_ms += game.clock_increment * 1000
+    return False
 
 
 def make_play(game, user, placements_data):
@@ -147,6 +186,7 @@ def make_play(game, user, placements_data):
         _draw_for(game, seat, bag)
 
         seat.score += result.points
+        flagged = _charge_clock(game, seat)
         seat.save()
 
         game.board = board.serialize()
@@ -154,8 +194,9 @@ def make_play(game, user, placements_data):
         game.consecutive_passes = 0
         _record_move(game, user, Move.PLAY, placements_data, result.words, result.points)
 
-        went_out = len(seat.rack) == 0 and len(bag) == 0
-        if went_out:
+        if flagged:
+            _finish(game, loser=seat)
+        elif len(seat.rack) == 0 and len(bag) == 0:
             _finish(game, last_seat=seat)
         else:
             _advance_turn(game)
@@ -166,11 +207,15 @@ def make_play(game, user, placements_data):
 def make_pass(game, user):
     with transaction.atomic():
         game = Game.objects.select_for_update().get(pk=game.pk)
-        _require_turn(game, user)
+        seat = _require_turn(game, user)
         game.consecutive_passes += 1
+        flagged = _charge_clock(game, seat)
+        seat.save()
         _record_move(game, user, Move.PASS, [], [], 0)
+        if flagged:
+            _finish(game, loser=seat)
         # End if everyone passed twice in a row.
-        if game.consecutive_passes >= 2 * game.players.count():
+        elif game.consecutive_passes >= 2 * game.players.count():
             _finish(game)
         else:
             _advance_turn(game)
@@ -193,12 +238,16 @@ def make_exchange(game, user, letters):
         drawn = bag.draw(len(letters))
         bag.put_back(letters)
         seat.rack = rack + drawn
+        flagged = _charge_clock(game, seat)
         seat.save()
         game.bag = bag.letters
         game.consecutive_passes = 0
         _record_move(game, user, Move.EXCHANGE, [], [], 0)
-        _advance_turn(game)
-        game.save()
+        if flagged:
+            _finish(game, loser=seat)
+        else:
+            _advance_turn(game)
+            game.save()
     return game
 
 
@@ -216,6 +265,28 @@ def resign(game, user):
         else:
             # Resigning player ranks last; pick highest scorer as winner.
             _finish(game, loser=seat)
+    return game
+
+
+def claim_time(game, user):
+    """Flag the player on the move if their clock has expired.
+
+    Callable by anyone watching the game (typically the opponent whose UI saw
+    the clock hit zero). Server-side time is authoritative.
+    """
+    with transaction.atomic():
+        game = Game.objects.select_for_update().get(pk=game.pk)
+        if game.status != Game.ACTIVE or not game.has_clock:
+            raise InvalidMove("No hay reloj que reclamar.")
+        seat = game.current_seat
+        if seat is None or game.turn_started_at is None:
+            raise InvalidMove("No se puede reclamar el tiempo.")
+        elapsed_ms = int((timezone.now() - game.turn_started_at).total_seconds() * 1000)
+        if seat.time_left_ms - elapsed_ms > 0:
+            raise InvalidMove("Al jugador todavía le queda tiempo.")
+        seat.time_left_ms = 0
+        seat.save()
+        _finish(game, loser=seat)
     return game
 
 
@@ -338,6 +409,18 @@ def public_state(game):
         "turn_user_id": current.player_id if current and game.status == Game.ACTIVE else None,
         "bag_count": len(game.bag),
         "winner_id": game.winner_id,
+        "clock": {
+            "enabled": game.has_clock,
+            "initial": game.clock_initial,
+            "increment": game.clock_increment,
+            # Epoch millis so the client can run a live countdown for the
+            # player on the move, corrected against server time.
+            "turn_started_at": (
+                int(game.turn_started_at.timestamp() * 1000)
+                if game.turn_started_at and game.status == Game.ACTIVE else None
+            ),
+            "server_now": int(timezone.now().timestamp() * 1000),
+        },
         "grid": [
             {"row": r, "col": c, "letter": letter,
              "blank": [r, c] in [list(b) for b in board.blanks]}
@@ -353,6 +436,7 @@ def public_state(game):
                 "tiles_left": len(s.rack),
                 "result": s.result,
                 "rating_delta": s.rating_delta,
+                "time_left_ms": s.time_left_ms if game.has_clock else None,
             }
             for s in game.seats
         ],

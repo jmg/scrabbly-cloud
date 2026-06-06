@@ -13,4 +13,5 @@ urlpatterns = [
     path("game/<int:game_id>/pass/", views.passturn, name="passturn"),
     path("game/<int:game_id>/exchange/", views.exchange, name="exchange"),
     path("game/<int:game_id>/resign/", views.resign, name="resign"),
+    path("game/<int:game_id>/flag/", views.flag, name="flag"),
 ]

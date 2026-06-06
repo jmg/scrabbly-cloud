@@ -104,6 +104,69 @@ class LanguageTests(TestCase):
             self.assertTrue(wl_es.is_valid("CASA"))
 
 
+class ClockTests(TestCase):
+    def setUp(self):
+        from accounts.models import User
+        self.u1 = User.objects.create(username="p1")
+        self.u2 = User.objects.create(username="p2")
+
+    def _timed_active_game(self, initial=300, increment=5):
+        from game import services
+        g = services.create_game(self.u1, clock_initial=initial,
+                                  clock_increment=increment)
+        g = services.join_game(g, self.u2)
+        return g
+
+    def test_clock_starts_when_game_becomes_active(self):
+        g = self._timed_active_game()
+        self.assertEqual(g.status, "active")
+        self.assertIsNotNone(g.turn_started_at)
+        for s in g.players.all():
+            self.assertEqual(s.time_left_ms, 300 * 1000)
+
+    def test_pass_charges_time_and_adds_increment(self):
+        import datetime
+        from django.utils import timezone
+        from game import services
+        from game.models import Game
+        g = self._timed_active_game(initial=300, increment=5)
+        # Pretend the player on move started their turn 10s ago.
+        Game.objects.filter(pk=g.pk).update(
+            turn_started_at=timezone.now() - datetime.timedelta(seconds=10)
+        )
+        g.refresh_from_db()
+        mover = g.current_seat.player
+        services.make_pass(g, mover)
+        g.refresh_from_db()
+        seat = g.players.get(player=mover)
+        # 300s - ~10s + 5s increment ≈ 295s. Allow slack for execution time.
+        self.assertLess(seat.time_left_ms, 300 * 1000)
+        self.assertGreater(seat.time_left_ms, 293 * 1000)
+
+    def test_claim_time_flags_expired_player(self):
+        import datetime
+        from django.utils import timezone
+        from game import services
+        from game.models import Game
+        from game.engine import InvalidMove
+        g = self._timed_active_game(initial=5, increment=0)
+        opponent = g.players.exclude(player=g.current_seat.player).first().player
+        # Not expired yet -> claim should fail.
+        with self.assertRaises(InvalidMove):
+            services.claim_time(g, opponent)
+        # Force the clock to have started 10s ago (> 5s budget).
+        Game.objects.filter(pk=g.pk).update(
+            turn_started_at=timezone.now() - datetime.timedelta(seconds=10)
+        )
+        g.refresh_from_db()
+        flagged_player = g.current_seat.player
+        services.claim_time(g, opponent)
+        g.refresh_from_db()
+        self.assertEqual(g.status, "finished")
+        self.assertEqual(g.winner_id, opponent.pk)
+        self.assertNotEqual(g.winner_id, flagged_player.pk)
+
+
 class RatingTests(TestCase):
     def test_winner_gains_loser_loses(self):
         new = ratings.compute_updates([

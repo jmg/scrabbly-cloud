@@ -21,6 +21,11 @@ class Game(models.Model):
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="es")
     max_players = models.PositiveSmallIntegerField(default=2)
 
+    # Clock (Fischer style). clock_initial == 0 means an untimed game.
+    clock_initial = models.PositiveIntegerField(default=0)    # seconds per player
+    clock_increment = models.PositiveIntegerField(default=0)  # seconds added per move
+    turn_started_at = models.DateTimeField(null=True, blank=True)
+
     board = models.JSONField(default=dict, blank=True)   # engine Board.serialize()
     bag = models.JSONField(default=list, blank=True)     # remaining bag letters
     turn_index = models.PositiveSmallIntegerField(default=0)
@@ -43,6 +48,16 @@ class Game(models.Model):
     @property
     def is_full(self):
         return self.players.count() >= self.max_players
+
+    @property
+    def has_clock(self):
+        return self.clock_initial > 0
+
+    @property
+    def clock_label(self):
+        if not self.has_clock:
+            return "∞"
+        return f"{self.clock_initial // 60}+{self.clock_increment}"
 
     @property
     def current_seat(self):
@@ -72,6 +87,7 @@ class GamePlayer(models.Model):
     seat = models.PositiveSmallIntegerField(default=0)
     score = models.IntegerField(default=0)
     rack = models.JSONField(default=list, blank=True)
+    time_left_ms = models.IntegerField(default=0)  # remaining clock, milliseconds
 
     result = models.CharField(max_length=4, blank=True)
     rating_before = models.IntegerField(null=True, blank=True)

@@ -41,16 +41,36 @@ def _language(request):
     return lang if lang in ("es", "en") else "es"
 
 
+# Allowed time controls as "initial_seconds,increment_seconds".
+TIME_CONTROLS = {"0,0", "180,0", "300,0", "300,5", "600,5", "900,10", "1800,0"}
+
+
+def _clock(request):
+    raw = request.POST.get("clock", "0,0")
+    if raw not in TIME_CONTROLS:
+        raw = "0,0"
+    initial, increment = (int(x) for x in raw.split(","))
+    return initial, increment
+
+
 @require_POST
 def create_game(request):
     rated = request.POST.get("rated", "1") == "1"
-    game = services.create_game(request.user, rated=rated, language=_language(request))
+    initial, increment = _clock(request)
+    game = services.create_game(
+        request.user, rated=rated, language=_language(request),
+        clock_initial=initial, clock_increment=increment,
+    )
     return redirect("game_detail", game_id=game.pk)
 
 
 @require_POST
 def quick_pair(request):
-    game = services.quick_pair(request.user, language=_language(request))
+    initial, increment = _clock(request)
+    game = services.quick_pair(
+        request.user, language=_language(request),
+        clock_initial=initial, clock_increment=increment,
+    )
     notify_update(game.pk)
     return redirect("game_detail", game_id=game.pk)
 
@@ -129,6 +149,17 @@ def resign(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
         game = services.resign(game, request.user)
+    except InvalidMove as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+    notify_update(game.pk)
+    return JsonResponse({"ok": True})
+
+
+@require_POST
+def flag(request, game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    try:
+        game = services.claim_time(game, request.user)
     except InvalidMove as exc:
         return JsonResponse({"ok": False, "error": str(exc)}, status=400)
     notify_update(game.pk)

@@ -6,17 +6,32 @@
     <div class="play-cta">
       <h1>Jugar al Scrabble online</h1>
       <div class="lang-pick">
-        <label><input type="radio" name="lang" value="es" form="quickform" checked> Español</label>
-        <label><input type="radio" name="lang" value="en" form="quickform"> English</label>
+        <label><input type="radio" name="lang" value="es" checked> Español</label>
+        <label><input type="radio" name="lang" value="en"> English</label>
+      </div>
+      <div class="clock-pick">
+        <label>Reloj:
+          <select id="clock-select">
+            <option value="0,0">Sin reloj</option>
+            <option value="180,0">3 min</option>
+            <option value="300,0">5 min</option>
+            <option value="300,5">5 min + 5s</option>
+            <option value="600,5">10 min + 5s</option>
+            <option value="900,10">15 min + 10s</option>
+            <option value="1800,0">30 min</option>
+          </select>
+        </label>
       </div>
       <form id="quickform" method="post" action="{% url 'quick_pair' %}">
         {% csrf_token %}
         <input type="hidden" name="language" value="es" class="lang-field">
+        <input type="hidden" name="clock" value="0,0" class="clock-field">
         <button class="btn-primary" type="submit">Partida rápida</button>
       </form>
       <form method="post" action="{% url 'create_game' %}" class="create-form">
         {% csrf_token %}
         <input type="hidden" name="language" value="es" class="lang-field">
+        <input type="hidden" name="clock" value="0,0" class="clock-field">
         <label><input type="checkbox" name="rated" value="1" checked> Con rating</label>
         <button class="btn-secondary" type="submit">Crear partida</button>
       </form>
@@ -44,6 +59,7 @@
       <li class="open-game">
         <span>#{{ g.id }} — {{ g.seats.0.player.display_name }} ({{ g.seats.0.player.rating }})
           <em class="lang-badge">{{ g.get_language_display }}</em>
+          <em class="clock-badge">⏱ {{ g.clock_label }}</em>
           {% if g.rated %}<em class="rated">rated</em>{% endif %}</span>
         <form method="post" action="{% url 'join_game' g.id %}">
           {% csrf_token %}
@@ -91,6 +107,13 @@
       document.querySelectorAll('.lang-field').forEach(function (f) {
         f.value = radio.value;
       });
+    });
+  });
+  // Keep both forms' hidden clock field in sync with the time-control select.
+  var clockSelect = document.getElementById('clock-select');
+  clockSelect.addEventListener('change', function () {
+    document.querySelectorAll('.clock-field').forEach(function (f) {
+      f.value = clockSelect.value;
     });
   });
 </script>
