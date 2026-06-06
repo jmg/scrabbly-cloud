@@ -2,7 +2,7 @@
 
 from game.models import Challenge
 
-from .models import Friendship
+from .models import Friendship, Notification
 
 
 def social_badges(request):
@@ -14,4 +14,6 @@ def social_badges(request):
             to_user=user, status=Friendship.PENDING).count(),
         "nav_challenges": Challenge.objects.filter(
             opponent=user, status=Challenge.PENDING).count(),
+        "nav_notifications": Notification.objects.filter(
+            user=user, is_read=False).count(),
     }

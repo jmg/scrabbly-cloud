@@ -11,6 +11,7 @@ urlpatterns = [
     path("settings/password/", views.change_password, name="change_password"),
     path("settings/delete/", views.delete_account, name="delete_account"),
     path("settings/theme/", views.set_theme, name="set_theme"),
+    path("notifications/", views.notifications, name="notifications"),
     path("friends/", views.friends, name="friends"),
     path("friends/request/", views.friend_request, name="friend_request"),
     path("friends/respond/", views.friend_respond, name="friend_respond"),

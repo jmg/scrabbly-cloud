@@ -19,6 +19,7 @@
         <a class="premium-link" href="{% url 'pricing' %}">👑 {% trans "Premium" %}</a>
       {% endif %}
       {% if user.is_authenticated and not user.is_guest %}
+        <a href="{% url 'notifications' %}" title="{% trans 'Notificaciones' %}">🔔{% if nav_notifications %} <span class="nav-badge" id="notif-badge">{{ nav_notifications }}</span>{% else %}<span class="nav-badge" id="notif-badge" hidden>0</span>{% endif %}</a>
         <a href="{% url 'friends' %}">{% trans "Amigos" %}{% if nav_friend_requests or nav_challenges %} <span class="nav-badge">{{ nav_friend_requests|add:nav_challenges }}</span>{% endif %}</a>
         <a class="me-link" href="{% url 'profile' user.username %}">{{ user.username|avatar:26 }} {% if user.is_premium %}<span class="crown" title="Premium">👑</span>{% endif %}{{ user.display_name }} · {{ user.rating }}</a>
         <a href="{% url 'settings' %}" title="{% trans 'Ajustes' %}">⚙</a>
@@ -48,6 +49,11 @@
   {% endif %}
 
   <main>{% block content %}{% endblock %}</main>
+  <div id="toast-host" class="toast-host"></div>
+  {% if user.is_authenticated and not user.is_guest %}
+    {% load static %}
+    <script src="{% static 'js/notifications.js' %}"></script>
+  {% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, TransactionTestCase
 
 from accounts import social
-from accounts.models import Friendship
+from accounts.models import Friendship, Notification
+from accounts.notifications import notify
 from game.models import Challenge, Game
 
 User = get_user_model()
@@ -54,6 +55,58 @@ class FriendshipTests(TestCase):
         fr = Friendship.objects.get()
         cb.post("/friends/respond/", {"id": fr.id})  # no accept flag
         self.assertFalse(Friendship.objects.exists())
+
+
+class NotificationTests(TestCase):
+    def test_notify_creates_record(self):
+        _, u = _login("alice")
+        notify(u, "hola", "/x/")
+        self.assertEqual(Notification.objects.filter(user=u, text="hola").count(), 1)
+
+    def test_guests_are_not_notified(self):
+        g = User.objects.create(username="g1", is_guest=True)
+        notify(g, "x")
+        self.assertEqual(Notification.objects.count(), 0)
+
+    def test_friend_request_notifies_target(self):
+        ca, a = _login("alice")
+        cb, b = _login("bob")
+        ca.post("/friends/request/", {"username": "bob"})
+        self.assertTrue(Notification.objects.filter(user=b).exists())
+
+    def test_challenge_notifies_opponent(self):
+        ca, a = _login("alice")
+        cb, b = _login("bob")
+        ca.post("/challenge/new/", {"opponent": "bob", "language": "es", "clock": "0,0"})
+        self.assertTrue(Notification.objects.filter(user=b).exists())
+
+    def test_inbox_marks_read(self):
+        ca, a = _login("alice")
+        notify(a, "uno")
+        notify(a, "dos")
+        self.assertEqual(Notification.objects.filter(user=a, is_read=False).count(), 2)
+        ca.get("/notifications/")
+        self.assertEqual(Notification.objects.filter(user=a, is_read=False).count(), 0)
+
+
+class NotificationSocketTests(TransactionTestCase):
+    async def test_live_push_received(self):
+        from asgiref.sync import sync_to_async
+        from channels.db import database_sync_to_async
+        from channels.routing import URLRouter
+        from channels.testing import WebsocketCommunicator
+        from game.routing import websocket_urlpatterns
+
+        user = await database_sync_to_async(User.objects.create)(username="sock")
+        comm = WebsocketCommunicator(URLRouter(websocket_urlpatterns), "/ws/notifications/")
+        comm.scope["user"] = user
+        connected, _ = await comm.connect()
+        self.assertTrue(connected)
+        await sync_to_async(notify)(user, "ping", "/p/")
+        msg = await comm.receive_json_from(timeout=2)
+        self.assertEqual(msg["text"], "ping")
+        self.assertEqual(msg["url"], "/p/")
+        await comm.disconnect()
 
 
 class SettingsTests(TestCase):

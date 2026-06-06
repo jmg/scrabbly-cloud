@@ -121,6 +121,11 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 .settings-page .auth-card { margin-bottom: 16px; }
 .settings-page label.check { display: flex; align-items: center; gap: 8px; }
 .danger-zone { border: 1px solid #d9534f; }
+.toast-host { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+.toast { background: var(--panel); border: 1px solid var(--accent); border-radius: 8px; padding: 10px 14px; box-shadow: 0 4px 16px #0007; opacity: 0; transform: translateY(10px); transition: all .25s ease; max-width: 320px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast a { color: var(--text-strong); }
+.game-list li.unread { border-left: 3px solid var(--accent); padding-left: 8px; }
 .premium-link { color: #f0b428 !important; font-weight: 600; }
 .pricing { max-width: 760px; margin: 0 auto; text-align: center; }
 .pricing .perks { list-style: none; padding: 0; display: inline-flex; flex-direction: column; gap: 8px; text-align: left; margin: 16px auto 24px; }

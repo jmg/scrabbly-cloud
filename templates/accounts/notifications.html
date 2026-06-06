@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Notificaciones" %} · Scrabbly{% endblock %}
+{% block content %}
+<div class="friends-page">
+  <h1>🔔 {% trans "Notificaciones" %}</h1>
+  <ul class="game-list">
+    {% for n in notes %}
+    <li class="{% if not n.is_read %}unread{% endif %}">
+      {% if n.url %}<a href="{{ n.url }}">{{ n.text }}</a>{% else %}{{ n.text }}{% endif %}
+      <span class="muted">{{ n.created_at|date:"d/m H:i" }}</span>
+    </li>
+    {% empty %}
+    <li class="muted">{% trans "No tenés notificaciones." %}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

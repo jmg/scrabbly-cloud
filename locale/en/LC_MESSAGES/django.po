@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 18:20+0000\n"
+"POT-Creation-Date: 2026-06-06 20:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,70 +17,77 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: accounts/views.py:40
+#: accounts/views.py:42
 msgid "¡Cuenta creada!"
 msgstr "Account created!"
 
-#: accounts/views.py:59
+#: accounts/views.py:61
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:130 game/views.py:321
+#: accounts/views.py:142 game/views.py:321
 msgid "No se encontró ese usuario."
 msgstr "User not found."
 
-#: accounts/views.py:138 accounts/views.py:159
+#: accounts/views.py:150 accounts/views.py:175
+#, python-format
+msgid "%(u)s aceptó tu solicitud de amistad."
+msgstr "%(u)s accepted your friend request."
+
+#: accounts/views.py:152 accounts/views.py:177
 msgid "¡Ahora son amigos!"
 msgstr "You're now friends!"
 
-#: accounts/views.py:140
+#: accounts/views.py:154
 msgid "Ya son amigos."
 msgstr "You're already friends."
 
-#: accounts/views.py:143
+#: accounts/views.py:157
+#, python-format
+msgid "%(u)s te envió una solicitud de amistad."
+msgstr "%(u)s sent you a friend request."
+
+#: accounts/views.py:159
 msgid "Solicitud enviada."
 msgstr "Request sent."
 
-#: accounts/views.py:162
+#: accounts/views.py:180
 msgid "Solicitud rechazada."
 msgstr "Request declined."
 
-#: accounts/views.py:176
+#: accounts/views.py:194
 msgid "Amistad eliminada."
 msgstr "Friend removed."
 
-#: accounts/views.py:251
-#| msgid "Tema actualizado."
+#: accounts/views.py:269
 msgid "Datos actualizados."
 msgstr "Details updated."
 
-#: accounts/views.py:264
+#: accounts/views.py:282
 msgid "La contraseña actual es incorrecta."
 msgstr "The current password is incorrect."
 
-#: accounts/views.py:266
+#: accounts/views.py:284
 msgid "La nueva contraseña es demasiado corta."
 msgstr "The new password is too short."
 
-#: accounts/views.py:271
-#| msgid "Tema actualizado."
+#: accounts/views.py:289
 msgid "Contraseña actualizada."
 msgstr "Password updated."
 
-#: accounts/views.py:281
+#: accounts/views.py:299
 msgid "Contraseña incorrecta. La cuenta no se eliminó."
 msgstr "Incorrect password. The account was not deleted."
 
-#: accounts/views.py:285
-#| msgid "Amistad eliminada."
+#: accounts/views.py:303
 msgid "Tu cuenta fue eliminada."
 msgstr "Your account was deleted."
 
-#: accounts/views.py:297
+#: accounts/views.py:315
 msgid "Ese tema es exclusivo de Premium. 👑"
 msgstr "That theme is Premium-only. 👑"
 
-#: accounts/views.py:301
+#: accounts/views.py:319
 msgid "Tema actualizado."
 msgstr "Theme updated."
 
@@ -133,16 +140,31 @@ msgstr "The tournament isn't active."
 msgid "No se pudo generar el puzzle. Probá de nuevo."
 msgstr "Couldn't generate the puzzle. Try again."
 
-#: game/views.py:329
+#: game/views.py:331
+#, python-format
+msgid "%(u)s te desafió a una partida."
+msgstr "%(u)s challenged you to a game."
+
+#: game/views.py:333
 msgid "Desafío enviado."
 msgstr "Challenge sent."
 
-#: game/views.py:348
+#: game/views.py:351
+#, python-format
+msgid "%(u)s aceptó tu desafío. ¡A jugar!"
+msgstr "%(u)s accepted your challenge. Let's play!"
+
+#: game/views.py:356
+#, python-format
+msgid "%(u)s rechazó tu desafío."
+msgstr "%(u)s declined your challenge."
+
+#: game/views.py:357
 msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
 #: templates/accounts/friends.html:3 templates/accounts/friends.html:6
-#: templates/accounts/profile.html:27 templates/base.html:22
+#: templates/accounts/profile.html:27 templates/base.html:23
 msgid "Amigos"
 msgstr "Friends"
 
@@ -193,7 +215,7 @@ msgstr "pending"
 
 #: templates/accounts/login.html:3 templates/accounts/login.html:6
 #: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:28
+#: templates/base.html:29
 msgid "Entrar"
 msgstr "Log in"
 
@@ -209,6 +231,15 @@ msgstr "Don't have an account?"
 #: templates/accounts/login.html:13
 msgid "Registrate"
 msgstr "Sign up"
+
+#: templates/accounts/notifications.html:3
+#: templates/accounts/notifications.html:6 templates/base.html:22
+msgid "Notificaciones"
+msgstr "Notifications"
+
+#: templates/accounts/notifications.html:14
+msgid "No tenés notificaciones."
+msgstr "You have no notifications."
 
 #: templates/accounts/profile.html:23
 msgid "Solicitud enviada"
@@ -288,7 +319,7 @@ msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:29
+#: templates/accounts/register.html:18 templates/base.html:30
 msgid "Crear cuenta"
 msgstr "Sign up"
 
@@ -310,12 +341,11 @@ msgid "¿Ya tenés cuenta?"
 msgstr "Already have an account?"
 
 #: templates/accounts/settings.html:3 templates/accounts/settings.html:6
-#: templates/base.html:24
+#: templates/base.html:25
 msgid "Ajustes"
 msgstr "Settings"
 
 #: templates/accounts/settings.html:9
-#| msgid "Crear cuenta"
 msgid "Cuenta"
 msgstr "Account"
 
@@ -328,22 +358,18 @@ msgid "Guardar"
 msgstr "Save"
 
 #: templates/accounts/settings.html:19 templates/accounts/settings.html:24
-#| msgid "Contraseña"
 msgid "Cambiar contraseña"
 msgstr "Change password"
 
 #: templates/accounts/settings.html:22
-#| msgid "Contraseña"
 msgid "Contraseña actual"
 msgstr "Current password"
 
 #: templates/accounts/settings.html:23
-#| msgid "Contraseña"
 msgid "Nueva contraseña"
 msgstr "New password"
 
 #: templates/accounts/settings.html:45
-#| msgid "Crear cuenta"
 msgid "Eliminar cuenta"
 msgstr "Delete account"
 
@@ -356,7 +382,6 @@ msgid "¿Seguro que querés eliminar tu cuenta?"
 msgstr "Are you sure you want to delete your account?"
 
 #: templates/accounts/settings.html:51
-#| msgid "Crear cuenta"
 msgid "Eliminar mi cuenta"
 msgstr "Delete my account"
 
@@ -373,11 +398,11 @@ msgstr "Puzzles"
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:25
+#: templates/base.html:26
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:34 templates/game/arenas.html:45
+#: templates/base.html:35 templates/game/arenas.html:45
 msgid "Idioma"
 msgstr "Language"
 

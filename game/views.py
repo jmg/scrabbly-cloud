@@ -326,6 +326,10 @@ def challenge_create(request):
         language=_language(request), rated=request.POST.get("rated") == "1",
         clock_initial=initial, clock_increment=increment,
     )
+    from accounts.notifications import notify
+    from django.urls import reverse
+    notify(opponent, _("%(u)s te desafió a una partida.") % {"u": user.display_name},
+           reverse("lobby"))
     messages.success(request, _("Desafío enviado."))
     return redirect(request.POST.get("next") or "lobby")
 
@@ -336,15 +340,20 @@ def challenge_respond(request):
     user = request.user
     ch = get_object_or_404(
         Challenge, pk=request.POST.get("id"), opponent=user, status=Challenge.PENDING)
+    from accounts.notifications import notify
     if request.POST.get("accept") == "1":
         try:
             game = services.accept_challenge(ch)
         except InvalidMove as exc:
             return _error(request, str(exc))
         notify_update(game.pk)
+        notify(ch.challenger,
+               _("%(u)s aceptó tu desafío. ¡A jugar!") % {"u": user.display_name},
+               f"/game/{game.pk}/")
         return redirect("game_detail", game_id=game.pk)
     ch.status = Challenge.DECLINED
     ch.save(update_fields=["status"])
+    notify(ch.challenger, _("%(u)s rechazó tu desafío.") % {"u": user.display_name})
     messages.info(request, _("Desafío rechazado."))
     return redirect("lobby")
 

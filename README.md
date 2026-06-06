@@ -67,6 +67,9 @@ necesidad de registrarse (cuentas de invitado).
 - **Social**: amigos (solicitudes de amistad con aceptar/rechazar) y **desafíos
   directos** a un usuario con la configuración elegida (reloj/idioma/rating);
   aceptar crea la partida al instante. Badges de pendientes en la barra superior.
+- **Notificaciones**: bandeja persistente (🔔 con contador) y **avisos en vivo
+  por WebSocket** (toasts) para solicitudes de amistad y desafíos, vía un socket
+  por usuario sobre Channels.
 - **Anti-spam**: rate-limiting por usuario en las acciones de juego.
 
 ## Traducciones (i18n)

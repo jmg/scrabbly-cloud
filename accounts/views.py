@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
@@ -9,6 +10,7 @@ from game.models import GamePlayer, Move
 from . import social
 from .forms import LoginForm, RegisterForm
 from .models import Friendship
+from .notifications import notify
 from .themes import THEMES, THEME_CODES, PREMIUM_THEMES
 
 User = get_user_model()
@@ -108,6 +110,16 @@ def _real_user(request):
     return u if (u.is_authenticated and not u.is_guest) else None
 
 
+def notifications(request):
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    notes = list(user.notifications.all()[:50])
+    # Mark everything read once the inbox is viewed.
+    user.notifications.filter(is_read=False).update(is_read=True)
+    return render(request, "accounts/notifications.html", {"notes": notes})
+
+
 def friends(request):
     user = _real_user(request)
     if user is None:
@@ -131,15 +143,19 @@ def friend_request(request):
         return redirect("friends")
 
     # If the other side already sent a request, accept it instead of duplicating.
-    reverse = Friendship.objects.filter(from_user=target, to_user=user).first()
-    if reverse:
-        reverse.status = Friendship.ACCEPTED
-        reverse.save(update_fields=["status"])
+    rev = Friendship.objects.filter(from_user=target, to_user=user).first()
+    if rev:
+        rev.status = Friendship.ACCEPTED
+        rev.save(update_fields=["status"])
+        notify(target, _("%(u)s aceptó tu solicitud de amistad.") % {"u": user.display_name},
+               reverse("friends"))
         messages.success(request, _("¡Ahora son amigos!"))
     elif social.are_friends(user, target):
         messages.info(request, _("Ya son amigos."))
     else:
         Friendship.objects.get_or_create(from_user=user, to_user=target)
+        notify(target, _("%(u)s te envió una solicitud de amistad.") % {"u": user.display_name},
+               reverse("friends"))
         messages.success(request, _("Solicitud enviada."))
     return redirect(request.POST.get("next") or "friends")
 
@@ -156,6 +172,8 @@ def friend_respond(request):
         if request.POST.get("accept") == "1":
             fr.status = Friendship.ACCEPTED
             fr.save(update_fields=["status"])
+            notify(fr.from_user, _("%(u)s aceptó tu solicitud de amistad.") % {"u": user.display_name},
+                   reverse("friends"))
             messages.success(request, _("¡Ahora son amigos!"))
         else:
             fr.delete()

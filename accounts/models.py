@@ -86,3 +86,20 @@ class Friendship(models.Model):
     def __str__(self):
         return f"{self.from_user} → {self.to_user} ({self.status})"
 
+
+class Notification(models.Model):
+    """A small in-app notification, also pushed live over WebSocket."""
+
+    user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="notifications")
+    text = models.CharField(max_length=255)
+    url = models.CharField(max_length=255, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user}: {self.text}"
+
