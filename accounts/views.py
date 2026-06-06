@@ -101,6 +101,19 @@ def profile(request, username):
             and not user.is_bot):
         ctx["relationship"] = social.relationship(request.user, user)
 
+    # Tournament history: arenas entered, with final/standing placement.
+    from game.models import ArenaPlayer
+    entries = []
+    for ap in (ArenaPlayer.objects.filter(user=user)
+               .select_related("arena").order_by("-arena__starts_at")[:10]):
+        better = ArenaPlayer.objects.filter(
+            arena=ap.arena, score__gt=ap.score).count()
+        entries.append({
+            "arena": ap.arena, "score": ap.score, "games": ap.games,
+            "place": better + 1, "state": ap.arena.state,
+        })
+    ctx["arena_entries"] = entries
+
     return render(request, "accounts/profile.html", ctx)
 
 

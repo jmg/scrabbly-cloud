@@ -260,6 +260,20 @@ def _language(request):
     return lang if lang in ("es", "en") else "es"
 
 
+def _notify_turn(game, actor):
+    """Ping the next player in correspondence (clockless) games, where the
+    opponent isn't necessarily watching live."""
+    if game.status != Game.ACTIVE or game.has_clock:
+        return
+    seat = game.current_seat
+    if seat is None or seat.player_id == actor.id or seat.player.is_bot:
+        return
+    from accounts.notifications import notify
+    notify(seat.player,
+           _("Te toca jugar en la partida #%(id)s") % {"id": game.pk},
+           f"/game/{game.pk}/")
+
+
 # Allowed time controls as "initial_seconds,increment_seconds".
 TIME_CONTROLS = {"0,0", "180,0", "300,0", "300,5", "600,5", "900,10", "1800,0"}
 
@@ -425,6 +439,7 @@ def play(request, game_id):
         return JsonResponse({"ok": False, "error": str(exc)}, status=400)
     game = services.maybe_play_bot(game)
     notify_update(game.pk)
+    _notify_turn(game, request.user)
     return JsonResponse({"ok": True})
 
 
@@ -438,6 +453,7 @@ def passturn(request, game_id):
         return JsonResponse({"ok": False, "error": str(exc)}, status=400)
     game = services.maybe_play_bot(game)
     notify_update(game.pk)
+    _notify_turn(game, request.user)
     return JsonResponse({"ok": True})
 
 
@@ -452,6 +468,7 @@ def exchange(request, game_id):
         return JsonResponse({"ok": False, "error": str(exc)}, status=400)
     game = services.maybe_play_bot(game)
     notify_update(game.pk)
+    _notify_turn(game, request.user)
     return JsonResponse({"ok": True})
 
 

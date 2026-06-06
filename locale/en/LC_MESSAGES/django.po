@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 20:37+0000\n"
+"POT-Creation-Date: 2026-06-06 20:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,69 +25,69 @@ msgstr "Account created!"
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:142 game/views.py:321
+#: accounts/views.py:155 game/views.py:335
 msgid "No se encontró ese usuario."
 msgstr "User not found."
 
-#: accounts/views.py:150 accounts/views.py:175
+#: accounts/views.py:163 accounts/views.py:188
 #, python-format
 msgid "%(u)s aceptó tu solicitud de amistad."
 msgstr "%(u)s accepted your friend request."
 
-#: accounts/views.py:152 accounts/views.py:177
+#: accounts/views.py:165 accounts/views.py:190
 msgid "¡Ahora son amigos!"
 msgstr "You're now friends!"
 
-#: accounts/views.py:154
+#: accounts/views.py:167
 msgid "Ya son amigos."
 msgstr "You're already friends."
 
-#: accounts/views.py:157
+#: accounts/views.py:170
 #, python-format
 msgid "%(u)s te envió una solicitud de amistad."
 msgstr "%(u)s sent you a friend request."
 
-#: accounts/views.py:159
+#: accounts/views.py:172
 msgid "Solicitud enviada."
 msgstr "Request sent."
 
-#: accounts/views.py:180
+#: accounts/views.py:193
 msgid "Solicitud rechazada."
 msgstr "Request declined."
 
-#: accounts/views.py:194
+#: accounts/views.py:207
 msgid "Amistad eliminada."
 msgstr "Friend removed."
 
-#: accounts/views.py:269
+#: accounts/views.py:282
 msgid "Datos actualizados."
 msgstr "Details updated."
 
-#: accounts/views.py:282
+#: accounts/views.py:295
 msgid "La contraseña actual es incorrecta."
 msgstr "The current password is incorrect."
 
-#: accounts/views.py:284
+#: accounts/views.py:297
 msgid "La nueva contraseña es demasiado corta."
 msgstr "The new password is too short."
 
-#: accounts/views.py:289
+#: accounts/views.py:302
 msgid "Contraseña actualizada."
 msgstr "Password updated."
 
-#: accounts/views.py:299
+#: accounts/views.py:312
 msgid "Contraseña incorrecta. La cuenta no se eliminó."
 msgstr "Incorrect password. The account was not deleted."
 
-#: accounts/views.py:303
+#: accounts/views.py:316
 msgid "Tu cuenta fue eliminada."
 msgstr "Your account was deleted."
 
-#: accounts/views.py:315
+#: accounts/views.py:328
 msgid "Ese tema es exclusivo de Premium. 👑"
 msgstr "That theme is Premium-only. 👑"
 
-#: accounts/views.py:319
+#: accounts/views.py:332
 msgid "Tema actualizado."
 msgstr "Theme updated."
 
@@ -140,26 +140,31 @@ msgstr "The tournament isn't active."
 msgid "No se pudo generar el puzzle. Probá de nuevo."
 msgstr "Couldn't generate the puzzle. Try again."
 
-#: game/views.py:331
+#: game/views.py:273
+#, python-format
+msgid "Te toca jugar en la partida #%(id)s"
+msgstr "It's your turn in game #%(id)s"
+
+#: game/views.py:345
 #, python-format
 msgid "%(u)s te desafió a una partida."
 msgstr "%(u)s challenged you to a game."
 
-#: game/views.py:333
+#: game/views.py:347
 msgid "Desafío enviado."
 msgstr "Challenge sent."
 
-#: game/views.py:351
+#: game/views.py:365
 #, python-format
 msgid "%(u)s aceptó tu desafío. ¡A jugar!"
 msgstr "%(u)s accepted your challenge. Let's play!"
 
-#: game/views.py:356
+#: game/views.py:370
 #, python-format
 msgid "%(u)s rechazó tu desafío."
 msgstr "%(u)s declined your challenge."
 
-#: game/views.py:357
+#: game/views.py:371
 msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
@@ -310,11 +315,39 @@ msgstr "Apply"
 msgid "Desbloqueá más temas con Premium"
 msgstr "Unlock more themes with Premium"
 
-#: templates/accounts/profile.html:91
+#: templates/accounts/profile.html:92 templates/base.html:14
+#: templates/game/arenas.html:3
+msgid "Torneos"
+msgstr "Tournaments"
+
+#: templates/accounts/profile.html:97
+#, python-format
+msgid "%(p)sº puesto"
+msgstr "%(p)s place"
+
+#: templates/accounts/profile.html:98
+msgid "en curso"
+msgstr "in progress"
+
+#: templates/accounts/profile.html:99
+#| msgid "Próximos"
+msgid "próximo"
+msgstr "upcoming"
+
+#: templates/accounts/profile.html:100 templates/game/analysis.html:12
+#: templates/game/arena.html:37
+msgid "pts"
+msgstr "pts"
+
+#: templates/accounts/profile.html:100 templates/game/arena.html:37
+msgid "PJ"
+msgstr "GP"
+
+#: templates/accounts/profile.html:106
 msgid "Historial"
 msgstr "History"
 
-#: templates/accounts/profile.html:102
+#: templates/accounts/profile.html:117
 msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
@@ -384,10 +417,6 @@ msgstr "Are you sure you want to delete your account?"
 #: templates/accounts/settings.html:51
 msgid "Eliminar mi cuenta"
 msgstr "Delete my account"
-
-#: templates/base.html:14 templates/game/arenas.html:3
-msgid "Torneos"
-msgstr "Tournaments"
 
 #: templates/base.html:15 templates/game/puzzles.html:3
 #: templates/game/puzzles.html:6
@@ -610,10 +639,6 @@ msgstr "Game"
 msgid "ver tablero"
 msgstr "view board"
 
-#: templates/game/analysis.html:12 templates/game/arena.html:37
-msgid "pts"
-msgstr "pts"
-
 #: templates/game/analysis.html:14 templates/game/game.html:43
 msgid "Jugadas"
 msgstr "Moves"
@@ -687,10 +712,6 @@ msgstr "Leave tournament"
 #: templates/game/arena.html:32
 msgid "Clasificación"
 msgstr "Standings"
-
-#: templates/game/arena.html:37
-msgid "PJ"
-msgstr "GP"
 
 #: templates/game/arena.html:40
 msgid "Nadie inscripto todavía."

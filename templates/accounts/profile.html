@@ -88,6 +88,21 @@
   </div>
   {% endif %}
 
+  {% if arena_entries %}
+  <h2>🏆 {% trans "Torneos" %}</h2>
+  <ul class="game-list">
+    {% for e in arena_entries %}
+    <li>
+      <a href="{% url 'arena_detail' e.arena.id %}">{{ e.arena.name }}</a>
+      {% if e.state == 'finished' %}<span class="muted">{% blocktrans with p=e.place %}{{ p }}º puesto{% endblocktrans %}</span>
+      {% elif e.state == 'active' %}<em class="result-win">{% trans "en curso" %}</em>
+      {% else %}<span class="muted">{% trans "próximo" %}</span>{% endif %}
+      <span class="muted">· {{ e.score }} {% trans "pts" %} · {{ e.games }} {% trans "PJ" %}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
   <h2>{% trans "Historial" %}</h2>
   <ul class="game-list">
     {% for seat in seats %}

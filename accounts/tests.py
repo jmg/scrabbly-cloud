@@ -88,6 +88,43 @@ class NotificationTests(TestCase):
         ca.get("/notifications/")
         self.assertEqual(Notification.objects.filter(user=a, is_read=False).count(), 0)
 
+    def test_correspondence_turn_notifies_opponent(self):
+        from game import services
+        a = User.objects.create_user("a", password="x")
+        b = User.objects.create_user("b", password="x")
+        game = services.join_game(services.create_game(a, rated=False), b)  # clockless
+        c = Client(); c.force_login(a)
+        c.post(f"/game/{game.id}/pass/")  # a's turn -> passes -> b's turn
+        self.assertTrue(Notification.objects.filter(user=b).exists())
+
+    def test_timed_game_does_not_notify_turn(self):
+        from game import services
+        a = User.objects.create_user("a", password="x")
+        b = User.objects.create_user("b", password="x")
+        game = services.join_game(
+            services.create_game(a, rated=False, clock_initial=300), b)
+        c = Client(); c.force_login(a)
+        c.post(f"/game/{game.id}/pass/")
+        self.assertFalse(Notification.objects.filter(user=b).exists())
+
+
+class TournamentHistoryTests(TestCase):
+    def test_profile_shows_arena_entry(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        from game.models import Arena, ArenaPlayer
+        u = User.objects.create_user("champ", password="x")
+        other = User.objects.create_user("rival", password="x")
+        arena = Arena.objects.create(
+            name="Winter Cup", starts_at=timezone.now() - timedelta(hours=2),
+            duration_min=30)  # finished
+        ArenaPlayer.objects.create(arena=arena, user=u, score=6, games=3)
+        ArenaPlayer.objects.create(arena=arena, user=other, score=2, games=3)
+        c = Client(); c.force_login(u)
+        html = c.get(f"/@/{u.username}/").content.decode()
+        self.assertIn("Winter Cup", html)
+        self.assertIn("1", html)  # first place
+
 
 class NotificationSocketTests(TransactionTestCase):
     async def test_live_push_received(self):
