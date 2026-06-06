@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Error · Scrabbly{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <h1>Ups</h1>
+  <p>{{ message }}</p>
+  <a class="btn-secondary" href="{% url 'lobby' %}">Volver al lobby</a>
+</div>
+{% endblock %}

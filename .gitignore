@@ -1,5 +1,11 @@
 *.py[co]
+__pycache__/
 *.sqlite
+*.sqlite3
+db.sqlite3
+staticfiles/
+.venv/
+venv/
 
 # Packages
 *.egg

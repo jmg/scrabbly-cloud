@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user.display_name }} · Scrabbly{% endblock %}
+{% block content %}
+<div class="profile">
+  <h1>{{ profile_user.display_name }}</h1>
+  <div class="rating-big">{{ profile_user.rating }}</div>
+  <p class="muted">
+    {{ profile_user.games_played }} partidas ·
+    {{ profile_user.wins }}V / {{ profile_user.losses }}D / {{ profile_user.draws }}E
+  </p>
+
+  <h2>Historial</h2>
+  <ul class="game-list">
+    {% for seat in seats %}
+    <li>
+      <a href="{% url 'game_detail' seat.game.id %}">
+        #{{ seat.game.id }} —
+        <span class="status status-{{ seat.game.status }}">{{ seat.game.get_status_display }}</span>
+        · {{ seat.score }} pts
+        {% if seat.result %}<em class="result-{{ seat.result }}">{{ seat.result }}</em>{% endif %}
+        {% if seat.rating_delta != None %}<span class="delta">({{ seat.rating_delta }})</span>{% endif %}
+      </a>
+    </li>
+    {% empty %}
+    <li class="muted">Sin partidas todavía.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

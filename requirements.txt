@@ -1,3 +1,5 @@
-django
-south
-pyfb
+Django>=5.0,<5.2
+channels>=4.0
+daphne>=4.0
+# Optional: enable a Redis channel layer in production by setting REDIS_URL.
+# channels-redis>=4.2

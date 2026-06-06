@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Crear cuenta · Scrabbly{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <h1>Crear cuenta</h1>
+  {% if user.is_authenticated and user.is_guest %}
+    <p class="muted">Tu progreso como invitado (rating {{ user.rating }}) se conservará.</p>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <label>Usuario<input type="text" name="username" required></label>
+    <label>Contraseña<input type="password" name="password" required minlength="4"></label>
+    {% if form.errors %}<ul class="form-errors">
+      {% for field, errors in form.errors.items %}{% for e in errors %}<li>{{ e }}</li>{% endfor %}{% endfor %}
+    </ul>{% endif %}
+    <button class="btn-primary" type="submit">Crear cuenta</button>
+  </form>
+  <p class="muted">¿Ya tenés cuenta? <a href="{% url 'login' %}">Entrar</a></p>
+</div>
+{% endblock %}

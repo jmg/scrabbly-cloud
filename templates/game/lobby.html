@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Lobby · Scrabbly{% endblock %}
+{% block content %}
+<div class="lobby">
+  <section class="lobby-main">
+    <div class="play-cta">
+      <h1>Jugar al Scrabble online</h1>
+      <form method="post" action="{% url 'quick_pair' %}">
+        {% csrf_token %}
+        <button class="btn-primary" type="submit">Partida rápida</button>
+      </form>
+      <form method="post" action="{% url 'create_game' %}" class="create-form">
+        {% csrf_token %}
+        <label><input type="checkbox" name="rated" value="1" checked> Con rating</label>
+        <button class="btn-secondary" type="submit">Crear partida</button>
+      </form>
+    </div>
+
+    {% if mine %}
+    <h2>Tus partidas</h2>
+    <ul class="game-list">
+      {% for g in mine %}
+      <li>
+        <a href="{% url 'game_detail' g.id %}">
+          <span class="status status-{{ g.status }}">{{ g.get_status_display }}</span>
+          #{{ g.id }} —
+          {% for s in g.seats %}{{ s.player.display_name }}{% if not forloop.last %} vs {% endif %}{% endfor %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h2>Partidas abiertas</h2>
+    {% if waiting %}
+    <ul class="game-list">
+      {% for g in waiting %}
+      <li class="open-game">
+        <span>#{{ g.id }} — {{ g.seats.0.player.display_name }} ({{ g.seats.0.player.rating }})
+          {% if g.rated %}<em class="rated">rated</em>{% endif %}</span>
+        <form method="post" action="{% url 'join_game' g.id %}">
+          {% csrf_token %}
+          <button class="btn-small" type="submit">Unirse</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No hay partidas abiertas. ¡Creá una!</p>
+    {% endif %}
+
+    <h2>En vivo <span class="muted">(espectar)</span></h2>
+    {% if active %}
+    <ul class="game-list">
+      {% for g in active %}
+      <li>
+        <a href="{% url 'game_detail' g.id %}">
+          ▶ #{{ g.id }} —
+          {% for s in g.seats %}{{ s.player.display_name }} ({{ s.score }}){% if not forloop.last %} vs {% endif %}{% endfor %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">Ninguna partida en curso.</p>
+    {% endif %}
+  </section>
+
+  <aside class="lobby-side">
+    <h2>Ranking</h2>
+    <ol class="leaderboard">
+      {% for u in leaders %}
+      <li><a href="{% url 'profile' u.username %}">{{ u.username }}</a> <span>{{ u.rating }}</span></li>
+      {% empty %}
+      <li class="muted">Sin jugadores aún.</li>
+      {% endfor %}
+    </ol>
+  </aside>
+</div>
+{% endblock %}

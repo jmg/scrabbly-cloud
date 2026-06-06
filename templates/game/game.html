@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Partida #{{ game.id }} · Scrabbly{% endblock %}
+{% block content %}
+<div class="game-layout"
+     data-game-id="{{ game.id }}"
+     data-me-id="{{ me_id }}"
+     data-is-player="{{ is_player|yesno:'1,0' }}">
+
+  <div class="board-wrap">
+    <div id="board" class="board"></div>
+    <div id="rack" class="rack"></div>
+    <div class="controls">
+      <button id="btn-play" class="btn-primary" disabled>Jugar</button>
+      <button id="btn-recall" class="btn-secondary" disabled>Recoger</button>
+      <button id="btn-pass" class="btn-secondary">Pasar</button>
+      <button id="btn-exchange" class="btn-secondary">Cambiar</button>
+      <button id="btn-resign" class="btn-danger">Abandonar</button>
+    </div>
+    <p id="feedback" class="feedback"></p>
+  </div>
+
+  <aside class="game-side">
+    <div id="status-banner" class="status-banner"></div>
+    <ul id="players" class="players"></ul>
+    <div class="bag-info">Fichas en la bolsa: <span id="bag-count">–</span></div>
+
+    <h3>Jugadas</h3>
+    <ol id="moves" class="moves"></ol>
+
+    <h3>Chat</h3>
+    <div id="chat" class="chat"></div>
+    <form id="chat-form" class="chat-form">
+      <input id="chat-input" type="text" maxlength="500" placeholder="Mensaje…" autocomplete="off">
+    </form>
+  </aside>
+</div>
+
+<script id="bootstrap-state" type="application/json">{{ state_json|safe }}</script>
+<script id="bootstrap-rack" type="application/json">{{ rack_json|safe }}</script>
+<script>window.CSRF_TOKEN = "{{ csrf_token }}";</script>
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/game.js' %}"></script>
+{% endblock %}

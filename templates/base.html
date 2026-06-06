@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Scrabbly{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{% url 'lobby' %}">♟ Scrabbly</a>
+    <nav>
+      {% if user.is_authenticated and not user.is_guest %}
+        <a href="{% url 'profile' user.username %}">{{ user.display_name }} · {{ user.rating }}</a>
+        <a href="{% url 'logout' %}">Salir</a>
+      {% else %}
+        <span class="guest">{{ user.display_name }} · {{ user.rating }}</span>
+        <a href="{% url 'login' %}">Entrar</a>
+        <a class="btn-small" href="{% url 'register' %}">Crear cuenta</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  <main>{% block content %}{% endblock %}</main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
