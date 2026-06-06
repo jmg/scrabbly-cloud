@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load avatars %}
 {% block title %}Lobby · Scrabbly{% endblock %}
 {% block content %}
 <div class="lobby">
@@ -153,7 +154,7 @@
     <h2>Ranking</h2>
     <ol class="leaderboard">
       {% for u in leaders %}
-      <li><a href="{% url 'profile' u.username %}">{{ u.username }}</a> <span>{{ u.rating }}</span></li>
+      <li><a href="{% url 'profile' u.username %}">{{ u.username|avatar:22 }} {{ u.username }}</a> <span>{{ u.rating }}</span></li>
       {% empty %}
       <li class="muted">Sin jugadores aún.</li>
       {% endfor %}

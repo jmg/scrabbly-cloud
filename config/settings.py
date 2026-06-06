@@ -74,6 +74,19 @@ else:
         "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
     }
 
+# Cache: Redis when available (shared across workers), else local memory.
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+        }
+    }
+else:
+    CACHES = {
+        "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}
+    }
+
 # Postgres when POSTGRES_DB is configured (production), else SQLite for dev.
 # DATABASE_DIR lets a SQLite container keep the file on a persistent volume.
 if os.environ.get("POSTGRES_DB"):

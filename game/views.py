@@ -9,7 +9,11 @@ from django.views.decorators.http import require_POST
 from . import services
 from .engine import InvalidMove
 from .models import Game
+from .ratelimit import rate_limit
 from .realtime import notify_update
+
+# Generous per-user throttle on game actions to stop spam/abuse.
+ACTION_LIMIT = rate_limit("action", limit=40, window=10)
 
 User = get_user_model()
 
@@ -84,6 +88,7 @@ def _clock(request):
 
 
 @require_POST
+@ACTION_LIMIT
 def create_game(request):
     rated = request.POST.get("rated", "1") == "1"
     initial, increment = _clock(request)
@@ -95,6 +100,7 @@ def create_game(request):
 
 
 @require_POST
+@ACTION_LIMIT
 def quick_pair(request):
     initial, increment = _clock(request)
     game = services.quick_pair(
@@ -106,6 +112,7 @@ def quick_pair(request):
 
 
 @require_POST
+@ACTION_LIMIT
 def join_game(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
@@ -140,6 +147,7 @@ def game_state(request, game_id):
 
 
 @require_POST
+@ACTION_LIMIT
 def play(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
@@ -152,6 +160,7 @@ def play(request, game_id):
 
 
 @require_POST
+@ACTION_LIMIT
 def passturn(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
@@ -163,6 +172,7 @@ def passturn(request, game_id):
 
 
 @require_POST
+@ACTION_LIMIT
 def exchange(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
@@ -175,6 +185,7 @@ def exchange(request, game_id):
 
 
 @require_POST
+@ACTION_LIMIT
 def resign(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
@@ -186,6 +197,7 @@ def resign(request, game_id):
 
 
 @require_POST
+@ACTION_LIMIT
 def flag(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
@@ -197,6 +209,7 @@ def flag(request, game_id):
 
 
 @require_POST
+@ACTION_LIMIT
 def offer_draw(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
@@ -208,6 +221,7 @@ def offer_draw(request, game_id):
 
 
 @require_POST
+@ACTION_LIMIT
 def respond_draw(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:
@@ -223,6 +237,7 @@ def respond_draw(request, game_id):
 
 
 @require_POST
+@ACTION_LIMIT
 def rematch(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:

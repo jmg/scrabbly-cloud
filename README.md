@@ -43,6 +43,16 @@ necesidad de registrarse (cuentas de invitado).
   listado paginado de partidas recientes (terminadas).
 - **Modo correspondencia**: partidas sin reloj jugables a lo largo del tiempo,
   con la sección «Te toca jugar» que lista las partidas que esperan tu turno.
+- **Perfiles y avatares**: avatares identicon generados (sin subidas), perfil
+  con estadísticas (% de victorias, racha de resultados, historial).
+- **Anti-spam**: rate-limiting por usuario en las acciones de juego.
+
+## API pública (solo lectura, JSON)
+
+- `GET /api/games/` — partidas abiertas y en curso (filtrable con `?status=`).
+- `GET /api/games/<id>/` — estado completo de una partida.
+- `GET /api/leaderboard/` — ranking de jugadores.
+- `GET /api/players/<username>/` — estadísticas de un jugador.
 
 ## Puesta en marcha (desarrollo)
 

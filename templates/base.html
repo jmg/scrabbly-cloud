@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %}{% load avatars %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,7 +12,7 @@
     <a class="brand" href="{% url 'lobby' %}">♟ Scrabbly</a>
     <nav>
       {% if user.is_authenticated and not user.is_guest %}
-        <a href="{% url 'profile' user.username %}">{{ user.display_name }} · {{ user.rating }}</a>
+        <a class="me-link" href="{% url 'profile' user.username %}">{{ user.username|avatar:26 }} {{ user.display_name }} · {{ user.rating }}</a>
         <a href="{% url 'logout' %}">Salir</a>
       {% else %}
         <span class="guest">{{ user.display_name }} · {{ user.rating }}</span>

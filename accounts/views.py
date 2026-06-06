@@ -60,11 +60,16 @@ def logout_view(request):
 
 def profile(request, username):
     user = get_object_or_404(User, username=username)
-    seats = (
-        GamePlayer.objects.filter(player=user)
+    seats = list(
+        GamePlayer.objects.filter(player=user, game__status="finished")
         .select_related("game")
         .order_by("-game__created_at")[:25]
     )
-    return render(
-        request, "accounts/profile.html", {"profile_user": user, "seats": seats}
-    )
+    decided = user.wins + user.losses
+    win_rate = round(100 * user.wins / decided) if decided else None
+    # Recent form: most-recent-first list of results for coloured dots.
+    form = [s.result for s in seats if s.result][:10]
+    return render(request, "accounts/profile.html", {
+        "profile_user": user, "seats": seats,
+        "win_rate": win_rate, "form": form,
+    })

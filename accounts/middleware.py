@@ -22,6 +22,7 @@ class GuestUserMiddleware:
             path.startswith("/static/")
             or path.startswith("/admin/")
             or path.startswith("/ws/")
+            or path.startswith("/api/")
         )
         if not skip and not request.user.is_authenticated:
             user = User.objects.create(

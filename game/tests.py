@@ -318,6 +318,78 @@ class LobbyTests(TestCase):
         self.assertEqual(len(c2.get("/").context["my_turn"]), 1)
 
 
+class ApiTests(TestCase):
+    def test_public_endpoints(self):
+        from django.test import Client
+        from accounts.models import User
+        from game import services
+        u1 = User.objects.create_user(username="api1", password="xxxx")
+        u2 = User.objects.create(username="api2")
+        guest = User.objects.create(username="g_x", is_guest=True)
+        g = services.join_game(services.create_game(u1), u2)
+        c = Client()
+
+        r = c.get("/api/games/")
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(any(item["id"] == g.pk for item in r.json()["games"]))
+
+        r = c.get(f"/api/games/{g.pk}/")
+        self.assertEqual(r.json()["id"], g.pk)
+        self.assertEqual(len(r.json()["players"]), 2)
+
+        self.assertEqual(c.get("/api/leaderboard/").status_code, 200)
+
+        r = c.get("/api/players/api1/")
+        self.assertEqual(r.json()["username"], "api1")
+        # Guest accounts are not exposed by the player endpoint.
+        self.assertEqual(c.get(f"/api/players/{guest.username}/").status_code, 404)
+
+    def test_api_does_not_create_guest_users(self):
+        from django.test import Client
+        from accounts.models import User
+        before = User.objects.count()
+        Client().get("/api/games/")
+        self.assertEqual(User.objects.count(), before)
+
+
+class RateLimitTests(TestCase):
+    def test_blocks_after_limit(self):
+        from django.test import RequestFactory
+        from django.contrib.auth.models import AnonymousUser
+        from django.core.cache import cache
+        from django.http import JsonResponse
+        from game.ratelimit import rate_limit
+
+        cache.clear()
+        calls = {"n": 0}
+
+        @rate_limit("test", limit=2, window=60)
+        def view(request):
+            calls["n"] += 1
+            return JsonResponse({"ok": True})
+
+        rf = RequestFactory()
+
+        def hit():
+            req = rf.post("/x")
+            req.user = AnonymousUser()
+            return view(req)
+
+        self.assertEqual(hit().status_code, 200)
+        self.assertEqual(hit().status_code, 200)
+        self.assertEqual(hit().status_code, 429)  # third call is throttled
+        self.assertEqual(calls["n"], 2)
+
+
+class AvatarTests(TestCase):
+    def test_avatar_is_deterministic_svg(self):
+        from accounts.templatetags.avatars import avatar
+        a = avatar("alice", 40)
+        self.assertIn("<svg", a)
+        self.assertEqual(avatar("alice", 40), a)
+        self.assertNotEqual(avatar("alice", 40), avatar("bob", 40))
+
+
 class RatingTests(TestCase):
     def test_winner_gains_loser_loses(self):
         new = ratings.compute_updates([

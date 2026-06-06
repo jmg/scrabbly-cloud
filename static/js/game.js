@@ -311,7 +311,8 @@
         clock = '<span class="clock" data-uid="' + p.user_id + '">' +
           formatTime(liveTimeFor(p)) + "</span>";
       }
-      li.innerHTML = '<span class="pname">' + esc(p.name) + " · " + p.rating + delta +
+      li.innerHTML = '<span class="pname">' + avatarTag(p.name) + esc(p.name) +
+        " · " + p.rating + delta +
         "</span>" + clock + '<span class="pscore">' + p.score + '</span>' +
         '<span class="ptiles">' + p.tiles_left + " fichas</span>";
       playersEl.appendChild(li);
@@ -675,6 +676,15 @@
         input.value = "";
       }
     });
+  }
+
+  // A small initials avatar with a deterministic colour from the name.
+  function avatarTag(name) {
+    var hash = 0;
+    for (var i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) & 0xffffff;
+    var hue = hash % 360;
+    var initial = esc((name[0] || "?").toUpperCase());
+    return '<span class="p-av" style="background:hsl(' + hue + ',55%,48%)">' + initial + "</span>";
   }
 
   function esc(s) {
