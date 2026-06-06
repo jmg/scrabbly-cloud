@@ -1,0 +1,7 @@
+# Development / test-only dependencies.
+-r requirements.txt
+
+# Browser end-to-end tests (game/tests_e2e.py). After installing, run:
+#   python -m playwright install chromium
+playwright>=1.40
+pytest-playwright>=0.4

@@ -86,6 +86,19 @@ django-admin compilemessages -l en
 
 El `Dockerfile` instala `gettext` y compila los catálogos en el build; los `.mo`
 también se versionan para que el inglés funcione sin gettext instalado.
+
+## Tests
+
+`python manage.py test` corre la batería (modelos, motor, IA, billing, social,
+puzzles, torneos, notificaciones). Los tests E2E de navegador
+(`game/tests_e2e.py`, Playwright) cubren los flujos JS (tablero de puzzle, UI
+del lobby/registro) y **se saltan solos** si no hay navegador. Para correrlos:
+
+```
+pip install -r requirements-dev.txt
+python -m playwright install chromium
+python manage.py test game.tests_e2e
+```
 - **Premium (suscripción)**: monetización estilo chess.com con dos niveles —
   **Gold** (temas, estadísticas avanzadas, insignia, partidas ilimitadas) y
   **Diamond** (todo lo de Gold + análisis post-partida). Incluye **prueba
