@@ -28,6 +28,7 @@ class User(AbstractUser):
     premium_tier = models.CharField(max_length=10, blank=True)  # "gold" | "diamond"
     has_used_trial = models.BooleanField(default=False)
     board_theme = models.CharField(max_length=20, default="classic")
+    email_opt_in = models.BooleanField(default=True)  # receipts & notifications
 
     @property
     def display_name(self):

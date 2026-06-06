@@ -229,6 +229,63 @@ def _sparkline(values, w=260, h=48):
     )
 
 
+def settings_view(request):
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    return render(request, "accounts/settings.html", {
+        "themes": THEMES,
+        "current_theme": user.board_theme,
+        "can_use_premium_themes": user.has_perk("themes"),
+    })
+
+
+@require_POST
+def update_account(request):
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    user.email = (request.POST.get("email") or "").strip()
+    user.email_opt_in = request.POST.get("email_opt_in") == "1"
+    user.save(update_fields=["email", "email_opt_in"])
+    messages.success(request, _("Datos actualizados."))
+    return redirect("settings")
+
+
+@require_POST
+def change_password(request):
+    from django.contrib.auth import update_session_auth_hash
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    current = request.POST.get("current", "")
+    new = request.POST.get("new", "")
+    if not user.check_password(current):
+        messages.error(request, _("La contraseña actual es incorrecta."))
+    elif len(new) < 4:
+        messages.error(request, _("La nueva contraseña es demasiado corta."))
+    else:
+        user.set_password(new)
+        user.save(update_fields=["password"])
+        update_session_auth_hash(request, user)  # keep the user logged in
+        messages.success(request, _("Contraseña actualizada."))
+    return redirect("settings")
+
+
+@require_POST
+def delete_account(request):
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    if not user.check_password(request.POST.get("password", "")):
+        messages.error(request, _("Contraseña incorrecta. La cuenta no se eliminó."))
+        return redirect("settings")
+    logout(request)
+    user.delete()
+    messages.info(request, _("Tu cuenta fue eliminada."))
+    return redirect("lobby")
+
+
 @require_POST
 def set_theme(request):
     if not request.user.is_authenticated or request.user.is_guest:

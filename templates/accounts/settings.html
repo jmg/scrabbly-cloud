@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Ajustes" %} · Scrabbly{% endblock %}
+{% block content %}
+<div class="settings-page">
+  <h1>⚙ {% trans "Ajustes" %}</h1>
+
+  <div class="auth-card">
+    <h2>{% trans "Cuenta" %}</h2>
+    <form method="post" action="{% url 'update_account' %}">
+      {% csrf_token %}
+      <label>{% trans "Email" %}<input type="email" name="email" value="{{ user.email }}"></label>
+      <label class="check"><input type="checkbox" name="email_opt_in" value="1" {% if user.email_opt_in %}checked{% endif %}> {% trans "Recibir recibos y avisos por email" %}</label>
+      <button class="btn-primary" type="submit">{% trans "Guardar" %}</button>
+    </form>
+  </div>
+
+  <div class="auth-card">
+    <h2>{% trans "Cambiar contraseña" %}</h2>
+    <form method="post" action="{% url 'change_password' %}">
+      {% csrf_token %}
+      <label>{% trans "Contraseña actual" %}<input type="password" name="current" required></label>
+      <label>{% trans "Nueva contraseña" %}<input type="password" name="new" required minlength="4"></label>
+      <button class="btn-primary" type="submit">{% trans "Cambiar contraseña" %}</button>
+    </form>
+  </div>
+
+  {% if themes %}
+  <div class="auth-card">
+    <h2>🎨 {% trans "Tema de tablero" %}</h2>
+    <form method="post" action="{% url 'set_theme' %}" class="filters">
+      {% csrf_token %}
+      <select name="theme">
+        {% for t in themes %}
+        <option value="{{ t.code }}" {% if t.code == current_theme %}selected{% endif %}
+          {% if t.premium and not can_use_premium_themes %}disabled{% endif %}>{{ t.name }}{% if t.premium %} 👑{% endif %}</option>
+        {% endfor %}
+      </select>
+      <button class="btn-small" type="submit">{% trans "Aplicar" %}</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="auth-card danger-zone">
+    <h2>{% trans "Eliminar cuenta" %}</h2>
+    <p class="muted">{% trans "Esta acción es permanente. Confirmá con tu contraseña." %}</p>
+    <form method="post" action="{% url 'delete_account' %}"
+          onsubmit="return confirm('{% trans "¿Seguro que querés eliminar tu cuenta?" %}');">
+      {% csrf_token %}
+      <label>{% trans "Contraseña" %}<input type="password" name="password" required></label>
+      <button class="btn-danger" type="submit">{% trans "Eliminar mi cuenta" %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

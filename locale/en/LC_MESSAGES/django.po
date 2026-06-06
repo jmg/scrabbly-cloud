@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 18:17+0000\n"
+"POT-Creation-Date: 2026-06-06 18:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,11 +49,38 @@ msgstr "Request declined."
 msgid "Amistad eliminada."
 msgstr "Friend removed."
 
-#: accounts/views.py:240
+#: accounts/views.py:251
+#| msgid "Tema actualizado."
+msgid "Datos actualizados."
+msgstr "Details updated."
+
+#: accounts/views.py:264
+msgid "La contraseña actual es incorrecta."
+msgstr "The current password is incorrect."
+
+#: accounts/views.py:266
+msgid "La nueva contraseña es demasiado corta."
+msgstr "The new password is too short."
+
+#: accounts/views.py:271
+#| msgid "Tema actualizado."
+msgid "Contraseña actualizada."
+msgstr "Password updated."
+
+#: accounts/views.py:281
+msgid "Contraseña incorrecta. La cuenta no se eliminó."
+msgstr "Incorrect password. The account was not deleted."
+
+#: accounts/views.py:285
+#| msgid "Amistad eliminada."
+msgid "Tu cuenta fue eliminada."
+msgstr "Your account was deleted."
+
+#: accounts/views.py:297
 msgid "Ese tema es exclusivo de Premium. 👑"
 msgstr "That theme is Premium-only. 👑"
 
-#: accounts/views.py:244
+#: accounts/views.py:301
 msgid "Tema actualizado."
 msgstr "Theme updated."
 
@@ -166,11 +193,12 @@ msgstr "pending"
 
 #: templates/accounts/login.html:3 templates/accounts/login.html:6
 #: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:27
+#: templates/base.html:28
 msgid "Entrar"
 msgstr "Log in"
 
 #: templates/accounts/login.html:10 templates/accounts/register.html:14
+#: templates/accounts/settings.html:50
 msgid "Contraseña"
 msgstr "Password"
 
@@ -239,11 +267,11 @@ msgstr "best move"
 msgid "Evolución de rating"
 msgstr "Rating over time"
 
-#: templates/accounts/profile.html:75
+#: templates/accounts/profile.html:75 templates/accounts/settings.html:30
 msgid "Tema de tablero"
 msgstr "Board theme"
 
-#: templates/accounts/profile.html:85
+#: templates/accounts/profile.html:85 templates/accounts/settings.html:39
 msgid "Aplicar"
 msgstr "Apply"
 
@@ -260,7 +288,7 @@ msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:28
+#: templates/accounts/register.html:18 templates/base.html:29
 msgid "Crear cuenta"
 msgstr "Sign up"
 
@@ -269,7 +297,7 @@ msgstr "Sign up"
 msgid "Tu progreso como invitado (rating %(rating)s) se conservará."
 msgstr "Your guest progress (rating %(rating)s) will be kept."
 
-#: templates/accounts/register.html:13
+#: templates/accounts/register.html:13 templates/accounts/settings.html:12
 msgid "Email"
 msgstr "Email"
 
@@ -280,6 +308,57 @@ msgstr "(optional, for receipts)"
 #: templates/accounts/register.html:20
 msgid "¿Ya tenés cuenta?"
 msgstr "Already have an account?"
+
+#: templates/accounts/settings.html:3 templates/accounts/settings.html:6
+#: templates/base.html:24
+msgid "Ajustes"
+msgstr "Settings"
+
+#: templates/accounts/settings.html:9
+#| msgid "Crear cuenta"
+msgid "Cuenta"
+msgstr "Account"
+
+#: templates/accounts/settings.html:13
+msgid "Recibir recibos y avisos por email"
+msgstr "Receive receipts and notifications by email"
+
+#: templates/accounts/settings.html:14
+msgid "Guardar"
+msgstr "Save"
+
+#: templates/accounts/settings.html:19 templates/accounts/settings.html:24
+#| msgid "Contraseña"
+msgid "Cambiar contraseña"
+msgstr "Change password"
+
+#: templates/accounts/settings.html:22
+#| msgid "Contraseña"
+msgid "Contraseña actual"
+msgstr "Current password"
+
+#: templates/accounts/settings.html:23
+#| msgid "Contraseña"
+msgid "Nueva contraseña"
+msgstr "New password"
+
+#: templates/accounts/settings.html:45
+#| msgid "Crear cuenta"
+msgid "Eliminar cuenta"
+msgstr "Delete account"
+
+#: templates/accounts/settings.html:46
+msgid "Esta acción es permanente. Confirmá con tu contraseña."
+msgstr "This action is permanent. Confirm with your password."
+
+#: templates/accounts/settings.html:48
+msgid "¿Seguro que querés eliminar tu cuenta?"
+msgstr "Are you sure you want to delete your account?"
+
+#: templates/accounts/settings.html:51
+#| msgid "Crear cuenta"
+msgid "Eliminar mi cuenta"
+msgstr "Delete my account"
 
 #: templates/base.html:14 templates/game/arenas.html:3
 msgid "Torneos"
@@ -294,11 +373,11 @@ msgstr "Puzzles"
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:24
+#: templates/base.html:25
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:33 templates/game/arenas.html:45
+#: templates/base.html:34 templates/game/arenas.html:45
 msgid "Idioma"
 msgstr "Language"
 
@@ -547,7 +626,6 @@ msgid "Volver a la partida"
 msgstr "Back to the game"
 
 #: templates/game/arena.html:10
-#| msgid "Con rating"
 msgid "con rating"
 msgstr "rated"
 
@@ -594,12 +672,10 @@ msgid "Nadie inscripto todavía."
 msgstr "No one has joined yet."
 
 #: templates/game/arena_waiting.html:3
-#| msgid "Esperando rival"
 msgid "Buscando rival"
 msgstr "Finding opponent"
 
 #: templates/game/arena_waiting.html:7
-#| msgid "Esperando rival"
 msgid "Buscando rival…"
 msgstr "Finding opponent…"
 
@@ -608,7 +684,6 @@ msgid "Te emparejaremos en cuanto haya otro jugador libre."
 msgstr "We'll pair you as soon as another player is free."
 
 #: templates/game/arena_waiting.html:9
-#| msgid "Volver al lobby"
 msgid "Volver al torneo"
 msgstr "Back to tournament"
 
@@ -643,7 +718,6 @@ msgid "Español"
 msgstr "Spanish"
 
 #: templates/game/arenas.html:48
-#| msgid "Reloj:"
 msgid "Reloj"
 msgstr "Clock"
 
@@ -669,7 +743,6 @@ msgid "Crear"
 msgstr "Create"
 
 #: templates/game/arenas.html:66
-#| msgid "Entrar"
 msgid "Entrá"
 msgstr "Log in"
 
@@ -749,7 +822,6 @@ msgid "Fichas en la bolsa:"
 msgstr "Tiles in the bag:"
 
 #: templates/game/game.html:41
-#| msgid "Ninguna partida en curso."
 msgid "Siguiente partida del torneo"
 msgstr "Next tournament game"
 

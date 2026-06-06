@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 
 def _send(user, subject, body):
     email = getattr(user, "email", "")
-    if not email:
+    if not email or not getattr(user, "email_opt_in", True):
         return False
     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [email],
               fail_silently=True)

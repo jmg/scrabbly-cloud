@@ -56,6 +56,48 @@ class FriendshipTests(TestCase):
         self.assertFalse(Friendship.objects.exists())
 
 
+class SettingsTests(TestCase):
+    def test_update_account_and_optin(self):
+        c, u = _login("alice")
+        c.post("/settings/account/", {"email": "a@x.com", "email_opt_in": "1"})
+        u.refresh_from_db()
+        self.assertEqual(u.email, "a@x.com")
+        self.assertTrue(u.email_opt_in)
+        c.post("/settings/account/", {"email": "a@x.com"})  # checkbox unchecked
+        u.refresh_from_db()
+        self.assertFalse(u.email_opt_in)
+
+    def test_change_password(self):
+        c, u = _login("alice")
+        c.post("/settings/password/", {"current": "x", "new": "newpass"})
+        u.refresh_from_db()
+        self.assertTrue(u.check_password("newpass"))
+        # wrong current password is rejected
+        c.post("/settings/password/", {"current": "wrong", "new": "another"})
+        u.refresh_from_db()
+        self.assertTrue(u.check_password("newpass"))
+
+    def test_delete_account_requires_password(self):
+        c, u = _login("alice")
+        c.post("/settings/delete/", {"password": "wrong"})
+        self.assertTrue(User.objects.filter(pk=u.pk).exists())
+        c.post("/settings/delete/", {"password": "x"})
+        self.assertFalse(User.objects.filter(pk=u.pk).exists())
+
+    def test_optout_blocks_email(self):
+        from django.core import mail
+        from billing.emails import send_receipt
+        from django.utils import timezone
+        from billing.models import Subscription
+        _, u = _login("alice")
+        u.email = "a@x.com"; u.email_opt_in = False; u.save()
+        sub = Subscription(user=u, plan_code="gold_monthly", tier="gold",
+                           provider="mock", current_period_end=timezone.now())
+        mail.outbox = []
+        send_receipt(u, sub)
+        self.assertEqual(len(mail.outbox), 0)
+
+
 class ChallengeTests(TestCase):
     def test_challenge_accept_creates_game(self):
         ca, a = _login("alice")

@@ -62,6 +62,8 @@ necesidad de registrarse (cuentas de invitado).
   de i18n de Django; viene en **español** (por defecto) e **inglés**, con un
   selector de idioma en la barra superior. El juego en vivo (JS) se traduce vía
   `JavaScriptCatalog`.
+- **Ajustes de cuenta**: cambiar email y contraseña, preferencia de avisos por
+  email, tema de tablero y eliminación de cuenta (confirmada con contraseña).
 - **Social**: amigos (solicitudes de amistad con aceptar/rechazar) y **desafíos
   directos** a un usuario con la configuración elegida (reloj/idioma/rating);
   aceptar crea la partida al instante. Badges de pendientes en la barra superior.
