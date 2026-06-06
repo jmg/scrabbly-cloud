@@ -1,27 +1,31 @@
-"""Premium plan catalogue.
+"""Premium tiers and plan catalogue.
 
-Plans are defined in code (not the DB) so they're easy to version and price.
-Amounts are in the currency's minor unit (e.g. cents).
+Two paid tiers (Gold, Diamond) à la chess.com. Tiers gate perks; plans are the
+purchasable billing periods for a tier. Amounts are in the currency minor unit.
 """
 
-PLANS = {
-    "monthly": {
-        "name": "Premium mensual",
-        "amount": 499,          # $4.99
-        "currency": "usd",
-        "interval": "month",    # Stripe recurring interval
-        "days": 31,             # local entitlement length per period
+# Perks a tier unlocks. Diamond is a superset of Gold.
+TIERS = {
+    "gold": {
+        "name": "Gold",
+        "rank": 1,
+        "perks": {"themes", "stats", "unlimited", "badge"},
     },
-    "yearly": {
-        "name": "Premium anual",
-        "amount": 3999,         # $39.99 (2 months free)
-        "currency": "usd",
-        "interval": "year",
-        "days": 366,
+    "diamond": {
+        "name": "Diamond",
+        "rank": 2,
+        "perks": {"themes", "stats", "unlimited", "badge", "analysis"},
     },
 }
 
-DEFAULT_PLAN = "monthly"
+PLANS = {
+    "gold_monthly":    {"tier": "gold",    "name": "Gold mensual",    "amount": 499,  "currency": "usd", "interval": "month", "days": 31},
+    "gold_yearly":     {"tier": "gold",    "name": "Gold anual",      "amount": 3999, "currency": "usd", "interval": "year",  "days": 366},
+    "diamond_monthly": {"tier": "diamond", "name": "Diamond mensual", "amount": 999,  "currency": "usd", "interval": "month", "days": 31},
+    "diamond_yearly":  {"tier": "diamond", "name": "Diamond anual",   "amount": 7999, "currency": "usd", "interval": "year",  "days": 366},
+}
+
+TRIAL_DAYS = 7
 
 
 def get_plan(code):
@@ -30,3 +34,11 @@ def get_plan(code):
 
 def price_display(plan):
     return f"${plan['amount'] / 100:.2f}"
+
+
+def tier_has_perk(tier, perk):
+    return tier in TIERS and perk in TIERS[tier]["perks"]
+
+
+def tier_rank(tier):
+    return TIERS.get(tier, {}).get("rank", 0)

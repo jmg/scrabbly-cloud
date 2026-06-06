@@ -3,35 +3,60 @@
 {% block content %}
 <div class="pricing">
   <h1>Scrabbly <span class="crown">👑</span> Premium</h1>
-  <p class="muted">Mejorá tu juego y destacate. Cancelás cuando quieras.</p>
-
-  <ul class="perks">
-    <li>📊 Análisis post-partida de tus jugadas</li>
-    <li>🎨 Temas de tablero y fichas exclusivos</li>
-    <li>📈 Estadísticas avanzadas y evolución de rating</li>
-    <li>👑 Insignia premium y partidas simultáneas ilimitadas</li>
-  </ul>
+  <p class="muted">Elegí tu nivel. Cancelás cuando quieras.</p>
 
   {% if is_premium %}
   <div class="already-premium">
-    Ya sos Premium 👑 — <a href="{% url 'billing_manage' %}">gestionar suscripción</a>
+    Sos <b>{{ current_tier|capfirst }}</b> 👑 — <a href="{% url 'billing_manage' %}">gestionar suscripción</a>
   </div>
-  {% else %}
-  <div class="plan-cards">
-    {% for plan in plans %}
-    <div class="plan-card {% if plan.code == 'yearly' %}featured{% endif %}">
-      {% if plan.code == 'yearly' %}<span class="badge-save">2 meses gratis</span>{% endif %}
-      <h2>{{ plan.name }}</h2>
-      <div class="plan-price">{{ plan.price }}<span>/{{ plan.interval }}</span></div>
-      <form method="post" action="{% url 'billing_subscribe' %}">
+  {% endif %}
+
+  <div class="coupon-row">
+    <label>¿Tenés un cupón?
+      <input type="text" id="coupon-input" placeholder="CÓDIGO" autocomplete="off">
+    </label>
+    {% if trial_available %}<span class="trial-note">✨ Probá {{ trial_days }} días gratis</span>{% endif %}
+  </div>
+
+  <div class="tier-cards">
+    {% for tier in tiers %}
+    <div class="tier-card tier-{{ tier.code }}">
+      <h2>{{ tier.name }} <span class="crown crown-{{ tier.code }}">👑</span></h2>
+      <ul class="perks">
+        <li>🎨 Temas de tablero</li>
+        <li>📈 Estadísticas avanzadas</li>
+        <li>👑 Insignia + partidas ilimitadas</li>
+        <li class="{% if 'analysis' in tier.perks %}on{% else %}off{% endif %}">📊 Análisis post-partida</li>
+      </ul>
+      {% for plan in tier.plans %}
+      <form method="post" action="{% url 'billing_subscribe' %}" class="plan-row">
         {% csrf_token %}
         <input type="hidden" name="plan" value="{{ plan.code }}">
-        <button class="btn-primary" type="submit">Suscribirme</button>
+        <input type="hidden" name="coupon" class="coupon-field" value="">
+        <button class="btn-primary" type="submit">{{ plan.price }}<small>/{{ plan.interval }}</small></button>
       </form>
+      {% endfor %}
+      {% if trial_available %}
+      <form method="post" action="{% url 'billing_subscribe' %}" class="trial-row">
+        {% csrf_token %}
+        <input type="hidden" name="plan" value="{{ tier.code }}_monthly">
+        <input type="hidden" name="trial" value="1">
+        <input type="hidden" name="coupon" class="coupon-field" value="">
+        <button class="btn-secondary" type="submit">Probar {{ trial_days }} días gratis</button>
+      </form>
+      {% endif %}
     </div>
     {% endfor %}
   </div>
-  <p class="muted small">Pagos procesados de forma segura. El cobro se renueva automáticamente hasta que canceles.</p>
-  {% endif %}
+  <p class="muted small">Pagos seguros vía Stripe. La suscripción se renueva automáticamente hasta que canceles.</p>
 </div>
+<script>
+  // Mirror the coupon code into every form's hidden field before submit.
+  var couponInput = document.getElementById('coupon-input');
+  function syncCoupon() {
+    document.querySelectorAll('.coupon-field').forEach(function (f) { f.value = couponInput.value.trim(); });
+  }
+  couponInput.addEventListener('input', syncCoupon);
+  document.querySelectorAll('form').forEach(function (f) { f.addEventListener('submit', syncCoupon); });
+</script>
 {% endblock %}

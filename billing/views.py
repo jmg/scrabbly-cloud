@@ -7,38 +7,67 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from . import service
-from .plans import PLANS, get_plan, price_display
+from .plans import PLANS, TIERS, TRIAL_DAYS, get_plan, price_display
 from .providers import get_provider
 
 
+def _tier_cards():
+    """Group plans by tier for the pricing page."""
+    cards = []
+    for tier_code, tier in TIERS.items():
+        plans = [
+            {"code": code, "price": price_display(p), **p}
+            for code, p in PLANS.items() if p["tier"] == tier_code
+        ]
+        cards.append({"code": tier_code, "name": tier["name"],
+                      "perks": tier["perks"], "plans": plans})
+    return cards
+
+
 def pricing(request):
-    plans = [
-        {"code": code, "price": price_display(p), **p}
-        for code, p in PLANS.items()
-    ]
+    user = request.user
     return render(request, "billing/pricing.html", {
-        "plans": plans,
-        "is_premium": request.user.is_authenticated and request.user.is_premium,
+        "tiers": _tier_cards(),
+        "trial_days": TRIAL_DAYS,
+        "is_premium": user.is_authenticated and user.is_premium,
+        "current_tier": getattr(user, "tier", ""),
+        "trial_available": user.is_authenticated and not getattr(user, "has_used_trial", True)
+                           and not getattr(user, "is_guest", True),
     })
 
 
 @require_POST
 @login_required
 def subscribe(request):
+    user = request.user
     plan_code = request.POST.get("plan", "")
-    if request.user.is_guest:
+    if user.is_guest:
         messages.error(request, "Creá una cuenta para suscribirte.")
         return redirect("register")
     if get_plan(plan_code) is None:
         return HttpResponseBadRequest("Plan inválido")
-    url = get_provider().create_checkout(request.user, plan_code, request)
+
+    coupon = None
+    code = (request.POST.get("coupon") or "").strip()
+    if code:
+        coupon = service.validate_coupon(code)
+        if coupon is None:
+            messages.error(request, "Cupón inválido o agotado.")
+            return redirect("pricing")
+
+    trial = request.POST.get("trial") == "1" and not user.has_used_trial
+    if trial:
+        user.has_used_trial = True
+        user.save(update_fields=["has_used_trial"])
+
+    url = get_provider().create_checkout(
+        user, plan_code, request, trial=trial, coupon=coupon
+    )
     return redirect(url)
 
 
 @login_required
 def success(request):
-    # Mock provider activates synchronously; Stripe activates via webhook, so
-    # entitlement may take a moment to appear after returning here.
     if request.user.is_premium:
         messages.success(request, "¡Bienvenido a Premium! 👑")
     else:
@@ -52,8 +81,17 @@ def manage(request):
     return render(request, "billing/manage.html", {
         "subscription": sub,
         "is_premium": request.user.is_premium,
+        "tier": request.user.tier,
         "premium_until": request.user.premium_until,
+        "stripe": bool(getattr(settings, "STRIPE_SECRET_KEY", "")),
     })
+
+
+@require_POST
+@login_required
+def portal(request):
+    url = get_provider().portal(request.user, request)
+    return redirect(url)
 
 
 @require_POST
@@ -90,7 +128,7 @@ def _handle_event(event):
     if etype in ("checkout.session.completed", "invoice.paid"):
         meta = obj.get("metadata") or {}
         user_id = meta.get("user_id") or obj.get("client_reference_id")
-        plan_code = meta.get("plan_code", "monthly")
+        plan_code = meta.get("plan_code", "gold_monthly")
         if user_id:
             user = User.objects.filter(pk=user_id).first()
             if user:
@@ -100,8 +138,7 @@ def _handle_event(event):
                     subscription_id=obj.get("subscription", "") or "",
                 )
     elif etype == "customer.subscription.deleted":
-        sub_id = obj.get("id", "")
         from .models import Subscription
-        Subscription.objects.filter(provider_subscription_id=sub_id).update(
-            status=Subscription.EXPIRED
-        )
+        Subscription.objects.filter(
+            provider_subscription_id=obj.get("id", "")
+        ).update(status=Subscription.EXPIRED)

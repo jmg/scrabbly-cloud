@@ -311,7 +311,8 @@
         clock = '<span class="clock" data-uid="' + p.user_id + '">' +
           formatTime(liveTimeFor(p)) + "</span>";
       }
-      var crown = p.premium ? ' <span class="crown" title="Premium">👑</span>' : "";
+      var crown = p.premium ? ' <span class="crown crown-' + (p.tier || "gold") +
+        '" title="' + (p.tier === "diamond" ? "Diamond" : "Gold") + '">👑</span>' : "";
       li.innerHTML = '<span class="pname">' + avatarTag(p.name) + esc(p.name) + crown +
         " · " + p.rating + delta +
         "</span>" + clock + '<span class="pscore">' + p.score + '</span>' +

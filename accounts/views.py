@@ -77,15 +77,15 @@ def profile(request, username):
         "win_rate": win_rate, "form": form,
     }
 
-    # Premium-only advanced stats for the profile owner.
-    if user.is_premium:
+    # Advanced stats require the 'stats' perk (Gold+).
+    if user.has_perk("stats"):
         ctx["advanced"] = _advanced_stats(user)
 
     # Board-theme picker is shown to the profile owner.
     if request.user == user and not user.is_guest:
         ctx["themes"] = THEMES
         ctx["current_theme"] = user.board_theme
-        ctx["can_use_premium_themes"] = user.is_premium
+        ctx["can_use_premium_themes"] = user.has_perk("themes")
 
     return render(request, "accounts/profile.html", ctx)
 
@@ -149,7 +149,7 @@ def set_theme(request):
     theme = request.POST.get("theme", "classic")
     if theme not in THEME_CODES:
         theme = "classic"
-    if theme in PREMIUM_THEMES and not request.user.is_premium:
+    if theme in PREMIUM_THEMES and not request.user.has_perk("themes"):
         messages.error(request, "Ese tema es exclusivo de Premium. 👑")
         return redirect("pricing")
     request.user.board_theme = theme

@@ -19,8 +19,11 @@ class Subscription(models.Model):
         related_name="subscriptions",
     )
     plan_code = models.CharField(max_length=20)
+    tier = models.CharField(max_length=10, blank=True)
     provider = models.CharField(max_length=20)  # "mock" or "stripe"
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=ACTIVE)
+    coupon_code = models.CharField(max_length=40, blank=True)
+    is_trial = models.BooleanField(default=False)
 
     provider_customer_id = models.CharField(max_length=255, blank=True)
     provider_subscription_id = models.CharField(max_length=255, blank=True)
@@ -34,3 +37,25 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.user} · {self.plan_code} ({self.status})"
+
+
+class Coupon(models.Model):
+    """A discount/bonus code. Drives the mock flow and bonus trial days; with
+    Stripe, native promotion codes are also accepted at Checkout."""
+
+    code = models.CharField(max_length=40, unique=True)
+    description = models.CharField(max_length=200, blank=True)
+    percent_off = models.PositiveSmallIntegerField(default=0)   # informational
+    free_days = models.PositiveIntegerField(default=0)          # bonus entitlement
+    active = models.BooleanField(default=True)
+    max_redemptions = models.PositiveIntegerField(default=0)    # 0 = unlimited
+    times_redeemed = models.PositiveIntegerField(default=0)
+    stripe_coupon_id = models.CharField(max_length=80, blank=True)
+
+    def is_redeemable(self):
+        if not self.active:
+            return False
+        return self.max_redemptions == 0 or self.times_redeemed < self.max_redemptions
+
+    def __str__(self):
+        return self.code

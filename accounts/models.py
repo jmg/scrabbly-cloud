@@ -24,6 +24,8 @@ class User(AbstractUser):
 
     # Premium subscription: active while premium_until is in the future.
     premium_until = models.DateTimeField(null=True, blank=True)
+    premium_tier = models.CharField(max_length=10, blank=True)  # "gold" | "diamond"
+    has_used_trial = models.BooleanField(default=False)
     board_theme = models.CharField(max_length=20, default="classic")
 
     @property
@@ -37,10 +39,19 @@ class User(AbstractUser):
         return self.premium_until is not None and self.premium_until > timezone.now()
 
     @property
+    def tier(self):
+        """Active tier name: 'gold', 'diamond' or '' when not premium."""
+        return self.premium_tier if self.is_premium else ""
+
+    def has_perk(self, perk):
+        from billing.plans import tier_has_perk
+        return self.is_premium and tier_has_perk(self.premium_tier, perk)
+
+    @property
     def effective_theme(self):
-        """The board theme actually applied (premium themes need a sub)."""
+        """The board theme actually applied (premium themes need the perk)."""
         from .themes import PREMIUM_THEMES
-        if self.board_theme in PREMIUM_THEMES and not self.is_premium:
+        if self.board_theme in PREMIUM_THEMES and not self.has_perk("themes"):
             return "classic"
         return self.board_theme or "classic"
 

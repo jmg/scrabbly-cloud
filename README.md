@@ -46,25 +46,28 @@ necesidad de registrarse (cuentas de invitado).
 - **Perfiles y avatares**: avatares identicon generados (sin subidas), perfil
   con estadísticas (% de victorias, racha de resultados, historial).
 - **Anti-spam**: rate-limiting por usuario en las acciones de juego.
-- **Premium (suscripción)**: monetización estilo chess.com con perks —
-  análisis post-partida, temas de tablero exclusivos, estadísticas avanzadas
-  (curva de rating), insignia 👑 y partidas simultáneas ilimitadas. Cobro vía
-  **Stripe Checkout** (con webhook); un proveedor *mock* activa la suscripción
-  al instante para desarrollo/demo cuando no hay claves de Stripe.
+- **Premium (suscripción)**: monetización estilo chess.com con dos niveles —
+  **Gold** (temas, estadísticas avanzadas, insignia, partidas ilimitadas) y
+  **Diamond** (todo lo de Gold + análisis post-partida). Incluye **prueba
+  gratis** (una vez por usuario), **cupones de descuento** y **portal de
+  cliente** para autogestión.
 
 ## Premium / pagos
 
-La capa de cobro es agnóstica del proveedor:
+Niveles y planes (mensual/anual) definidos en `billing/plans.py`. La capa de
+cobro es agnóstica del proveedor:
 
-- Sin `STRIPE_SECRET_KEY`, se usa un proveedor **mock** que activa la
-  suscripción inmediatamente (ideal para dev/demo y tests).
+- Sin `STRIPE_SECRET_KEY`, un proveedor **mock** activa la suscripción al
+  instante (dev/demo y tests), aplicando trial y cupones locales.
 - Con `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` y `STRIPE_WEBHOOK_SECRET`,
-  se crea una **Stripe Checkout Session** (modo suscripción) y la activación
-  ocurre vía el webhook `POST /billing/stripe/webhook/`
-  (`checkout.session.completed` / `invoice.paid`).
+  se usa **Stripe Checkout** (modo suscripción, con `trial_period_days` y
+  códigos promocionales nativos), el **Billing Portal** de Stripe para
+  autogestión, y el webhook `POST /billing/stripe/webhook/`
+  (`checkout.session.completed` / `invoice.paid` / `customer.subscription.deleted`).
 
-Los planes se definen en `billing/plans.py`. Las cuentas gratuitas tienen un
-tope de partidas simultáneas (`FREE_CONCURRENT_GAMES`); Premium es ilimitado.
+Perks por nivel se controlan con `user.has_perk(...)`. Cupones (`Coupon`) y
+trial se gestionan desde el admin. Las cuentas gratuitas tienen un tope de
+partidas simultáneas (`FREE_CONCURRENT_GAMES`); Premium es ilimitado.
 
 ## API pública (solo lectura, JSON)
 

@@ -79,6 +79,23 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 
 /* Premium */
 .crown { color: #f0b428; }
+.crown-gold { color: #f0b428; }
+.crown-diamond { color: #5bc8e6; }
+.tier-cards { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+.tier-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 24px; min-width: 260px; }
+.tier-card.tier-gold { border-color: #f0b428; }
+.tier-card.tier-diamond { border-color: #5bc8e6; box-shadow: 0 0 0 1px #5bc8e6; }
+.tier-card .perks { list-style: none; padding: 0; text-align: left; margin: 12px 0 16px; }
+.tier-card .perks li { padding: 4px 0; }
+.tier-card .perks li.off { opacity: .35; text-decoration: line-through; }
+.plan-row, .trial-row { margin: 8px 0; }
+.plan-row .btn-primary { width: 100%; }
+.plan-row small, .plan-price span { font-weight: 400; opacity: .8; }
+.trial-row .btn-secondary { width: 100%; }
+.coupon-row { margin: 16px 0; display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.coupon-row input { padding: 6px 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; color: var(--text-strong); text-transform: uppercase; }
+.trial-note { color: var(--accent); font-weight: 600; }
+.manage-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
 .premium-link { color: #f0b428 !important; font-weight: 600; }
 .pricing { max-width: 760px; margin: 0 auto; text-align: center; }
 .pricing .perks { list-style: none; padding: 0; display: inline-flex; flex-direction: column; gap: 8px; text-align: left; margin: 16px auto 24px; }

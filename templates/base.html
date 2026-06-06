@@ -12,7 +12,7 @@
     <a class="brand" href="{% url 'lobby' %}">♟ Scrabbly</a>
     <nav>
       {% if user.is_authenticated and user.is_premium %}
-        <a class="premium-link" href="{% url 'billing_manage' %}">👑 Premium</a>
+        <a class="premium-link crown-{{ user.tier }}" href="{% url 'billing_manage' %}">👑 {{ user.tier|capfirst }}</a>
       {% else %}
         <a class="premium-link" href="{% url 'pricing' %}">👑 Premium</a>
       {% endif %}

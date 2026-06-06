@@ -140,7 +140,7 @@ def game_detail(request, game_id):
 def analysis(request, game_id):
     """Premium-only post-game analysis."""
     game = get_object_or_404(Game, pk=game_id)
-    if not (request.user.is_authenticated and request.user.is_premium):
+    if not (request.user.is_authenticated and request.user.has_perk("analysis")):
         return render(request, "game/analysis_locked.html", {"game": game}, status=200)
     if game.status not in (Game.FINISHED, Game.ABORTED):
         return redirect("game_detail", game_id=game.pk)

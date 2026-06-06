@@ -538,6 +538,7 @@ def public_state(game):
                 "name": s.player.display_name,
                 "rating": s.player.rating,
                 "premium": s.player.is_premium,
+                "tier": s.player.tier,
                 "seat": s.seat,
                 "score": s.score,
                 "tiles_left": len(s.rack),
