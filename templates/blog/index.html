@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Blog de Scrabble" %} · Scrabbly{% endblock %}
+{% block meta_description %}{% trans "Consejos, estrategias y trucos de Scrabble: cómo jugar, mejores palabras, y guías para mejorar tu juego." %}{% endblock %}
+{% block og_title %}{% trans "Blog de Scrabble" %}{% endblock %}
+{% block content %}
+<div class="blog-index">
+  <h1>{% trans "Blog de Scrabble" %}</h1>
+  <p class="muted">{% trans "Estrategias, trucos y guías para dominar el tablero." %}</p>
+  <ul class="post-list">
+    {% for post in posts %}
+    <li class="post-card">
+      <h2><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+      <p class="muted">{{ post.published_at|date:"d/m/Y" }}</p>
+      <p>{{ post.excerpt }}</p>
+      <a href="{{ post.get_absolute_url }}">{% trans "Leer más" %} →</a>
+    </li>
+    {% empty %}
+    <li class="muted">{% trans "Todavía no hay artículos." %}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

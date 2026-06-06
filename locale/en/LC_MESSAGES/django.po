@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 20:43+0000\n"
+"POT-Creation-Date: 2026-06-06 20:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -169,7 +169,7 @@ msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
 #: templates/accounts/friends.html:3 templates/accounts/friends.html:6
-#: templates/accounts/profile.html:27 templates/base.html:23
+#: templates/accounts/profile.html:27 templates/base.html:32
 msgid "Amigos"
 msgstr "Friends"
 
@@ -220,7 +220,7 @@ msgstr "pending"
 
 #: templates/accounts/login.html:3 templates/accounts/login.html:6
 #: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:29
+#: templates/base.html:38
 msgid "Entrar"
 msgstr "Log in"
 
@@ -238,7 +238,7 @@ msgid "Registrate"
 msgstr "Sign up"
 
 #: templates/accounts/notifications.html:3
-#: templates/accounts/notifications.html:6 templates/base.html:22
+#: templates/accounts/notifications.html:6 templates/base.html:31
 msgid "Notificaciones"
 msgstr "Notifications"
 
@@ -315,7 +315,7 @@ msgstr "Apply"
 msgid "Desbloqueá más temas con Premium"
 msgstr "Unlock more themes with Premium"
 
-#: templates/accounts/profile.html:92 templates/base.html:14
+#: templates/accounts/profile.html:92 templates/base.html:22
 #: templates/game/arenas.html:3
 msgid "Torneos"
 msgstr "Tournaments"
@@ -330,7 +330,6 @@ msgid "en curso"
 msgstr "in progress"
 
 #: templates/accounts/profile.html:99
-#| msgid "Próximos"
 msgid "próximo"
 msgstr "upcoming"
 
@@ -352,7 +351,7 @@ msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:30
+#: templates/accounts/register.html:18 templates/base.html:39
 msgid "Crear cuenta"
 msgstr "Sign up"
 
@@ -374,7 +373,7 @@ msgid "¿Ya tenés cuenta?"
 msgstr "Already have an account?"
 
 #: templates/accounts/settings.html:3 templates/accounts/settings.html:6
-#: templates/base.html:25
+#: templates/base.html:34
 msgid "Ajustes"
 msgstr "Settings"
 
@@ -418,20 +417,40 @@ msgstr "Are you sure you want to delete your account?"
 msgid "Eliminar mi cuenta"
 msgstr "Delete my account"
 
-#: templates/base.html:15 templates/game/puzzles.html:3
+#: templates/base.html:7
+#| msgid "Jugar al Scrabble online"
+msgid "Scrabble online"
+msgstr "Scrabble online"
+
+#: templates/base.html:8
+msgid ""
+"Jugá al Scrabble online gratis: partidas en tiempo real, contra la IA, "
+"torneos, puzzles y ranking ELO en español e inglés."
+msgstr ""
+
+#: templates/base.html:13
+#| msgid "Jugar al Scrabble online"
+msgid "Jugá al Scrabble online gratis."
+msgstr "Play Scrabble online for free."
+
+#: templates/base.html:23 templates/game/puzzles.html:3
 #: templates/game/puzzles.html:6
 msgid "Puzzles"
 msgstr "Puzzles"
 
-#: templates/base.html:19
+#: templates/base.html:24
+msgid "Blog"
+msgstr "Blog"
+
+#: templates/base.html:28
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:26
+#: templates/base.html:35
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:35 templates/game/arenas.html:45
+#: templates/base.html:44 templates/game/arenas.html:45
 msgid "Idioma"
 msgstr "Language"
 
@@ -626,6 +645,38 @@ msgstr "Go play"
 #: templates/billing/success.html:9
 msgid "Gestionar suscripción"
 msgstr "Manage subscription"
+
+#: templates/blog/index.html:3 templates/blog/index.html:5
+#: templates/blog/index.html:8
+msgid "Blog de Scrabble"
+msgstr "Scrabble Blog"
+
+#: templates/blog/index.html:4
+msgid ""
+"Consejos, estrategias y trucos de Scrabble: cómo jugar, mejores palabras, y "
+"guías para mejorar tu juego."
+msgstr ""
+
+#: templates/blog/index.html:9
+msgid "Estrategias, trucos y guías para dominar el tablero."
+msgstr "Strategies, tricks and guides to master the board."
+
+#: templates/blog/index.html:16
+msgid "Leer más"
+msgstr "Read more"
+
+#: templates/blog/index.html:19
+msgid "Todavía no hay artículos."
+msgstr "No articles yet."
+
+#: templates/blog/post.html:28
+#| msgid "Jugar al Scrabble online"
+msgid "Jugá al Scrabble ahora"
+msgstr "Play Scrabble now"
+
+#: templates/blog/post.html:31
+msgid "Seguí leyendo"
+msgstr "Keep reading"
 
 #: templates/game/analysis.html:6
 msgid "Análisis"

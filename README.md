@@ -99,6 +99,17 @@ pip install -r requirements-dev.txt
 python -m playwright install chromium
 python manage.py test game.tests_e2e
 ```
+
+CI (GitHub Actions, `.github/workflows/ci.yml`) corre en cada push/PR: instala
+gettext y Chromium, compila traducciones, chequea migraciones y ejecuta toda la
+batería **incluidos los E2E de navegador**.
+
+## SEO / Blog
+
+Hay un blog (`/blog/`) con artículos optimizados para SEO (editables en el
+admin), `sitemap.xml` (`django.contrib.sitemaps`) y `robots.txt`. Cada página
+incluye `meta description`, `canonical` y Open Graph; los posts agregan JSON-LD
+(`BlogPosting`). El dominio previsto es **scrabblycloud.com**.
 - **Premium (suscripción)**: monetización estilo chess.com con dos niveles —
   **Gold** (temas, estadísticas avanzadas, insignia, partidas ilimitadas) y
   **Diamond** (todo lo de Gold + análisis post-partida). Incluye **prueba

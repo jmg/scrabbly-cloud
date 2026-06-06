@@ -24,6 +24,8 @@ class GuestUserMiddleware:
             or path.startswith("/ws/")
             or path.startswith("/api/")
             or path.startswith("/billing/")
+            or path == "/robots.txt"
+            or path == "/sitemap.xml"
         )
         if not skip and not request.user.is_authenticated:
             user = User.objects.create(

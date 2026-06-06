@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ post.title }} · Scrabbly{% endblock %}
+{% block meta_description %}{{ post.description }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.description }}{% endblock %}
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ post.title|escapejs }}",
+  "description": "{{ post.description|escapejs }}",
+  "datePublished": "{{ post.published_at|date:'c' }}",
+  "dateModified": "{{ post.updated_at|date:'c' }}",
+  "author": {"@type": "Organization", "name": "Scrabbly"},
+  "mainEntityOfPage": "{{ request.build_absolute_uri }}"
+}
+</script>
+{% endblock %}
+{% block content %}
+<article class="blog-post">
+  <h1>{{ post.title }}</h1>
+  <p class="muted">{{ post.published_at|date:"d/m/Y" }}</p>
+  <div class="post-body">{{ post.body|safe }}</div>
+
+  <p class="post-cta"><a class="btn-primary" href="{% url 'lobby' %}">{% trans "Jugá al Scrabble ahora" %}</a></p>
+
+  {% if related %}
+  <h2>{% trans "Seguí leyendo" %}</h2>
+  <ul class="post-list">
+    {% for r in related %}
+    <li><a href="{{ r.get_absolute_url }}">{{ r.title }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</article>
+{% endblock %}

@@ -4,8 +4,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Scrabbly{% endblock %}</title>
+  <title>{% block title %}Scrabbly — {% trans "Scrabble online" %}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{% trans "Jugá al Scrabble online gratis: partidas en tiempo real, contra la IA, torneos, puzzles y ranking ELO en español e inglés." %}{% endblock %}">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <meta property="og:site_name" content="Scrabbly">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}Scrabbly{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{% trans "Jugá al Scrabble online gratis." %}{% endblock %}">
+  <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block head_extra %}{% endblock %}
 </head>
 <body data-theme="{{ user.effective_theme|default:'classic' }}">
   <header class="topbar">
@@ -13,6 +21,7 @@
     <nav>
       <a href="{% url 'arenas' %}">🏆 {% trans "Torneos" %}</a>
       <a href="{% url 'puzzles' %}">🧩 {% trans "Puzzles" %}</a>
+      <a href="{% url 'blog' %}">📰 {% trans "Blog" %}</a>
       {% if user.is_authenticated and user.is_premium %}
         <a class="premium-link crown-{{ user.tier }}" href="{% url 'billing_manage' %}">👑 {{ user.tier|capfirst }}</a>
       {% else %}
