@@ -4,13 +4,14 @@ The HTTP views and the Stripe webhook both funnel through ``activate`` /
 ``cancel`` so premium entitlement is granted in exactly one place.
 """
 
+import secrets
 from datetime import timedelta
 
 from django.db.models import F
 from django.utils import timezone
 
-from .models import Coupon, Subscription
-from .plans import get_plan
+from .models import Coupon, GiftCode, Subscription
+from .plans import GIFT_PLANS, get_plan
 
 
 def activate(user, plan_code, provider, *, customer_id="", subscription_id="",
@@ -41,6 +42,8 @@ def activate(user, plan_code, provider, *, customer_id="", subscription_id="",
             "is_trial": is_trial,
         },
     )
+    from .emails import send_receipt
+    send_receipt(user, sub)
     return sub
 
 
@@ -70,3 +73,47 @@ def redeem_coupon(coupon):
         Coupon.objects.filter(pk=coupon.pk).update(
             times_redeemed=F("times_redeemed") + 1
         )
+
+
+def grant_premium(user, tier, days, *, source="gift"):
+    """Extend a user's premium entitlement without a recurring subscription."""
+    now = timezone.now()
+    base = user.premium_until if (user.premium_until and user.premium_until > now) else now
+    user.premium_until = base + timedelta(days=days)
+    user.premium_tier = tier
+    user.save(update_fields=["premium_until", "premium_tier"])
+    Subscription.objects.create(
+        user=user, plan_code=source, tier=tier, provider=source,
+        status=Subscription.CANCELED, current_period_end=user.premium_until,
+    )
+
+
+def _gift_code():
+    return "GIFT-" + secrets.token_hex(4).upper()
+
+
+def create_gift(purchaser, gift_plan_code):
+    plan = GIFT_PLANS.get(gift_plan_code)
+    if plan is None:
+        raise ValueError("Unknown gift plan")
+    code = _gift_code()
+    while GiftCode.objects.filter(code=code).exists():
+        code = _gift_code()
+    gift = GiftCode.objects.create(
+        code=code, plan_code=gift_plan_code, tier=plan["tier"],
+        days=plan["days"], purchaser=purchaser,
+    )
+    from .emails import send_gift_purchased
+    send_gift_purchased(purchaser, gift)
+    return gift
+
+
+def redeem_gift(user, code):
+    gift = GiftCode.objects.filter(code__iexact=(code or "").strip()).first()
+    if gift is None or gift.is_redeemed:
+        return None
+    grant_premium(user, gift.tier, gift.days, source="gift")
+    gift.redeemed_by = user
+    gift.redeemed_at = timezone.now()
+    gift.save(update_fields=["redeemed_by", "redeemed_at"])
+    return gift

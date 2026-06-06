@@ -56,7 +56,7 @@ def _check_game_quota(user):
     """Free accounts may only have a limited number of games in progress."""
     from accounts.models import FREE_CONCURRENT_GAMES
 
-    if getattr(user, "is_premium", False):
+    if getattr(user, "is_premium", False) or getattr(user, "is_bot", False):
         return
     in_progress = (
         Game.objects.filter(players__player=user)
@@ -565,6 +565,69 @@ def public_state(game):
 def rack_for(game, user):
     seat = game.seat_for(user)
     return list(seat.rack) if seat else []
+
+
+BOT_USERNAMES = {
+    "easy": "IA-Fácil",
+    "medium": "IA-Media",
+    "hard": "IA-Difícil",
+}
+BOT_RATINGS = {"easy": 1000, "medium": 1400, "hard": 1800}
+
+
+def get_bot_user(level):
+    """Return (creating if needed) the bot account for a difficulty level."""
+    from accounts.models import User
+
+    username = BOT_USERNAMES.get(level, BOT_USERNAMES["medium"])
+    bot, created = User.objects.get_or_create(
+        username=username,
+        defaults={"is_bot": True, "rating": BOT_RATINGS.get(level, 1400)},
+    )
+    if created:
+        bot.set_unusable_password()
+        bot.save(update_fields=["password"])
+    return bot
+
+
+def create_ai_game(user, level="medium", language=DEFAULT_LANGUAGE):
+    """Start an unrated game between ``user`` and the computer."""
+    if level not in BOT_USERNAMES:
+        level = "medium"
+    game = create_game(user, rated=False, language=language)
+    game.ai_level = level
+    game.save(update_fields=["ai_level"])
+    return join_game(game, get_bot_user(level))  # fills 2nd seat -> active
+
+
+def maybe_play_bot(game):
+    """If it's the bot's turn, compute and apply its move(s)."""
+    from game import ai
+
+    for _ in range(8):  # safety cap against pathological loops
+        game = Game.objects.get(pk=game.pk)
+        if not game.ai_level or game.status != Game.ACTIVE:
+            return game
+        seat = game.current_seat
+        if seat is None or not seat.player.is_bot:
+            return game
+
+        ruleset = get_ruleset(game.language)
+        board = Board.deserialize(game.board)
+        placements = ai.choose_move(
+            board, list(seat.rack), ruleset, get_wordlist(game.language),
+            game.language, difficulty=game.ai_level,
+        )
+        try:
+            if placements:
+                game = make_play(game, seat.player, placements)
+            elif len(Bag(letters=list(game.bag))) >= 1:
+                game = make_exchange(game, seat.player, list(seat.rack)[:1])
+            else:
+                game = make_pass(game, seat.player)
+        except InvalidMove:
+            game = make_pass(game, seat.player)
+    return game
 
 
 def game_analysis(game):

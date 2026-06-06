@@ -390,6 +390,50 @@ class AvatarTests(TestCase):
         self.assertNotEqual(avatar("alice", 40), avatar("bob", 40))
 
 
+class AiTests(TestCase):
+    def test_generator_finds_a_legal_move(self):
+        from game.engine import Board, get_ruleset
+        from game.services import get_wordlist
+        from game import ai
+        wl = get_wordlist("es")
+        if not wl.enabled:
+            self.skipTest("dictionary not bundled")
+        board = Board(grid={(7, 6): "C", (7, 7): "A", (7, 8): "S", (7, 9): "A"})
+        move = ai.choose_move(board, list("SRLOEIT"), get_ruleset("es"), wl, "es", "hard")
+        self.assertIsNotNone(move)
+        self.assertTrue(all({"letter", "row", "col"} <= set(p) for p in move))
+
+    def test_ai_game_bot_moves_after_human(self):
+        from accounts.models import User
+        from game import services
+        from game.models import Game
+        u = User.objects.create_user("human", password="x")
+        game = services.create_ai_game(u, level="hard", language="es")
+        self.assertEqual(game.status, "active")
+        self.assertEqual(game.ai_level, "hard")
+        bot_seat = game.players.filter(player__is_bot=True).first()
+        self.assertIsNotNone(bot_seat)
+
+        # Human opens with CASA through the centre, then the bot replies.
+        seat = game.seat_for(u)
+        seat.rack = list("CASA") + list(seat.rack)[:3]
+        seat.save()
+        placements = [
+            {"letter": "C", "row": 7, "col": 6, "is_blank": False},
+            {"letter": "A", "row": 7, "col": 7, "is_blank": False},
+            {"letter": "S", "row": 7, "col": 8, "is_blank": False},
+            {"letter": "A", "row": 7, "col": 9, "is_blank": False},
+        ]
+        game = services.make_play(game, u, placements)
+        game = services.maybe_play_bot(game)
+        # The bot took its turn (a move record exists for it).
+        self.assertTrue(Game.objects.get(pk=game.pk).moves.filter(player__is_bot=True).exists())
+        # Bots never appear on the leaderboard.
+        self.assertFalse(
+            User.objects.filter(is_guest=False, is_bot=False, username__startswith="IA-").exists()
+        )
+
+
 class RatingTests(TestCase):
     def test_winner_gains_loser_loses(self):
         new = ratings.compute_updates([

@@ -41,6 +41,9 @@ necesidad de registrarse (cuentas de invitado).
 
 - **Lobby**: filtros por idioma y rating, paginación de partidas abiertas y
   listado paginado de partidas recientes (terminadas).
+- **Rival IA**: jugá contra la computadora en tres niveles (fácil/media/difícil).
+  El bot genera jugadas legales (hooks, extensiones y plays a través de fichas
+  existentes) con un motor propio y presupuesto de tiempo por jugada.
 - **Modo correspondencia**: partidas sin reloj jugables a lo largo del tiempo,
   con la sección «Te toca jugar» que lista las partidas que esperan tu turno.
 - **Perfiles y avatares**: avatares identicon generados (sin subidas), perfil
@@ -68,6 +71,13 @@ cobro es agnóstica del proveedor:
 Perks por nivel se controlan con `user.has_perk(...)`. Cupones (`Coupon`) y
 trial se gestionan desde el admin. Las cuentas gratuitas tienen un tope de
 partidas simultáneas (`FREE_CONCURRENT_GAMES`); Premium es ilimitado.
+
+Además: **tier vitalicio** (pago único), **regalar Premium** (códigos de
+regalo, `/premium/gift/`), **emails transaccionales** (bienvenida, recibo,
+aviso de pago fallido — backend de consola en dev, SMTP por env en prod),
+**dunning** (webhook `invoice.payment_failed` marca `past_due` y avisa al
+cliente), y un **panel de métricas** staff-only (`/premium/metrics/`: MRR/ARR,
+conversión, churn, suscripciones por tier, trials, regalos).
 
 ## API pública (solo lectura, JSON)
 

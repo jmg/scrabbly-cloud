@@ -6,10 +6,11 @@ User = get_user_model()
 
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, min_length=4)
+    email = forms.EmailField(required=False)
 
     class Meta:
         model = User
-        fields = ["username"]
+        fields = ["username", "email"]
 
     def clean_username(self):
         username = self.cleaned_data["username"].strip()

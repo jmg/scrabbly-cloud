@@ -33,7 +33,7 @@
         {% csrf_token %}
         <input type="hidden" name="plan" value="{{ plan.code }}">
         <input type="hidden" name="coupon" class="coupon-field" value="">
-        <button class="btn-primary" type="submit">{{ plan.price }}<small>/{{ plan.interval }}</small></button>
+        <button class="{% if plan.lifetime %}btn-secondary{% else %}btn-primary{% endif %}" type="submit">{{ plan.price }}<small>{% if plan.interval %}/{{ plan.interval }}{% else %} · de por vida{% endif %}</small></button>
       </form>
       {% endfor %}
       {% if trial_available %}
@@ -49,6 +49,7 @@
     {% endfor %}
   </div>
   <p class="muted small">Pagos seguros vía Stripe. La suscripción se renueva automáticamente hasta que canceles.</p>
+  <p><a href="{% url 'gift' %}">🎁 Regalar Premium</a></p>
 </div>
 <script>
   // Mirror the coupon code into every form's hidden field before submit.

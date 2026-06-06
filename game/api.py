@@ -47,7 +47,7 @@ def game(request, game_id):
 
 
 def leaderboard(request):
-    top = User.objects.filter(is_guest=False).order_by("-rating")[:50]
+    top = User.objects.filter(is_guest=False, is_bot=False).order_by("-rating")[:50]
     return JsonResponse({"players": [
         {"username": u.username, "rating": u.rating,
          "games_played": u.games_played, "wins": u.wins}

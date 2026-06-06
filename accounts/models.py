@@ -16,6 +16,7 @@ class User(AbstractUser):
     """
 
     is_guest = models.BooleanField(default=False)
+    is_bot = models.BooleanField(default=False)
     rating = models.IntegerField(default=DEFAULT_RATING)
     games_played = models.IntegerField(default=0)
     wins = models.IntegerField(default=0)

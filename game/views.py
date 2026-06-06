@@ -61,7 +61,7 @@ def lobby(request):
     )
     recent_page = Paginator(recent, 12).get_page(request.GET.get("fpage"))
 
-    leaders = User.objects.filter(is_guest=False).order_by("-rating")[:10]
+    leaders = User.objects.filter(is_guest=False, is_bot=False).order_by("-rating")[:10]
     return render(request, "game/lobby.html", {
         "waiting": waiting_page, "active": active,
         "my_turn": my_turn, "my_waiting": my_waiting,
@@ -108,6 +108,17 @@ def quick_pair(request):
         clock_initial=initial, clock_increment=increment,
     )
     notify_update(game.pk)
+    return redirect("game_detail", game_id=game.pk)
+
+
+@require_POST
+@ACTION_LIMIT
+def create_ai_game(request):
+    level = request.POST.get("level", "medium")
+    try:
+        game = services.create_ai_game(request.user, level=level, language=_language(request))
+    except InvalidMove as exc:
+        return _error(request, str(exc))
     return redirect("game_detail", game_id=game.pk)
 
 
@@ -167,6 +178,7 @@ def play(request, game_id):
         game = services.make_play(game, request.user, placements)
     except (InvalidMove, ValueError, KeyError) as exc:
         return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+    game = services.maybe_play_bot(game)
     notify_update(game.pk)
     return JsonResponse({"ok": True})
 
@@ -179,6 +191,7 @@ def passturn(request, game_id):
         game = services.make_pass(game, request.user)
     except InvalidMove as exc:
         return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+    game = services.maybe_play_bot(game)
     notify_update(game.pk)
     return JsonResponse({"ok": True})
 
@@ -192,6 +205,7 @@ def exchange(request, game_id):
         game = services.make_exchange(game, request.user, letters)
     except (InvalidMove, ValueError) as exc:
         return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+    game = services.maybe_play_bot(game)
     notify_update(game.pk)
     return JsonResponse({"ok": True})
 

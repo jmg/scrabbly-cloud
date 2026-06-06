@@ -71,6 +71,69 @@ class PremiumFlowTests(TestCase):
         self.assertEqual(r.status_code, 302)  # mock -> manage page
 
 
+class MonetizationExtrasTests(TestCase):
+    def _register(self, username, email=""):
+        c = Client()
+        c.get("/")
+        c.post("/register/", {"username": username, "password": "abcd", "email": email})
+        return c, User.objects.get(username=username)
+
+    def test_lifetime_plan_grants_long_premium(self):
+        c, u = self._register("lifer")
+        c.post("/premium/subscribe/", {"plan": "diamond_lifetime"})
+        u.refresh_from_db()
+        self.assertTrue(u.is_premium)
+        self.assertEqual(u.tier, "diamond")
+        self.assertGreater(u.premium_until, timezone.now() + timedelta(days=3650))
+
+    def test_gift_buy_and_redeem(self):
+        from billing.models import GiftCode
+        c1, buyer = self._register("buyer")
+        r = c1.post("/premium/gift/buy/", {"plan": "gift_diamond_year"})
+        self.assertEqual(r.status_code, 200)  # shows the code
+        g = GiftCode.objects.get(purchaser=buyer)
+        self.assertFalse(g.is_redeemed)
+
+        c2, recipient = self._register("recipient")
+        c2.post("/premium/gift/redeem/", {"code": g.code})
+        recipient.refresh_from_db()
+        self.assertTrue(recipient.is_premium)
+        self.assertEqual(recipient.tier, "diamond")
+        g.refresh_from_db()
+        self.assertEqual(g.redeemed_by_id, recipient.pk)
+        # A used code can't be redeemed again.
+        self.assertIsNone(__import__("billing.service", fromlist=["x"]).redeem_gift(recipient, g.code))
+
+    def test_metrics_staff_only(self):
+        c, u = self._register("viewer")
+        self.assertEqual(c.get("/premium/metrics/").status_code, 403)
+        u.is_staff = True
+        u.save(update_fields=["is_staff"])
+        self.assertEqual(c.get("/premium/metrics/").status_code, 200)
+
+    def test_welcome_email_sent_when_email_given(self):
+        from django.core import mail
+        mail.outbox = []
+        self._register("emailer", email="e@example.com")
+        self.assertTrue(any("Bienvenido" in m.subject for m in mail.outbox))
+
+    def test_dunning_marks_past_due_and_emails(self):
+        from django.core import mail
+        from billing import service, views
+        from billing.models import Subscription
+        u = User.objects.create_user("dun", password="x", email="d@example.com")
+        service.activate(u, "gold_monthly", "stripe", subscription_id="sub_123")
+        mail.outbox = []
+        views._handle_event({
+            "type": "invoice.payment_failed",
+            "data": {"object": {"subscription": "sub_123",
+                                "metadata": {"user_id": str(u.pk)}}},
+        })
+        self.assertTrue(Subscription.objects.filter(
+            provider_subscription_id="sub_123", status=Subscription.PAST_DUE).exists())
+        self.assertTrue(any("pago" in m.subject.lower() for m in mail.outbox))
+
+
 class PerkGatingTests(TestCase):
     def _premium(self, username, tier):
         u = User.objects.create_user(username, password="x")

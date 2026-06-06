@@ -17,19 +17,23 @@ def register(request):
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
+            email = form.cleaned_data.get("email", "")
             user = request.user
             # Upgrade the current guest account in place so its rating and
             # game history carry over. Otherwise create a fresh account.
             if user.is_authenticated and getattr(user, "is_guest", False):
                 user.username = username
+                user.email = email
                 user.is_guest = False
                 user.set_password(password)
                 user.save()
             else:
                 user = User.objects.create_user(
-                    username=username, password=password
+                    username=username, password=password, email=email
                 )
             login(request, user)
+            from billing.emails import send_welcome
+            send_welcome(user)
             messages.success(request, "¡Cuenta creada!")
             return redirect("lobby")
     else:

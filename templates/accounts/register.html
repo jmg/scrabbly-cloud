@@ -9,6 +9,7 @@
   <form method="post">
     {% csrf_token %}
     <label>Usuario<input type="text" name="username" required></label>
+    <label>Email <span class="muted small">(opcional, para recibos)</span><input type="email" name="email"></label>
     <label>Contraseña<input type="password" name="password" required minlength="4"></label>
     {% if form.errors %}<ul class="form-errors">
       {% for field, errors in form.errors.items %}{% for e in errors %}<li>{{ e }}</li>{% endfor %}{% endfor %}

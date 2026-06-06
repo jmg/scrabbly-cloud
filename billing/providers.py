@@ -50,31 +50,63 @@ class StripeProvider:
         plan = get_plan(plan_code)
         success = request.build_absolute_uri(reverse("billing_success"))
         cancel = request.build_absolute_uri(reverse("pricing"))
-        sub_data = {"metadata": {"user_id": str(user.pk), "plan_code": plan_code}}
-        if trial:
-            sub_data["trial_period_days"] = TRIAL_DAYS
-        params = dict(
-            mode="subscription",
-            success_url=success + "?session_id={CHECKOUT_SESSION_ID}",
+        metadata = {"user_id": str(user.pk), "plan_code": plan_code}
+        price_data = {
+            "currency": plan["currency"],
+            "unit_amount": plan["amount"],
+            "product_data": {"name": "Scrabbly " + plan["name"]},
+        }
+        if plan.get("lifetime"):
+            # One-time payment, no recurring billing.
+            params = dict(
+                mode="payment",
+                success_url=success + "?session_id={CHECKOUT_SESSION_ID}",
+                cancel_url=cancel,
+                client_reference_id=str(user.pk),
+                metadata=metadata,
+                line_items=[{"quantity": 1, "price_data": price_data}],
+            )
+        else:
+            price_data["recurring"] = {"interval": plan["interval"]}
+            sub_data = {"metadata": metadata}
+            if trial:
+                sub_data["trial_period_days"] = TRIAL_DAYS
+            params = dict(
+                mode="subscription",
+                success_url=success + "?session_id={CHECKOUT_SESSION_ID}",
+                cancel_url=cancel,
+                client_reference_id=str(user.pk),
+                metadata=metadata,
+                subscription_data=sub_data,
+                allow_promotion_codes=True,
+                line_items=[{"quantity": 1, "price_data": price_data}],
+            )
+            if coupon and coupon.stripe_coupon_id:
+                params.pop("allow_promotion_codes")
+                params["discounts"] = [{"coupon": coupon.stripe_coupon_id}]
+        session = self.stripe.checkout.Session.create(**params)
+        return session.url
+
+    def create_gift_checkout(self, user, gift_plan_code, request):
+        from .plans import GIFT_PLANS
+        plan = GIFT_PLANS[gift_plan_code]
+        success = request.build_absolute_uri(reverse("billing_success"))
+        cancel = request.build_absolute_uri(reverse("gift"))
+        session = self.stripe.checkout.Session.create(
+            mode="payment",
+            success_url=success,
             cancel_url=cancel,
             client_reference_id=str(user.pk),
-            metadata={"user_id": str(user.pk), "plan_code": plan_code},
-            subscription_data=sub_data,
-            allow_promotion_codes=True,
+            metadata={"kind": "gift", "user_id": str(user.pk), "gift_plan": gift_plan_code},
             line_items=[{
                 "quantity": 1,
                 "price_data": {
                     "currency": plan["currency"],
                     "unit_amount": plan["amount"],
-                    "recurring": {"interval": plan["interval"]},
-                    "product_data": {"name": "Scrabbly " + plan["name"]},
+                    "product_data": {"name": "Scrabbly regalo · " + plan["name"]},
                 },
             }],
         )
-        if coupon and coupon.stripe_coupon_id:
-            params.pop("allow_promotion_codes")
-            params["discounts"] = [{"coupon": coupon.stripe_coupon_id}]
-        session = self.stripe.checkout.Session.create(**params)
         return session.url
 
     def portal(self, user, request):

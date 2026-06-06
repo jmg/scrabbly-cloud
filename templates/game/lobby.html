@@ -36,6 +36,17 @@
         <label><input type="checkbox" name="rated" value="1" checked> Con rating</label>
         <button class="btn-secondary" type="submit">Crear partida</button>
       </form>
+      <form method="post" action="{% url 'create_ai_game' %}" class="create-form">
+        {% csrf_token %}
+        <input type="hidden" name="language" value="es" class="lang-field">
+        <span>🤖 Jugar vs IA:</span>
+        <select name="level">
+          <option value="easy">Fácil</option>
+          <option value="medium" selected>Media</option>
+          <option value="hard">Difícil</option>
+        </select>
+        <button class="btn-secondary" type="submit">Jugar</button>
+      </form>
     </div>
 
     {% if my_turn %}

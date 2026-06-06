@@ -23,6 +23,13 @@ PLANS = {
     "gold_yearly":     {"tier": "gold",    "name": "Gold anual",      "amount": 3999, "currency": "usd", "interval": "year",  "days": 366},
     "diamond_monthly": {"tier": "diamond", "name": "Diamond mensual", "amount": 999,  "currency": "usd", "interval": "month", "days": 31},
     "diamond_yearly":  {"tier": "diamond", "name": "Diamond anual",   "amount": 7999, "currency": "usd", "interval": "year",  "days": 366},
+    "diamond_lifetime": {"tier": "diamond", "name": "Diamond de por vida", "amount": 19999, "currency": "usd", "interval": None, "days": 36500, "lifetime": True},
+}
+
+# Plans purchasable as a one-time gift (no recurring billing).
+GIFT_PLANS = {
+    "gift_gold_year":    {"tier": "gold",    "name": "Gold (1 año, regalo)",    "amount": 3999, "currency": "usd", "days": 366},
+    "gift_diamond_year": {"tier": "diamond", "name": "Diamond (1 año, regalo)", "amount": 7999, "currency": "usd", "days": 366},
 }
 
 TRIAL_DAYS = 7

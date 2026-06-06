@@ -96,6 +96,8 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .coupon-row input { padding: 6px 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; color: var(--text-strong); text-transform: uppercase; }
 .trial-note { color: var(--accent); font-weight: 600; }
 .manage-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.gift-code { font-size: 28px; font-weight: 700; letter-spacing: 2px; color: var(--accent); background: var(--panel2); padding: 12px; border-radius: 8px; }
+.metrics-grid { grid-template-columns: repeat(4, 1fr); }
 .premium-link { color: #f0b428 !important; font-weight: 600; }
 .pricing { max-width: 760px; margin: 0 auto; text-align: center; }
 .pricing .perks { list-style: none; padding: 0; display: inline-flex; flex-direction: column; gap: 8px; text-align: left; margin: 16px auto 24px; }

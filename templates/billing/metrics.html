@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Métricas · Scrabbly{% endblock %}
+{% block content %}
+<div class="metrics">
+  <h1>📊 Métricas de negocio</h1>
+  <div class="stat-grid metrics-grid">
+    <div class="stat"><b>${{ mrr }}</b><span>MRR</span></div>
+    <div class="stat"><b>${{ arr }}</b><span>ARR</span></div>
+    <div class="stat"><b>{{ active_subs }}</b><span>suscripciones activas</span></div>
+    <div class="stat"><b>{{ conversion }}%</b><span>conversión</span></div>
+    <div class="stat"><b>{{ churn }}%</b><span>churn (30d)</span></div>
+    <div class="stat"><b>{{ premium_users }}/{{ total_users }}</b><span>premium / usuarios</span></div>
+    <div class="stat"><b>{{ by_tier.gold }}</b><span>Gold</span></div>
+    <div class="stat"><b>{{ by_tier.diamond }}</b><span>Diamond</span></div>
+    <div class="stat"><b>{{ trials }}</b><span>trials activos</span></div>
+    <div class="stat"><b>{{ past_due }}</b><span>pago pendiente</span></div>
+    <div class="stat"><b>{{ gifts_redeemed }}</b><span>regalos canjeados</span></div>
+  </div>
+</div>
+{% endblock %}

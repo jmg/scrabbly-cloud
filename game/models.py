@@ -26,6 +26,9 @@ class Game(models.Model):
     clock_increment = models.PositiveIntegerField(default=0)  # seconds added per move
     turn_started_at = models.DateTimeField(null=True, blank=True)
 
+    # Set for games against the computer ("easy" | "medium" | "hard").
+    ai_level = models.CharField(max_length=10, blank=True)
+
     board = models.JSONField(default=dict, blank=True)   # engine Board.serialize()
     bag = models.JSONField(default=list, blank=True)     # remaining bag letters
     turn_index = models.PositiveSmallIntegerField(default=0)

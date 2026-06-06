@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Regalar Premium · Scrabbly{% endblock %}
+{% block content %}
+<div class="pricing">
+  <h1>🎁 Regalar Premium</h1>
+  <p class="muted">Comprá un código y regalalo a quien quieras.</p>
+
+  <div class="plan-cards">
+    {% for plan in plans %}
+    <div class="plan-card">
+      <h2>{{ plan.name }}</h2>
+      <div class="plan-price">{{ plan.price }}</div>
+      <form method="post" action="{% url 'gift_buy' %}">
+        {% csrf_token %}
+        <input type="hidden" name="plan" value="{{ plan.code }}">
+        <button class="btn-primary" type="submit">Comprar regalo</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="auth-card" style="margin-top:24px">
+    <h2>¿Tenés un código?</h2>
+    <form method="post" action="{% url 'gift_redeem' %}" class="filters">
+      {% csrf_token %}
+      <input type="text" name="code" placeholder="GIFT-XXXXXXXX" required>
+      <button class="btn-secondary" type="submit">Canjear</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

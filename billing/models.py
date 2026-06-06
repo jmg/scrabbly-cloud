@@ -7,10 +7,12 @@ class Subscription(models.Model):
 
     ACTIVE = "active"
     CANCELED = "canceled"   # will not renew; entitlement runs to period end
+    PAST_DUE = "past_due"   # a payment failed; retrying (dunning)
     EXPIRED = "expired"
     STATUS_CHOICES = [
         (ACTIVE, "Activa"),
         (CANCELED, "Cancelada"),
+        (PAST_DUE, "Pago pendiente"),
         (EXPIRED, "Expirada"),
     ]
 
@@ -59,3 +61,29 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.code
+
+
+class GiftCode(models.Model):
+    """A one-time gift of Premium that a recipient redeems for a code."""
+
+    code = models.CharField(max_length=20, unique=True)
+    plan_code = models.CharField(max_length=30)
+    tier = models.CharField(max_length=10)
+    days = models.PositiveIntegerField()
+    purchaser = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="gifts_bought",
+    )
+    redeemed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="gifts_redeemed",
+    )
+    redeemed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def is_redeemed(self):
+        return self.redeemed_by_id is not None
+
+    def __str__(self):
+        return f"Gift {self.code} ({self.tier})"
