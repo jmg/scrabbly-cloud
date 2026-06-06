@@ -86,6 +86,86 @@ def lobby(request):
     })
 
 
+def puzzles_index(request):
+    from .models import PuzzleSolve
+    solved = 0
+    if request.user.is_authenticated and not request.user.is_guest:
+        solved = PuzzleSolve.objects.filter(user=request.user, solved=True).count()
+    return render(request, "game/puzzles.html", {"solved_count": solved})
+
+
+def puzzle_daily(request):
+    from . import puzzles
+    lang = request.GET.get("lang", "es")
+    p = puzzles.get_daily(lang if lang in ("es", "en") else "es")
+    if p is None:
+        return _error(request, _("No se pudo generar el puzzle. Probá de nuevo."))
+    return redirect("puzzle_detail", puzzle_id=p.pk)
+
+
+@require_POST
+@ACTION_LIMIT
+def puzzle_new(request):
+    from . import puzzles
+    p = puzzles.new_training_puzzle(_language(request))
+    if p is None:
+        return _error(request, _("No se pudo generar el puzzle. Probá de nuevo."))
+    return redirect("puzzle_detail", puzzle_id=p.pk)
+
+
+def puzzle_detail(request, puzzle_id):
+    from .models import Puzzle
+    from .engine import Board, get_ruleset
+    puzzle = get_object_or_404(Puzzle, pk=puzzle_id)
+    board = Board.deserialize(puzzle.board)
+    state = {
+        "id": puzzle.pk,
+        "grid": {f"{r},{c}": l for (r, c), l in board.grid.items()},
+        "blanks": [list(b) for b in board.blanks],
+        "rack": puzzle.rack,
+        "points": get_ruleset(puzzle.language).points,
+        "best_score": puzzle.best_score,
+    }
+    return render(request, "game/puzzle.html", {
+        "puzzle": puzzle, "state_json": json.dumps(state),
+    })
+
+
+@require_POST
+@ACTION_LIMIT
+def puzzle_solve(request, puzzle_id):
+    from . import puzzles
+    from .models import Puzzle, PuzzleSolve
+    puzzle = get_object_or_404(Puzzle, pk=puzzle_id)
+    try:
+        placements = json.loads(request.body or "{}").get("placements", [])
+        score = puzzles.evaluate(puzzle, placements)
+    except (InvalidMove, ValueError, KeyError) as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+
+    solved = score >= puzzle.best_score
+    if request.user.is_authenticated and not request.user.is_guest:
+        rec, _created = PuzzleSolve.objects.get_or_create(
+            user=request.user, puzzle=puzzle)
+        if score > rec.best_score_achieved:
+            rec.best_score_achieved = score
+        rec.solved = rec.solved or solved
+        rec.save()
+    return JsonResponse({
+        "ok": True, "your_score": score, "best_score": puzzle.best_score,
+        "solved": solved,
+    })
+
+
+def puzzle_reveal(request, puzzle_id):
+    from .models import Puzzle
+    puzzle = get_object_or_404(Puzzle, pk=puzzle_id)
+    return JsonResponse({
+        "best_move": puzzle.best_move, "best_word": puzzle.best_word,
+        "best_score": puzzle.best_score,
+    })
+
+
 def _language(request):
     lang = request.POST.get("language", "es")
     return lang if lang in ("es", "en") else "es"

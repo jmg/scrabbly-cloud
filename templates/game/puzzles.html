@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Puzzles" %} · Scrabbly{% endblock %}
+{% block content %}
+<div class="pricing">
+  <h1>🧩 {% trans "Puzzles" %}</h1>
+  <p class="muted">{% trans "Encontrá la jugada de mayor puntaje en cada posición." %}</p>
+  {% if solved_count %}<p>{% blocktrans %}Resueltos: {{ solved_count }}{% endblocktrans %}</p>{% endif %}
+
+  <div class="plan-cards">
+    <div class="plan-card featured">
+      <h2>🗓 {% trans "Puzzle diario" %}</h2>
+      <p class="muted">{% trans "El mismo para todos, cada día." %}</p>
+      <a class="btn-primary" href="{% url 'puzzle_daily' %}?lang=es">{% trans "Jugar (ES)" %}</a>
+      <a class="btn-secondary" href="{% url 'puzzle_daily' %}?lang=en">{% trans "Jugar (EN)" %}</a>
+    </div>
+    <div class="plan-card">
+      <h2>🎲 {% trans "Entrenamiento" %}</h2>
+      <p class="muted">{% trans "Posiciones aleatorias, las que quieras." %}</p>
+      <form method="post" action="{% url 'puzzle_new' %}">
+        {% csrf_token %}<input type="hidden" name="language" value="es">
+        <button class="btn-primary" type="submit">{% trans "Nuevo puzzle (ES)" %}</button>
+      </form>
+      <form method="post" action="{% url 'puzzle_new' %}">
+        {% csrf_token %}<input type="hidden" name="language" value="en">
+        <button class="btn-secondary" type="submit">{% trans "Nuevo puzzle (EN)" %}</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

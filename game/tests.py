@@ -1,4 +1,4 @@
-from django.test import TestCase, TransactionTestCase
+from django.test import Client, TestCase, TransactionTestCase
 
 from .engine import (
     DISTRIBUTIONS,
@@ -457,6 +457,59 @@ class AiTests(TestCase):
         self.assertFalse(
             User.objects.filter(is_guest=False, is_bot=False, username__startswith="IA-").exists()
         )
+
+
+class PuzzleTests(TestCase):
+    def _wl(self):
+        from game.services import get_wordlist
+        return get_wordlist("es")
+
+    def test_generate_and_best_move_scores(self):
+        from game import puzzles
+        if not self._wl().enabled:
+            self.skipTest("dictionary not bundled")
+        p = puzzles.generate_puzzle("es")
+        self.assertIsNotNone(p)
+        self.assertGreater(p.best_score, 0)
+        self.assertTrue(p.best_move)
+        # Evaluating the stored best move reproduces best_score (and is legal).
+        self.assertEqual(puzzles.evaluate(p, p.best_move), p.best_score)
+
+    def test_evaluate_rejects_off_rack_tile(self):
+        from game import puzzles
+        from game.engine import InvalidMove
+        if not self._wl().enabled:
+            self.skipTest("dictionary not bundled")
+        p = puzzles.new_training_puzzle("es")
+        missing = next(ch for ch in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" if ch not in p.rack)
+        with self.assertRaises(InvalidMove):
+            puzzles.evaluate(p, [{"letter": missing, "row": 7, "col": 7, "is_blank": False}])
+
+    def test_solve_endpoint_marks_solved(self):
+        import json
+        from accounts.models import User
+        from game import puzzles
+        if not self._wl().enabled:
+            self.skipTest("dictionary not bundled")
+        p = puzzles.new_training_puzzle("es")
+        u = User.objects.create_user("solver", password="x")
+        c = Client(); c.force_login(u)
+        r = c.post(f"/puzzles/{p.id}/solve/",
+                   data=json.dumps({"placements": p.best_move}),
+                   content_type="application/json")
+        j = r.json()
+        self.assertTrue(j["solved"])
+        self.assertEqual(j["your_score"], p.best_score)
+        from game.models import PuzzleSolve
+        self.assertTrue(PuzzleSolve.objects.filter(user=u, puzzle=p, solved=True).exists())
+
+    def test_daily_is_cached_by_date(self):
+        from game import puzzles
+        if not self._wl().enabled:
+            self.skipTest("dictionary not bundled")
+        a = puzzles.get_daily("es")
+        b = puzzles.get_daily("es")
+        self.assertEqual(a.pk, b.pk)
 
 
 class RatingTests(TestCase):

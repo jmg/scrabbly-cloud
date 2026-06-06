@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Puzzle" %} #{{ puzzle.id }} · Scrabbly{% endblock %}
+{% block content %}
+<div class="puzzle-layout" data-puzzle-id="{{ puzzle.id }}"
+     data-reveal-url="{% url 'puzzle_reveal' puzzle.id %}"
+     data-solve-url="{% url 'puzzle_solve' puzzle.id %}">
+  <div class="board-wrap">
+    <div id="board" class="board"></div>
+    <div id="rack" class="rack"></div>
+    <div class="controls">
+      <button id="btn-submit" class="btn-primary">{% trans "Enviar jugada" %}</button>
+      <button id="btn-recall" class="btn-secondary">{% trans "Recoger" %}</button>
+      <button id="btn-reveal" class="btn-secondary">{% trans "Ver solución" %}</button>
+      <a class="btn-secondary" href="{% url 'puzzles' %}">{% trans "Otro puzzle" %}</a>
+    </div>
+    <p id="feedback" class="feedback"></p>
+  </div>
+  <aside class="game-side">
+    <h3>🧩 {% trans "Encontrá la mejor jugada" %}</h3>
+    <p class="muted">{% blocktrans with n=puzzle.best_score %}La mejor jugada vale {{ n }} puntos. ¿La encontrás?{% endblocktrans %}</p>
+    <div id="puzzle-result"></div>
+  </aside>
+</div>
+<script id="puzzle-state" type="application/json">{{ state_json|safe }}</script>
+<script>window.CSRF_TOKEN = "{{ csrf_token }}";</script>
+{% endblock %}
+{% block scripts %}
+{% load static %}
+<script src="{% url 'javascript-catalog' %}"></script>
+<script src="{% static 'js/puzzle.js' %}"></script>
+{% endblock %}

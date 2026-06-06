@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 06:05+0000\n"
+"POT-Creation-Date: 2026-06-06 18:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: static/js/game.js:229
+
+#: static/js/game.js:229 static/js/puzzle.js:97
 msgid "Letra para la ficha comodín:"
 msgstr "Letter for the blank tile:"
 
@@ -118,7 +119,7 @@ msgstr "Game #%s"
 msgid "Jugada enviada"
 msgstr "Move sent"
 
-#: static/js/game.js:587
+#: static/js/game.js:587 static/js/puzzle.js:134
 msgid "Jugada inválida"
 msgstr "Invalid move"
 
@@ -165,3 +166,27 @@ msgstr "Link copied"
 #: static/js/game.js:760
 msgid "Copiá el enlace:"
 msgstr "Copy the link:"
+
+#: static/js/puzzle.js:94
+msgid "Elegí una ficha del atril primero."
+msgstr "Pick a tile from your rack first."
+
+#: static/js/puzzle.js:129
+msgid "Colocá fichas para formar una palabra."
+msgstr "Place tiles to form a word."
+
+#: static/js/puzzle.js:136
+msgid "Tu jugada: %(you)s · Mejor: %(best)s"
+msgstr "Your move: %(you)s · Best: %(best)s"
+
+#: static/js/puzzle.js:140
+msgid "¡Resuelto!"
+msgstr "Solved!"
+
+#: static/js/puzzle.js:144
+msgid "¡seguí buscando!"
+msgstr "keep looking!"
+
+#: static/js/puzzle.js:157
+msgid "Solución: %(w)s (+%(s)s)"
+msgstr "Solution: %(w)s (+%(s)s)"

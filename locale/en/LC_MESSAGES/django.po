@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 17:59+0000\n"
+"POT-Creation-Date: 2026-06-06 18:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr "Account created!"
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:130 game/views.py:152
+#: accounts/views.py:130 game/views.py:231
 msgid "No se encontró ese usuario."
 msgstr "User not found."
 
@@ -94,16 +94,20 @@ msgid ""
 "Premium para partidas ilimitadas."
 msgstr ""
 
-#: game/views.py:160
+#: game/views.py:102 game/views.py:112
+msgid "No se pudo generar el puzzle. Probá de nuevo."
+msgstr "Couldn't generate the puzzle. Try again."
+
+#: game/views.py:239
 msgid "Desafío enviado."
 msgstr "Challenge sent."
 
-#: game/views.py:179
+#: game/views.py:258
 msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
 #: templates/accounts/friends.html:3 templates/accounts/friends.html:6
-#: templates/accounts/profile.html:27 templates/base.html:20
+#: templates/accounts/profile.html:27 templates/base.html:21
 msgid "Amigos"
 msgstr "Friends"
 
@@ -149,14 +153,13 @@ msgid "Solicitudes enviadas"
 msgstr "Requests sent"
 
 #: templates/accounts/friends.html:62 templates/game/lobby.html:89
-#, fuzzy
 #| msgid "pago pendiente"
 msgid "pendiente"
 msgstr "pending"
 
 #: templates/accounts/login.html:3 templates/accounts/login.html:6
 #: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:25
+#: templates/base.html:26
 msgid "Entrar"
 msgstr "Log in"
 
@@ -250,7 +253,7 @@ msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:26
+#: templates/accounts/register.html:18 templates/base.html:27
 msgid "Crear cuenta"
 msgstr "Sign up"
 
@@ -271,15 +274,20 @@ msgstr "(optional, for receipts)"
 msgid "¿Ya tenés cuenta?"
 msgstr "Already have an account?"
 
-#: templates/base.html:17
+#: templates/base.html:14 templates/game/puzzles.html:3
+#: templates/game/puzzles.html:6
+msgid "Puzzles"
+msgstr "Puzzles"
+
+#: templates/base.html:18
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:22
+#: templates/base.html:23
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:31
+#: templates/base.html:32
 msgid "Idioma"
 msgstr "Language"
 
@@ -567,7 +575,7 @@ msgstr "Next"
 msgid "Jugar"
 msgstr "Play"
 
-#: templates/game/game.html:22
+#: templates/game/game.html:22 templates/game/puzzle.html:13
 msgid "Recoger"
 msgstr "Recall"
 
@@ -708,7 +716,6 @@ msgid "Desafíos enviados"
 msgstr "Challenges sent"
 
 #: templates/game/lobby.html:87
-#, fuzzy
 #| msgid "Volver a la partida"
 msgid "Ir a la partida"
 msgstr "Go to game"
@@ -789,3 +796,73 @@ msgstr "Leaderboard"
 #: templates/game/lobby.html:219
 msgid "Sin jugadores aún."
 msgstr "No players yet."
+
+#: templates/game/puzzle.html:3
+msgid "Puzzle"
+msgstr "Puzzle"
+
+#: templates/game/puzzle.html:12
+#| msgid "mejor jugada"
+msgid "Enviar jugada"
+msgstr "Submit move"
+
+#: templates/game/puzzle.html:14
+msgid "Ver solución"
+msgstr "View solution"
+
+#: templates/game/puzzle.html:15
+msgid "Otro puzzle"
+msgstr "Another puzzle"
+
+#: templates/game/puzzle.html:20
+#| msgid "mejor jugada"
+msgid "Encontrá la mejor jugada"
+msgstr "Find the best move"
+
+#: templates/game/puzzle.html:21
+#, python-format
+msgid "La mejor jugada vale %(n)s puntos. ¿La encontrás?"
+msgstr "The best move is worth %(n)s points. Can you find it?"
+
+#: templates/game/puzzles.html:7
+msgid "Encontrá la jugada de mayor puntaje en cada posición."
+msgstr "Find the highest-scoring move in each position."
+
+#: templates/game/puzzles.html:8
+#, python-format
+msgid "Resueltos: %(solved_count)s"
+msgstr "Solved: %(solved_count)s"
+
+#: templates/game/puzzles.html:12
+msgid "Puzzle diario"
+msgstr "Daily puzzle"
+
+#: templates/game/puzzles.html:13
+msgid "El mismo para todos, cada día."
+msgstr "The same for everyone, every day."
+
+#: templates/game/puzzles.html:14
+#| msgid "Jugar"
+msgid "Jugar (ES)"
+msgstr "Play (ES)"
+
+#: templates/game/puzzles.html:15
+#| msgid "Jugar"
+msgid "Jugar (EN)"
+msgstr "Play (EN)"
+
+#: templates/game/puzzles.html:18
+msgid "Entrenamiento"
+msgstr "Training"
+
+#: templates/game/puzzles.html:19
+msgid "Posiciones aleatorias, las que quieras."
+msgstr "Random positions, as many as you like."
+
+#: templates/game/puzzles.html:22
+msgid "Nuevo puzzle (ES)"
+msgstr "New puzzle (ES)"
+
+#: templates/game/puzzles.html:26
+msgid "Nuevo puzzle (EN)"
+msgstr "New puzzle (EN)"

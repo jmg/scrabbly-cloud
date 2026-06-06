@@ -181,3 +181,33 @@ class Challenge(models.Model):
 
     def __str__(self):
         return f"{self.challenger} → {self.opponent} ({self.status})"
+
+
+class Puzzle(models.Model):
+    """A 'find the best move' puzzle: a board + rack with a known top play."""
+
+    language = models.CharField(max_length=5, default="es")
+    board = models.JSONField(default=dict)      # engine Board.serialize()
+    rack = models.JSONField(default=list)
+    best_move = models.JSONField(default=list)  # placements data of the top play
+    best_score = models.IntegerField(default=0)
+    best_word = models.CharField(max_length=20, blank=True)
+    date = models.DateField(null=True, blank=True, unique=True)  # set for the daily
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Puzzle #{self.pk} ({self.best_word} +{self.best_score})"
+
+
+class PuzzleSolve(models.Model):
+    """A user's best attempt at a puzzle."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="puzzle_solves")
+    puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE, related_name="solves")
+    solved = models.BooleanField(default=False)
+    best_score_achieved = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "puzzle")

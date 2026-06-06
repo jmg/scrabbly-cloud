@@ -47,6 +47,10 @@ necesidad de registrarse (cuentas de invitado).
   encuentra **todas** las jugadas legales del tablero —hooks, extensiones,
   through-plays y jugadas paralelas— en fracciones de segundo. El nivel experto
   rankea por *equity* (puntaje + heurística de fichas que quedan en el atril).
+- **Puzzles / entrenamiento**: puzzle diario (igual para todos) y posiciones
+  aleatorias de práctica; el objetivo es encontrar la jugada de mayor puntaje.
+  Las posiciones se generan con auto-juego de la IA y la solución es la mejor
+  jugada del motor DAWG. Tablero interactivo standalone (click para colocar).
 - **Modo correspondencia**: partidas sin reloj jugables a lo largo del tiempo,
   con la sección «Te toca jugar» que lista las partidas que esperan tu turno.
 - **Perfiles y avatares**: avatares identicon generados (sin subidas), perfil
