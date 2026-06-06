@@ -8,19 +8,33 @@
 
   <div class="board-wrap">
     <div id="board" class="board"></div>
+    <div id="history-bar" class="history-bar" hidden>
+      <button id="h-first" title="Inicio">⏮</button>
+      <button id="h-prev" title="Anterior">◀</button>
+      <span id="h-label" class="h-label">En vivo</span>
+      <button id="h-next" title="Siguiente">▶</button>
+      <button id="h-live" title="En vivo">⏭</button>
+    </div>
     <div id="rack" class="rack"></div>
     <div class="controls">
       <button id="btn-play" class="btn-primary" disabled>Jugar</button>
       <button id="btn-recall" class="btn-secondary" disabled>Recoger</button>
       <button id="btn-pass" class="btn-secondary">Pasar</button>
       <button id="btn-exchange" class="btn-secondary">Cambiar</button>
+      <button id="btn-draw" class="btn-secondary">Tablas</button>
       <button id="btn-resign" class="btn-danger">Abandonar</button>
     </div>
     <p id="feedback" class="feedback"></p>
   </div>
 
   <aside class="game-side">
+    <div class="side-head">
+      <span id="conn" class="conn" title="Conexión">●</span>
+      <button id="btn-sound" class="icon-btn" title="Sonido">🔊</button>
+      <button id="btn-share" class="icon-btn" title="Copiar enlace">🔗</button>
+    </div>
     <div id="status-banner" class="status-banner"></div>
+    <div id="offer-box" class="offer-box" hidden></div>
     <ul id="players" class="players"></ul>
     <div class="bag-info">Fichas en la bolsa: <span id="bag-count">–</span></div>
 

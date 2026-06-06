@@ -14,4 +14,7 @@ urlpatterns = [
     path("game/<int:game_id>/exchange/", views.exchange, name="exchange"),
     path("game/<int:game_id>/resign/", views.resign, name="resign"),
     path("game/<int:game_id>/flag/", views.flag, name="flag"),
+    path("game/<int:game_id>/offer-draw/", views.offer_draw, name="offer_draw"),
+    path("game/<int:game_id>/respond-draw/", views.respond_draw, name="respond_draw"),
+    path("game/<int:game_id>/rematch/", views.rematch, name="rematch"),
 ]

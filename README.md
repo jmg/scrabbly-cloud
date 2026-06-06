@@ -27,7 +27,17 @@ necesidad de registrarse (cuentas de invitado).
 - **Ratings ELO**: ranking de jugadores y perfiles con estadísticas.
 - **Espectar**: ver partidas en curso en vivo (los atriles rivales nunca se
   envían a oponentes ni espectadores).
-- **Tiempo real**: tablero, marcador, registro de jugadas y chat por WebSocket.
+- **Relojes**: controles de tiempo estilo Fischer (3–30 min, con incremento)
+  con cuenta regresiva en vivo y derrota por tiempo (flag).
+- **Tablas y revancha**: ofrecer/aceptar tablas durante la partida; pedir
+  revancha al terminar (crea una nueva partida con asientos invertidos).
+- **Historial navegable**: revisá la partida jugada por jugada y volvé al vivo.
+- **Compartir**: cada partida tiene una URL; botón para copiar el enlace.
+- **Tiempo real**: tablero, marcador, registro de jugadas y chat por WebSocket,
+  con reconexión automática (backoff exponencial) e indicador de conexión.
+- **Calidad de vida**: arrastrar y soltar fichas (con recogida y reposición),
+  sonidos opcionales, aviso de turno (notificación + título de pestaña) y
+  persistencia de las fichas que estás colocando ante recargas.
 
 ## Puesta en marcha
 

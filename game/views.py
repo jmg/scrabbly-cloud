@@ -166,5 +166,42 @@ def flag(request, game_id):
     return JsonResponse({"ok": True})
 
 
+@require_POST
+def offer_draw(request, game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    try:
+        game = services.offer_draw(game, request.user)
+    except InvalidMove as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+    notify_update(game.pk)
+    return JsonResponse({"ok": True})
+
+
+@require_POST
+def respond_draw(request, game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    try:
+        accept = bool(json.loads(request.body or "{}").get("accept"))
+    except ValueError:
+        accept = False
+    try:
+        game = services.respond_draw(game, request.user, accept)
+    except InvalidMove as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+    notify_update(game.pk)
+    return JsonResponse({"ok": True})
+
+
+@require_POST
+def rematch(request, game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    try:
+        game = services.offer_rematch(game, request.user)
+    except InvalidMove as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+    notify_update(game.pk)
+    return JsonResponse({"ok": True, "next_game_id": game.next_game_id})
+
+
 def _error(request, message):
     return render(request, "game/error.html", {"message": message}, status=400)

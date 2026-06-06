@@ -167,6 +167,83 @@ class ClockTests(TestCase):
         self.assertNotEqual(g.winner_id, flagged_player.pk)
 
 
+class DrawRematchTests(TestCase):
+    def setUp(self):
+        from accounts.models import User
+        from game import services
+        self.u1 = User.objects.create(username="d1")
+        self.u2 = User.objects.create(username="d2")
+        g = services.create_game(self.u1, rated=True)
+        self.game = services.join_game(g, self.u2)
+
+    def test_draw_offer_and_accept_ends_in_draw(self):
+        from game import services
+        from game.models import GamePlayer
+        services.offer_draw(self.game, self.u1)
+        self.game.refresh_from_db()
+        self.assertEqual(self.game.draw_offer_by_id, self.u1.pk)
+        services.respond_draw(self.game, self.u2, accept=True)
+        self.game.refresh_from_db()
+        self.assertEqual(self.game.status, "finished")
+        self.assertIsNone(self.game.winner_id)
+        for s in self.game.players.all():
+            self.assertEqual(s.result, GamePlayer.DRAW)
+
+    def test_cannot_accept_own_draw_offer(self):
+        from game import services
+        from game.engine import InvalidMove
+        services.offer_draw(self.game, self.u1)
+        with self.assertRaises(InvalidMove):
+            services.respond_draw(self.game, self.u1, accept=True)
+
+    def test_decline_draw_clears_offer(self):
+        from game import services
+        services.offer_draw(self.game, self.u1)
+        services.respond_draw(self.game, self.u2, accept=False)
+        self.game.refresh_from_db()
+        self.assertIsNone(self.game.draw_offer_by_id)
+        self.assertEqual(self.game.status, "active")
+
+    def test_rematch_offer_and_accept_creates_swapped_game(self):
+        from game import services
+        services.resign(self.game, self.u1)  # finish the game
+        services.offer_rematch(self.game, self.u1)
+        self.game.refresh_from_db()
+        self.assertEqual(self.game.rematch_offer_by_id, self.u1.pk)
+        services.offer_rematch(self.game, self.u2)  # acceptance
+        self.game.refresh_from_db()
+        self.assertIsNotNone(self.game.next_game_id)
+        new = self.game.next_game
+        self.assertEqual(new.status, "active")
+        # Seats are swapped: previous second player opens the rematch.
+        self.assertEqual(new.seats[0].player_id, self.u2.pk)
+        self.assertEqual(new.seats[1].player_id, self.u1.pk)
+
+
+class FinishTests(TestCase):
+    def setUp(self):
+        from accounts.models import User
+        from game import services
+        self.u1 = User.objects.create(username="f1")
+        self.u2 = User.objects.create(username="f2")
+        g = services.create_game(self.u1, rated=False)
+        self.game = services.join_game(g, self.u2)
+
+    def test_resigner_loses_opponent_wins(self):
+        from game import services
+        from game.models import GamePlayer
+        resigner = self.game.current_seat.player
+        opponent = self.game.players.exclude(player=resigner).first().player
+        services.resign(self.game, resigner)
+        self.game.refresh_from_db()
+        self.assertEqual(self.game.status, "finished")
+        self.assertEqual(self.game.winner_id, opponent.pk)
+        self.assertEqual(
+            self.game.players.get(player=resigner).result, GamePlayer.LOSS)
+        self.assertEqual(
+            self.game.players.get(player=opponent).result, GamePlayer.WIN)
+
+
 class RatingTests(TestCase):
     def test_winner_gains_loser_loses(self):
         new = ratings.compute_updates([

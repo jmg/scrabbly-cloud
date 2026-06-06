@@ -165,6 +165,7 @@ def make_play(game, user, placements_data):
     with transaction.atomic():
         game = Game.objects.select_for_update().get(pk=game.pk)
         seat = _require_turn(game, user)
+        game.draw_offer_by = None
 
         placements = [
             Placement(
@@ -208,6 +209,7 @@ def make_pass(game, user):
     with transaction.atomic():
         game = Game.objects.select_for_update().get(pk=game.pk)
         seat = _require_turn(game, user)
+        game.draw_offer_by = None
         game.consecutive_passes += 1
         flagged = _charge_clock(game, seat)
         seat.save()
@@ -227,6 +229,7 @@ def make_exchange(game, user, letters):
     with transaction.atomic():
         game = Game.objects.select_for_update().get(pk=game.pk)
         seat = _require_turn(game, user)
+        game.draw_offer_by = None
         bag = Bag(letters=list(game.bag))
         if len(bag) < len(letters):
             raise InvalidMove("No hay suficientes fichas en la bolsa.")
@@ -265,6 +268,71 @@ def resign(game, user):
         else:
             # Resigning player ranks last; pick highest scorer as winner.
             _finish(game, loser=seat)
+    return game
+
+
+def offer_draw(game, user):
+    with transaction.atomic():
+        game = Game.objects.select_for_update().get(pk=game.pk)
+        seat = game.seat_for(user)
+        if not seat or game.status != Game.ACTIVE:
+            raise InvalidMove("No podés ofrecer tablas ahora.")
+        # If the opponent already offered, this acts as an acceptance.
+        if game.draw_offer_by_id and game.draw_offer_by_id != user.pk:
+            _finish(game, forced_draw=True)
+            return game
+        game.draw_offer_by = user
+        game.save(update_fields=["draw_offer_by"])
+    return game
+
+
+def respond_draw(game, user, accept):
+    with transaction.atomic():
+        game = Game.objects.select_for_update().get(pk=game.pk)
+        seat = game.seat_for(user)
+        if not seat or game.status != Game.ACTIVE or not game.draw_offer_by_id:
+            raise InvalidMove("No hay oferta de tablas pendiente.")
+        if game.draw_offer_by_id == user.pk:
+            raise InvalidMove("No podés responder tu propia oferta.")
+        if accept:
+            _finish(game, forced_draw=True)
+        else:
+            game.draw_offer_by = None
+            game.save(update_fields=["draw_offer_by"])
+    return game
+
+
+def offer_rematch(game, user):
+    with transaction.atomic():
+        game = Game.objects.select_for_update().get(pk=game.pk)
+        seat = game.seat_for(user)
+        if not seat or game.status not in (Game.FINISHED, Game.ABORTED):
+            raise InvalidMove("Solo se puede pedir revancha al terminar.")
+        if game.players.count() != 2:
+            raise InvalidMove("La revancha es solo para partidas de dos.")
+        if game.next_game_id:
+            return game
+        # If the opponent already offered, accept and build the rematch.
+        if game.rematch_offer_by_id and game.rematch_offer_by_id != user.pk:
+            return _create_rematch(game)
+        game.rematch_offer_by = user
+        game.save(update_fields=["rematch_offer_by"])
+    return game
+
+
+def _create_rematch(game):
+    """Spawn a fresh game with the same settings and swapped seat order."""
+    seats = list(game.seats)
+    # Swap who starts: previous second seat opens the rematch.
+    first, second = seats[1].player, seats[0].player
+    new_game = create_game(
+        first, rated=game.rated, language=game.language,
+        clock_initial=game.clock_initial, clock_increment=game.clock_increment,
+    )
+    new_game = join_game(new_game, second)
+    game.next_game = new_game
+    game.rematch_offer_by = None
+    game.save(update_fields=["next_game", "rematch_offer_by"])
     return game
 
 
@@ -311,10 +379,14 @@ def _rack_value(rack, ruleset):
     return sum(ruleset.letter_points(letter, letter == BLANK) for letter in rack)
 
 
-def _finish(game, last_seat=None, loser=None):
+def _finish(game, last_seat=None, loser=None, forced_draw=False):
     """Apply end-of-game scoring and rating changes, then mark finished."""
     seats = list(game.players.all())
     ruleset = get_ruleset(game.language)
+    # `loser`/`last_seat` may be instances fetched elsewhere; match them to the
+    # freshly-loaded seat objects by pk so identity checks are reliable.
+    loser_pk = loser.pk if loser else None
+    last_pk = last_seat.pk if last_seat else None
 
     # Endgame tile adjustment: each player loses their remaining rack value; if
     # someone emptied their rack, they also gain the sum of everyone else's.
@@ -323,21 +395,26 @@ def _finish(game, last_seat=None, loser=None):
         value = _rack_value(seat.rack, ruleset)
         seat.score -= value
         leftover_total += value
-    if last_seat is not None:
-        last_seat.score += leftover_total
+    if last_pk is not None:
+        for seat in seats:
+            if seat.pk == last_pk:
+                seat.score += leftover_total
 
-    # Determine winner. A resigning player is forced last.
-    ranked = sorted(
-        seats,
-        key=lambda s: (-1 if s is loser else 0, s.score),
-        reverse=True,
-    )
-    top_score = ranked[0].score
-    winners = [s for s in ranked if s.score == top_score and s is not loser]
-    is_draw = len(winners) > 1
-    game.winner = None if is_draw else winners[0].player
+    # Determine winner. A resigning/flagged player is forced last.
+    if forced_draw:
+        game.winner = None
+    else:
+        ranked = sorted(
+            seats,
+            key=lambda s: (-1 if s.pk == loser_pk else 0, s.score),
+            reverse=True,
+        )
+        top_score = ranked[0].score
+        winners = [s for s in ranked if s.score == top_score and s.pk != loser_pk]
+        is_draw = len(winners) != 1
+        game.winner = None if is_draw else winners[0].player
 
-    _apply_ratings(game, seats, loser)
+    _apply_ratings(game, seats, loser_pk, forced_draw)
 
     for seat in seats:
         seat.save()
@@ -348,15 +425,15 @@ def _finish(game, last_seat=None, loser=None):
     game.save()
 
 
-def _apply_ratings(game, seats, loser):
+def _apply_ratings(game, seats, loser_pk, forced_draw=False):
     if not game.rated:
         for seat in seats:
             if seat.result == "":
-                _set_result(seat, loser)
+                _set_result(seat, loser_pk, forced_draw)
         return
     standings = [
         {"rating": seat.player.rating,
-         "points": -1 if seat is loser else seat.score}
+         "points": 0 if forced_draw else (-1 if seat.pk == loser_pk else seat.score)}
         for seat in seats
     ]
     new_ratings = ratings.compute_updates(standings)
@@ -365,12 +442,15 @@ def _apply_ratings(game, seats, loser):
         seat.rating_after = new_rating
         seat.player.rating = new_rating
         seat.player.save(update_fields=["rating"])
-        _set_result(seat, loser)
+        _set_result(seat, loser_pk, forced_draw)
 
 
-def _set_result(seat, loser):
+def _set_result(seat, loser_pk, forced_draw=False):
     game = seat.game
-    if seat is loser:
+    if forced_draw:
+        seat.result = GamePlayer.DRAW
+        return
+    if seat.pk == loser_pk:
         seat.result = GamePlayer.LOSS
     elif game.winner_id is None:
         seat.result = GamePlayer.DRAW
@@ -409,6 +489,11 @@ def public_state(game):
         "turn_user_id": current.player_id if current and game.status == Game.ACTIVE else None,
         "bag_count": len(game.bag),
         "winner_id": game.winner_id,
+        "draw_offer_by": game.draw_offer_by_id,
+        "rematch": {
+            "offer_by": game.rematch_offer_by_id,
+            "next_game_id": game.next_game_id,
+        },
         "clock": {
             "enabled": game.has_clock,
             "initial": game.clock_initial,
@@ -447,6 +532,7 @@ def public_state(game):
                 "kind": m.kind,
                 "words": m.words,
                 "points": m.points,
+                "placements": m.placements,
             }
             for m in game.moves.select_related("player")
         ],

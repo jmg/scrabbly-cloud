@@ -39,6 +39,10 @@
   var bagEl = document.getElementById("bag-count");
   var bannerEl = document.getElementById("status-banner");
   var chatEl = document.getElementById("chat");
+  var offerBox = document.getElementById("offer-box");
+  var connEl = document.getElementById("conn");
+  var historyBar = document.getElementById("history-bar");
+  var hLabel = document.getElementById("h-label");
 
   var state = JSON.parse(document.getElementById("bootstrap-state").textContent);
   var rack = JSON.parse(document.getElementById("bootstrap-rack").textContent);
@@ -53,6 +57,13 @@
   var serverOffset = 0;   // serverNow - clientNow, to sync the countdown
   var flagClaimed = false; // guard so we POST /flag/ at most once per timeout
   var dragData = null;     // active drag-and-drop payload
+  var reviewIndex = null;  // null = live; otherwise show board after move N
+  var wasMyTurn = false;
+  var redirecting = false;
+
+  var PENDING_KEY = "scrabbly_pending_" + gameId;
+  var MUTE_KEY = "scrabbly_muted";
+  var muted = localStorage.getItem(MUTE_KEY) === "1";
 
   // ---- Board rendering -----------------------------------------------------
   var cells = {};
@@ -87,29 +98,59 @@
     return '<span class="tl">' + letter + "</span><span class=\"pt\">" + pts + "</span>";
   }
 
+  // Rebuild the board grid as it stood right after move index `idx`.
+  function reconstructGrid(idx) {
+    var out = [];
+    for (var i = 0; i <= idx && i < state.moves.length; i++) {
+      var m = state.moves[i];
+      if (m.kind === "play" && m.placements) {
+        m.placements.forEach(function (p) {
+          out.push({ row: p.row, col: p.col, letter: p.letter, blank: !!p.is_blank });
+        });
+      }
+    }
+    return out;
+  }
+
+  // Cells placed by the move at index `idx` (to highlight in review mode).
+  function placedAt(idx) {
+    var m = state.moves[idx];
+    var set = {};
+    if (m && m.kind === "play" && m.placements) {
+      m.placements.forEach(function (p) { set[p.row + "," + p.col] = true; });
+    }
+    return set;
+  }
+
   function renderBoard() {
     for (var key in cells) {
       var cell = cells[key];
-      cell.classList.remove("filled", "pending", "drop-in");
+      cell.classList.remove("filled", "pending", "drop-in", "last");
       cell.draggable = false;
       var lbl = cell.dataset.label;
       cell.innerHTML = lbl ? '<span class="premium-label">' + lbl + "</span>" : "";
     }
-    state.grid.forEach(function (g) {
+    var reviewing = reviewIndex !== null;
+    var grid = reviewing ? reconstructGrid(reviewIndex) : state.grid;
+    var highlight = reviewing ? placedAt(reviewIndex) : {};
+    grid.forEach(function (g) {
       var cell = cells[g.row + "," + g.col];
       if (cell) {
         cell.classList.add("filled");
+        if (highlight[g.row + "," + g.col]) cell.classList.add("last");
         cell.innerHTML = tileHTML(g.letter, g.blank);
       }
     });
-    pending.forEach(function (p) {
-      var cell = cells[p.row + "," + p.col];
-      if (cell) {
-        cell.classList.add("filled", "pending", "drop-in");
-        cell.draggable = true;
-        cell.innerHTML = tileHTML(p.letter, p.isBlank);
-      }
-    });
+    if (!reviewing) {
+      pending.forEach(function (p) {
+        var cell = cells[p.row + "," + p.col];
+        if (cell) {
+          cell.classList.add("filled", "pending", "drop-in");
+          cell.draggable = true;
+          cell.innerHTML = tileHTML(p.letter, p.isBlank);
+        }
+      });
+    }
   }
 
   function occupied(row, col) {
@@ -130,7 +171,7 @@
       var display = letter === BLANK ? "·" : letter;
       tile.innerHTML = tileHTML(display, letter === BLANK);
       tile.addEventListener("click", function () { onRackClick(idx, used); });
-      if (!used && isPlayer && !exchangeMode) {
+      if (!used && isPlayer && !exchangeMode && reviewIndex === null) {
         tile.draggable = true;
         tile.addEventListener("dragstart", function (e) {
           dragData = { source: "rack", rackIdx: idx };
@@ -146,7 +187,7 @@
   }
 
   function onRackClick(idx, used) {
-    if (!isPlayer || used) return;
+    if (!isPlayer || used || reviewIndex !== null) return;
     if (exchangeMode) {
       var pos = exchangeSel.indexOf(idx);
       if (pos === -1) exchangeSel.push(idx); else exchangeSel.splice(pos, 1);
@@ -158,6 +199,7 @@
   }
 
   function afterChange() {
+    savePending();
     refreshControls();
     renderBoard();
     renderRack();
@@ -169,7 +211,7 @@
 
   // Place a rack tile (by index) onto an empty cell. Returns true on success.
   function placeFromRack(rackIdx, row, col) {
-    if (!isPlayer || exchangeMode) return false;
+    if (!isPlayer || exchangeMode || reviewIndex !== null) return false;
     if (occupied(row, col)) return false;
     if (pending.some(function (p) { return p.rackIdx === rackIdx; })) return false;
     var letter = rack[rackIdx];
@@ -184,6 +226,7 @@
   }
 
   function onCellClick(e) {
+    if (reviewIndex !== null) return;
     var cell = e.currentTarget;
     var row = parseInt(cell.dataset.row, 10);
     var col = parseInt(cell.dataset.col, 10);
@@ -245,6 +288,7 @@
   function recall() {
     pending = [];
     selectedRackIdx = null;
+    savePending();
     refreshControls();
     renderBoard();
     renderRack();
@@ -298,6 +342,149 @@
     else banner = "Turno del rival";
     bannerEl.textContent = banner;
     bannerEl.className = "status-banner s-" + state.status;
+
+    renderOfferBox();
+    renderHistoryBar();
+  }
+
+  // ---- Draw offers, rematch & sharing -------------------------------------
+  function renderOfferBox() {
+    var html = "";
+    var amPlayer = isPlayer;
+    if (state.status === "active" && state.draw_offer_by) {
+      if (state.draw_offer_by === meId) {
+        html = '<div class="offer">Ofreciste tablas…</div>';
+      } else if (amPlayer) {
+        html = '<div class="offer">El rival ofrece tablas ' +
+          '<button class="btn-small" id="o-draw-yes">Aceptar</button> ' +
+          '<button class="btn-small" id="o-draw-no">Rechazar</button></div>';
+      }
+    } else if (state.status === "finished" || state.status === "aborted") {
+      if (state.rematch && state.rematch.next_game_id) {
+        html = '<div class="offer">Revancha lista. ' +
+          '<a class="btn-small" href="/game/' + state.rematch.next_game_id + '/">Ir →</a></div>';
+      } else if (amPlayer) {
+        if (state.rematch && state.rematch.offer_by === meId) {
+          html = '<div class="offer">Esperando que el rival acepte la revancha…</div>';
+        } else if (state.rematch && state.rematch.offer_by) {
+          html = '<div class="offer">El rival quiere revancha ' +
+            '<button class="btn-small" id="o-rematch">Aceptar</button></div>';
+        } else {
+          html = '<div class="offer"><button class="btn-small" id="o-rematch">Revancha</button></div>';
+        }
+      }
+    }
+    offerBox.innerHTML = html;
+    offerBox.hidden = html === "";
+    bind("o-draw-yes", function () { post(url("respond-draw"), { accept: true }); });
+    bind("o-draw-no", function () { post(url("respond-draw"), { accept: false }); });
+    bind("o-rematch", function () {
+      post(url("rematch"), {}).then(function (res) {
+        if (res.ok && res.j.next_game_id) location.href = "/game/" + res.j.next_game_id + "/";
+      });
+    });
+  }
+
+  function bind(id, fn) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("click", fn);
+  }
+
+  function url(action) { return "/game/" + gameId + "/" + action + "/"; }
+
+  // ---- History review ------------------------------------------------------
+  function renderHistoryBar() {
+    var n = state.moves.length;
+    historyBar.hidden = n === 0;
+    if (n === 0) return;
+    if (reviewIndex === null) {
+      hLabel.textContent = "En vivo";
+    } else {
+      hLabel.textContent = "Jugada " + (reviewIndex + 1) + " / " + n;
+    }
+    document.getElementById("h-prev").disabled = reviewIndex === 0;
+    document.getElementById("h-next").disabled = reviewIndex === null;
+    document.getElementById("h-first").disabled = reviewIndex === 0;
+    document.getElementById("h-live").disabled = reviewIndex === null;
+  }
+
+  function reviewGo(idx) {
+    var n = state.moves.length;
+    if (n === 0) return;
+    if (idx === null || idx >= n - 1) {
+      reviewIndex = null;          // back to live
+    } else {
+      reviewIndex = Math.max(0, idx);
+    }
+    renderBoard();
+    renderHistoryBar();
+    refreshControls();
+  }
+
+  function setupHistory() {
+    document.getElementById("h-first").addEventListener("click", function () { reviewGo(0); });
+    document.getElementById("h-prev").addEventListener("click", function () {
+      var cur = reviewIndex === null ? state.moves.length - 1 : reviewIndex;
+      reviewGo(cur - 1);
+    });
+    document.getElementById("h-next").addEventListener("click", function () {
+      if (reviewIndex === null) return;
+      reviewGo(reviewIndex + 1);
+    });
+    document.getElementById("h-live").addEventListener("click", function () { reviewGo(null); });
+  }
+
+  // ---- Sounds (WebAudio, no asset files) -----------------------------------
+  var audioCtx = null;
+  function beep(freq, durMs, type) {
+    if (muted) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + durMs / 1000);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + durMs / 1000);
+    } catch (e) { /* audio not available */ }
+  }
+  function sound(kind) {
+    if (kind === "move") beep(440, 90, "triangle");
+    else if (kind === "turn") { beep(660, 110, "sine"); setTimeout(function () { beep(880, 120, "sine"); }, 120); }
+    else if (kind === "end") { beep(523, 160); setTimeout(function () { beep(392, 220); }, 160); }
+  }
+
+  // ---- "Your turn" notification & tab title ---------------------------------
+  function notifyTurn() {
+    if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+      try { new Notification("Scrabbly", { body: "¡Es tu turno!" }); } catch (e) {}
+    }
+  }
+  function updateTitle() {
+    var myTurn = state.status === "active" && state.turn_user_id === meId;
+    document.title = (myTurn ? "🔔 Tu turno · " : "") + "Partida #" + gameId + " · Scrabbly";
+  }
+
+  // ---- Pending placement persistence (survives reloads) --------------------
+  function savePending() {
+    if (reviewIndex !== null) return;
+    if (pending.length === 0) { localStorage.removeItem(PENDING_KEY); return; }
+    localStorage.setItem(PENDING_KEY, JSON.stringify({ rack: rack, pending: pending }));
+  }
+  function restorePending() {
+    try {
+      var raw = localStorage.getItem(PENDING_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      // Only restore if it's still my turn and the rack is unchanged.
+      if (state.turn_user_id !== meId || JSON.stringify(data.rack) !== JSON.stringify(rack)) {
+        localStorage.removeItem(PENDING_KEY);
+        return;
+      }
+      pending = data.pending || [];
+    } catch (e) { localStorage.removeItem(PENDING_KEY); }
   }
 
   // ---- Clocks --------------------------------------------------------------
@@ -346,13 +533,19 @@
   }
 
   function refreshControls() {
-    var myTurn = isPlayer && state.status === "active" && state.turn_user_id === meId;
+    var reviewing = reviewIndex !== null;
+    var active = state.status === "active";
+    var myTurn = isPlayer && active && state.turn_user_id === meId && !reviewing;
     document.getElementById("btn-play").disabled = !(myTurn && pending.length > 0);
-    document.getElementById("btn-recall").disabled = pending.length === 0;
+    document.getElementById("btn-recall").disabled = reviewing || pending.length === 0;
     document.getElementById("btn-pass").disabled = !myTurn;
     document.getElementById("btn-exchange").disabled = !myTurn;
+    var drawBtn = document.getElementById("btn-draw");
+    drawBtn.disabled = !(isPlayer && active && !reviewing && !state.draw_offer_by);
+    drawBtn.hidden = !active;
     document.getElementById("btn-resign").disabled =
-      !(isPlayer && (state.status === "active" || state.status === "waiting"));
+      !(isPlayer && (active || state.status === "waiting"));
+    document.getElementById("btn-resign").hidden = !(active || state.status === "waiting");
   }
 
   // ---- Server actions ------------------------------------------------------
@@ -374,7 +567,7 @@
       return { letter: p.letter, row: p.row, col: p.col, is_blank: p.isBlank };
     });
     post("/game/" + gameId + "/play/", { placements: placements }).then(function (res) {
-      if (res.ok) { pending = []; flash("Jugada enviada", false); }
+      if (res.ok) { pending = []; localStorage.removeItem(PENDING_KEY); flash("Jugada enviada", false); }
       else flash(res.j.error || "Jugada inválida", true);
     });
   }
@@ -398,27 +591,70 @@
 
   // ---- WebSocket (single connection for state + chat) ----------------------
   var ws = null;
+  var reconnectDelay = 1000;
+  function setConn(stateName) {
+    connEl.className = "conn " + stateName;
+    connEl.title = stateName === "online" ? "Conectado"
+      : stateName === "offline" ? "Reconectando…" : "Conectando…";
+  }
   function connect() {
+    setConn("connecting");
     var proto = location.protocol === "https:" ? "wss" : "ws";
     ws = new WebSocket(proto + "://" + location.host + "/ws/game/" + gameId + "/");
+    ws.onopen = function () { setConn("online"); reconnectDelay = 1000; };
     ws.onmessage = function (ev) {
       var data = JSON.parse(ev.data);
       if (data.type === "state") {
-        var prevStatus = state.status;
-        state = data.state;
-        POINTS = state.points || POINTS;
-        rack = data.rack;
-        syncClock();
-        // Drop pending tiles that are no longer ours to place.
-        pending = pending.filter(function (p) { return p.rackIdx < rack.length; });
-        if (state.turn_user_id !== meId) { pending = []; }
-        renderAll();
-        if (prevStatus !== state.status && state.status === "active") flash("", false);
+        applyState(data);
       } else if (data.type === "chat") {
         appendChat(data.author, data.text);
       }
     };
-    ws.onclose = function () { setTimeout(connect, 2000); };
+    ws.onclose = function () {
+      setConn("offline");
+      setTimeout(connect, reconnectDelay);
+      reconnectDelay = Math.min(reconnectDelay * 2, 15000);  // exponential backoff
+    };
+    ws.onerror = function () { try { ws.close(); } catch (e) {} };
+  }
+
+  function applyState(data) {
+    var prevStatus = state.status;
+    var prevMoveCount = state.moves.length;
+    var prevTurn = state.turn_user_id;
+    state = data.state;
+    POINTS = state.points || POINTS;
+    rack = data.rack;
+    syncClock();
+
+    // Drop pending tiles that are no longer ours to place.
+    pending = pending.filter(function (p) { return p.rackIdx < rack.length; });
+    if (state.turn_user_id !== meId) { pending = []; }
+    savePending();
+
+    // A new move arrived from the server.
+    if (state.moves.length > prevMoveCount) {
+      if (reviewIndex !== null) reviewIndex = null;  // jump back to live on new move
+      if (state.turn_user_id !== prevTurn || prevTurn === undefined) sound("move");
+    }
+    // Transition into my turn -> alert.
+    var myTurnNow = state.status === "active" && state.turn_user_id === meId;
+    if (myTurnNow && !wasMyTurn) { sound("turn"); notifyTurn(); }
+    wasMyTurn = myTurnNow;
+
+    if (prevStatus !== state.status &&
+        (state.status === "finished" || state.status === "aborted")) {
+      sound("end");
+    }
+    // Auto-jump to a freshly created rematch.
+    if (state.rematch && state.rematch.next_game_id && !redirecting) {
+      redirecting = true;
+      setTimeout(function () { location.href = "/game/" + state.rematch.next_game_id + "/"; }, 1200);
+    }
+
+    renderAll();
+    updateTitle();
+    if (prevStatus !== state.status && state.status === "active") flash("", false);
   }
 
   function appendChat(author, text) {
@@ -454,12 +690,22 @@
     refreshControls();
   }
 
+  function updateSoundBtn() {
+    document.getElementById("btn-sound").textContent = muted ? "🔇" : "🔊";
+  }
+
   // ---- Init ----------------------------------------------------------------
   buildBoard();
   setupRackDropZone();
+  setupHistory();
   syncClock();
+  restorePending();
+  wasMyTurn = state.status === "active" && state.turn_user_id === meId;
   renderAll();
+  updateTitle();
+  updateSoundBtn();
   setInterval(tickClocks, 200);
+
   document.getElementById("btn-play").addEventListener("click", submitPlay);
   document.getElementById("btn-recall").addEventListener("click", recall);
   document.getElementById("btn-pass").addEventListener("click", function () {
@@ -468,11 +714,37 @@
     });
   });
   document.getElementById("btn-exchange").addEventListener("click", doExchange);
-  document.getElementById("btn-resign").addEventListener("click", function () {
-    if (confirm("¿Abandonar la partida?")) {
-      post("/game/" + gameId + "/resign/", {});
-    }
+  document.getElementById("btn-draw").addEventListener("click", function () {
+    post(url("offer-draw"), {}).then(function (res) {
+      if (!res.ok) flash(res.j.error || "Error", true);
+    });
   });
+  document.getElementById("btn-resign").addEventListener("click", function () {
+    if (confirm("¿Abandonar la partida?")) post("/game/" + gameId + "/resign/", {});
+  });
+  document.getElementById("btn-sound").addEventListener("click", function () {
+    muted = !muted;
+    localStorage.setItem(MUTE_KEY, muted ? "1" : "0");
+    updateSoundBtn();
+    if (!muted) sound("move");
+  });
+  document.getElementById("btn-share").addEventListener("click", function () {
+    var link = location.href;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link).then(function () { flash("Enlace copiado", false); });
+    } else { prompt("Copiá el enlace:", link); }
+  });
+
+  // Ask for notification permission once a player interacts with the page.
+  if (isPlayer && "Notification" in window && Notification.permission === "default") {
+    document.body.addEventListener("click", function once() {
+      Notification.requestPermission();
+      document.body.removeEventListener("click", once);
+    }, { once: true });
+  }
+  // Refresh the title when the tab regains focus.
+  document.addEventListener("visibilitychange", updateTitle);
+
   connect();
   setupChat();
 })();

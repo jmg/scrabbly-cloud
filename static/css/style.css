@@ -134,8 +134,27 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .feedback { min-height: 20px; margin-top: 10px; }
 .feedback.error { color: var(--danger); } .feedback.ok { color: var(--accent); }
 
+.cell.last { box-shadow: inset 0 0 0 2px var(--blue); }
+
+/* History review bar */
+.history-bar { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.history-bar button { background: var(--panel2); color: var(--text-strong); border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; }
+.history-bar button:hover:not(:disabled) { background: var(--line); }
+.history-bar .h-label { flex: 1; text-align: center; color: var(--muted); font-size: 13px; }
+
 /* Game sidebar */
 .game-side { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+.side-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.side-head .icon-btn { margin-left: 0; }
+.icon-btn { background: var(--panel2); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 15px; }
+.icon-btn:hover { background: var(--line); }
+.conn { font-size: 12px; margin-right: auto; }
+.conn.online { color: var(--accent); }
+.conn.offline { color: var(--danger); animation: clockpulse 1s infinite; }
+.conn.connecting { color: var(--muted); }
+.offer-box { margin-bottom: 12px; }
+.offer { background: var(--panel2); border: 1px solid var(--accent); border-radius: 6px; padding: 8px 10px; font-size: 14px; color: var(--text-strong); }
+.offer .btn-small { margin-left: 4px; }
 .status-banner { font-weight: 600; padding: 10px; border-radius: 6px; text-align: center; background: var(--panel2); margin-bottom: 12px; color: var(--text-strong); }
 .status-banner.s-finished { background: var(--accent); color: #fff; }
 .players { list-style: none; padding: 0; margin: 0 0 12px; }
