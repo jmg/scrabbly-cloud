@@ -11,6 +11,30 @@
     </div>
   </div>
 
+  {% if relationship and relationship != 'self' %}
+  <div class="profile-actions">
+    {% if relationship == 'none' %}
+      <form method="post" action="{% url 'friend_request' %}">
+        {% csrf_token %}<input type="hidden" name="username" value="{{ profile_user.username }}">
+        <input type="hidden" name="next" value="{% url 'profile' profile_user.username %}">
+        <button class="btn-small" type="submit">+ {% trans "Agregar amigo" %}</button>
+      </form>
+    {% elif relationship == 'sent' %}
+      <span class="muted">{% trans "Solicitud enviada" %}</span>
+    {% elif relationship == 'incoming' %}
+      <a class="btn-small" href="{% url 'friends' %}">{% trans "Responder solicitud" %}</a>
+    {% elif relationship == 'friends' %}
+      <span class="muted">✓ {% trans "Amigos" %}</span>
+    {% endif %}
+    <form method="post" action="{% url 'challenge_create' %}">
+      {% csrf_token %}<input type="hidden" name="opponent" value="{{ profile_user.username }}">
+      <input type="hidden" name="language" value="es"><input type="hidden" name="clock" value="0,0">
+      <input type="hidden" name="rated" value="1"><input type="hidden" name="next" value="{% url 'profile' profile_user.username %}">
+      <button class="btn-small" type="submit">⚔ {% trans "Desafiar" %}</button>
+    </form>
+  </div>
+  {% endif %}
+
   <div class="stat-grid">
     <div class="stat"><b>{{ profile_user.games_played }}</b><span>{% trans "partidas" %}</span></div>
     <div class="stat"><b>{{ profile_user.wins }}</b><span>{% trans "victorias" %}</span></div>

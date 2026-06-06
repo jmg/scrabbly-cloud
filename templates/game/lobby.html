@@ -51,6 +51,53 @@
       </form>
     </div>
 
+    {% if incoming_challenges %}
+    <h2>⚔ {% trans "Desafíos recibidos" %}</h2>
+    <ul class="game-list">
+      {% for ch in incoming_challenges %}
+      <li class="challenge">
+        <span>
+          <a href="{% url 'profile' ch.challenger.username %}">{{ ch.challenger.display_name }} ({{ ch.challenger.rating }})</a>
+          <em class="lang-badge">{{ ch.get_language_display }}</em>
+          <em class="clock-badge">⏱ {% if ch.clock_initial %}{{ ch.clock_initial }}+{{ ch.clock_increment }}{% else %}∞{% endif %}</em>
+          {% if ch.rated %}<em class="rated">{% trans "rated" %}</em>{% endif %}
+        </span>
+        <span class="friend-actions">
+          <form method="post" action="{% url 'challenge_respond' %}">
+            {% csrf_token %}<input type="hidden" name="id" value="{{ ch.id }}"><input type="hidden" name="accept" value="1">
+            <button class="btn-small" type="submit">{% trans "Aceptar" %}</button>
+          </form>
+          <form method="post" action="{% url 'challenge_respond' %}">
+            {% csrf_token %}<input type="hidden" name="id" value="{{ ch.id }}">
+            <button class="btn-small" type="submit">{% trans "Rechazar" %}</button>
+          </form>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if outgoing_challenges %}
+    <h2>⚔ {% trans "Desafíos enviados" %}</h2>
+    <ul class="game-list">
+      {% for ch in outgoing_challenges %}
+      <li class="challenge">
+        <span><a href="{% url 'profile' ch.opponent.username %}">{{ ch.opponent.display_name }}</a></span>
+        {% if ch.status == 'accepted' and ch.game %}
+          <a class="btn-small" href="{% url 'game_detail' ch.game.id %}">{% trans "Ir a la partida" %} →</a>
+        {% else %}
+          <span class="friend-actions"><span class="muted">{% trans "pendiente" %}</span>
+            <form method="post" action="{% url 'challenge_cancel' %}">
+              {% csrf_token %}<input type="hidden" name="id" value="{{ ch.id }}">
+              <button class="btn-small btn-danger" type="submit">{% trans "Cancelar" %}</button>
+            </form>
+          </span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
     {% if my_turn %}
     <h2>{% trans "Te toca jugar" %} <span class="turn-count">{{ my_turn|length }}</span></h2>
     <ul class="game-list">

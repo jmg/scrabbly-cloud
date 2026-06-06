@@ -58,3 +58,30 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.display_name
+
+
+class Friendship(models.Model):
+    """A friend relationship/request between two users.
+
+    A single row per direction: it starts ``pending`` (a request) and becomes
+    ``accepted`` once the recipient confirms. Two users are friends if an
+    accepted row exists in either direction.
+    """
+
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    STATUS_CHOICES = [(PENDING, "Pendiente"), (ACCEPTED, "Aceptada")]
+
+    from_user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="friendship_sent")
+    to_user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="friendship_received")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("from_user", "to_user")
+
+    def __str__(self):
+        return f"{self.from_user} → {self.to_user} ({self.status})"
+

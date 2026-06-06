@@ -6,9 +6,13 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from django.contrib import messages
+from django.db.models import Q
+from django.utils.translation import gettext as _
+
 from . import services
 from .engine import InvalidMove
-from .models import Game
+from .models import Challenge, Game
 from .ratelimit import rate_limit
 from .realtime import notify_update
 
@@ -62,11 +66,23 @@ def lobby(request):
     recent_page = Paginator(recent, 12).get_page(request.GET.get("fpage"))
 
     leaders = User.objects.filter(is_guest=False, is_bot=False).order_by("-rating")[:10]
+
+    incoming_ch, outgoing_ch = [], []
+    if request.user.is_authenticated and not request.user.is_guest:
+        incoming_ch = list(
+            Challenge.objects.filter(opponent=request.user, status=Challenge.PENDING)
+            .select_related("challenger"))
+        outgoing_ch = list(
+            Challenge.objects.filter(challenger=request.user)
+            .filter(Q(status=Challenge.PENDING) | Q(status=Challenge.ACCEPTED))
+            .select_related("opponent", "game")[:10])
+
     return render(request, "game/lobby.html", {
         "waiting": waiting_page, "active": active,
         "my_turn": my_turn, "my_waiting": my_waiting,
         "recent": recent_page, "leaders": leaders,
         "f_lang": f_lang, "f_rated": f_rated,
+        "incoming_challenges": incoming_ch, "outgoing_challenges": outgoing_ch,
     })
 
 
@@ -120,6 +136,57 @@ def create_ai_game(request):
     except InvalidMove as exc:
         return _error(request, str(exc))
     return redirect("game_detail", game_id=game.pk)
+
+
+@require_POST
+@ACTION_LIMIT
+def challenge_create(request):
+    user = request.user
+    if not user.is_authenticated or user.is_guest:
+        return redirect("login")
+    opponent = User.objects.filter(
+        username=(request.POST.get("opponent") or "").strip(),
+        is_guest=False, is_bot=False,
+    ).first()
+    if opponent is None or opponent == user:
+        messages.error(request, _("No se encontró ese usuario."))
+        return redirect("friends")
+    initial, increment = _clock(request)
+    Challenge.objects.create(
+        challenger=user, opponent=opponent,
+        language=_language(request), rated=request.POST.get("rated") == "1",
+        clock_initial=initial, clock_increment=increment,
+    )
+    messages.success(request, _("Desafío enviado."))
+    return redirect(request.POST.get("next") or "lobby")
+
+
+@require_POST
+@ACTION_LIMIT
+def challenge_respond(request):
+    user = request.user
+    ch = get_object_or_404(
+        Challenge, pk=request.POST.get("id"), opponent=user, status=Challenge.PENDING)
+    if request.POST.get("accept") == "1":
+        try:
+            game = services.accept_challenge(ch)
+        except InvalidMove as exc:
+            return _error(request, str(exc))
+        notify_update(game.pk)
+        return redirect("game_detail", game_id=game.pk)
+    ch.status = Challenge.DECLINED
+    ch.save(update_fields=["status"])
+    messages.info(request, _("Desafío rechazado."))
+    return redirect("lobby")
+
+
+@require_POST
+@ACTION_LIMIT
+def challenge_cancel(request):
+    Challenge.objects.filter(
+        pk=request.POST.get("id"), challenger=request.user, status=Challenge.PENDING
+    ).update(status=Challenge.CANCELED)
+    return redirect(request.POST.get("next") or "lobby")
 
 
 @require_POST

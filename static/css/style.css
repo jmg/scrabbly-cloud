@@ -100,6 +100,12 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .metrics-grid { grid-template-columns: repeat(4, 1fr); }
 .lang-switch { display: inline; margin-left: 4px; }
 .lang-switch select { background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; font-size: 13px; cursor: pointer; }
+.nav-badge { background: #d9534f; color: #fff; border-radius: 10px; padding: 0 6px; font-size: 11px; font-weight: 700; }
+.friend-actions { display: inline-flex; gap: 6px; align-items: center; }
+.friend-actions form { display: inline; }
+.profile-actions { display: flex; gap: 8px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+.profile-actions form { display: inline; }
+li.challenge { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .premium-link { color: #f0b428 !important; font-weight: 600; }
 .pricing { max-width: 760px; margin: 0 auto; text-align: center; }
 .pricing .perks { list-style: none; padding: 0; display: inline-flex; flex-direction: column; gap: 8px; text-align: left; margin: 16px auto 24px; }

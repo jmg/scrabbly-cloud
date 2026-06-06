@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 06:05+0000\n"
+"POT-Creation-Date: 2026-06-06 17:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,19 +16,44 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: accounts/views.py:38
+
+#: accounts/views.py:40
 msgid "¡Cuenta creada!"
 msgstr "Account created!"
 
-#: accounts/views.py:57
+#: accounts/views.py:59
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:158
+#: accounts/views.py:130 game/views.py:152
+msgid "No se encontró ese usuario."
+msgstr "User not found."
+
+#: accounts/views.py:138 accounts/views.py:159
+msgid "¡Ahora son amigos!"
+msgstr "You're now friends!"
+
+#: accounts/views.py:140
+msgid "Ya son amigos."
+msgstr "You're already friends."
+
+#: accounts/views.py:143
+msgid "Solicitud enviada."
+msgstr "Request sent."
+
+#: accounts/views.py:162
+msgid "Solicitud rechazada."
+msgstr "Request declined."
+
+#: accounts/views.py:176
+msgid "Amistad eliminada."
+msgstr "Friend removed."
+
+#: accounts/views.py:240
 msgid "Ese tema es exclusivo de Premium. 👑"
 msgstr "That theme is Premium-only. 👑"
 
-#: accounts/views.py:162
+#: accounts/views.py:244
 msgid "Tema actualizado."
 msgstr "Theme updated."
 
@@ -69,15 +94,71 @@ msgid ""
 "Premium para partidas ilimitadas."
 msgstr ""
 
-#: templates/accounts/login.html:3 templates/accounts/login.html:6
-#: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:24
-msgid "Entrar"
-msgstr "Log in"
+#: game/views.py:160
+msgid "Desafío enviado."
+msgstr "Challenge sent."
 
-#: templates/accounts/login.html:9 templates/accounts/register.html:12
+#: game/views.py:179
+msgid "Desafío rechazado."
+msgstr "Challenge declined."
+
+#: templates/accounts/friends.html:3 templates/accounts/friends.html:6
+#: templates/accounts/profile.html:27 templates/base.html:20
+msgid "Amigos"
+msgstr "Friends"
+
+#: templates/accounts/friends.html:10 templates/accounts/login.html:9
+#: templates/accounts/register.html:12
 msgid "Usuario"
 msgstr "Username"
+
+#: templates/accounts/friends.html:11 templates/accounts/profile.html:20
+msgid "Agregar amigo"
+msgstr "Add friend"
+
+#: templates/accounts/friends.html:15
+msgid "Solicitudes recibidas"
+msgstr "Requests received"
+
+#: templates/accounts/friends.html:23 templates/game/lobby.html:68
+msgid "Aceptar"
+msgstr "Accept"
+
+#: templates/accounts/friends.html:27 templates/game/lobby.html:72
+msgid "Rechazar"
+msgstr "Decline"
+
+#: templates/accounts/friends.html:35
+msgid "Mis amigos"
+msgstr "My friends"
+
+#: templates/accounts/friends.html:45 templates/accounts/profile.html:33
+msgid "Desafiar"
+msgstr "Challenge"
+
+#: templates/accounts/friends.html:49
+msgid "Quitar"
+msgstr "Remove"
+
+#: templates/accounts/friends.html:54
+msgid "Todavía no tenés amigos. ¡Agregá a alguien!"
+msgstr "You have no friends yet. Add someone!"
+
+#: templates/accounts/friends.html:59
+msgid "Solicitudes enviadas"
+msgstr "Requests sent"
+
+#: templates/accounts/friends.html:62 templates/game/lobby.html:89
+#, fuzzy
+#| msgid "pago pendiente"
+msgid "pendiente"
+msgstr "pending"
+
+#: templates/accounts/login.html:3 templates/accounts/login.html:6
+#: templates/accounts/login.html:11 templates/accounts/register.html:20
+#: templates/base.html:25
+msgid "Entrar"
+msgstr "Log in"
 
 #: templates/accounts/login.html:10 templates/accounts/register.html:14
 msgid "Contraseña"
@@ -91,77 +172,85 @@ msgstr "Don't have an account?"
 msgid "Registrate"
 msgstr "Sign up"
 
-#: templates/accounts/profile.html:15
+#: templates/accounts/profile.html:23
+msgid "Solicitud enviada"
+msgstr "Request sent"
+
+#: templates/accounts/profile.html:25
+msgid "Responder solicitud"
+msgstr "Respond to request"
+
+#: templates/accounts/profile.html:39
 msgid "partidas"
 msgstr "games"
 
-#: templates/accounts/profile.html:16
+#: templates/accounts/profile.html:40
 msgid "victorias"
 msgstr "wins"
 
-#: templates/accounts/profile.html:17
+#: templates/accounts/profile.html:41
 msgid "derrotas"
 msgstr "losses"
 
-#: templates/accounts/profile.html:18
+#: templates/accounts/profile.html:42
 msgid "empates"
 msgstr "draws"
 
-#: templates/accounts/profile.html:19
+#: templates/accounts/profile.html:43
 #, python-format
 msgid "%% victorias"
 msgstr "%% wins"
 
-#: templates/accounts/profile.html:24
+#: templates/accounts/profile.html:48
 msgid "Racha:"
 msgstr "Streak:"
 
-#: templates/accounts/profile.html:31 templates/billing/pricing.html:28
+#: templates/accounts/profile.html:55 templates/billing/pricing.html:28
 msgid "Estadísticas avanzadas"
 msgstr "Advanced stats"
 
-#: templates/accounts/profile.html:33
+#: templates/accounts/profile.html:57
 msgid "pts/jugada"
 msgstr "pts/move"
 
-#: templates/accounts/profile.html:34
+#: templates/accounts/profile.html:58
 msgid "jugadas"
 msgstr "moves"
 
-#: templates/accounts/profile.html:35
+#: templates/accounts/profile.html:59
 msgid "mejor partida"
 msgstr "best game"
 
-#: templates/accounts/profile.html:37
+#: templates/accounts/profile.html:61
 msgid "mejor jugada"
 msgstr "best move"
 
-#: templates/accounts/profile.html:42
+#: templates/accounts/profile.html:66
 msgid "Evolución de rating"
 msgstr "Rating over time"
 
-#: templates/accounts/profile.html:51
+#: templates/accounts/profile.html:75
 msgid "Tema de tablero"
 msgstr "Board theme"
 
-#: templates/accounts/profile.html:61
+#: templates/accounts/profile.html:85
 msgid "Aplicar"
 msgstr "Apply"
 
-#: templates/accounts/profile.html:62
+#: templates/accounts/profile.html:86
 msgid "Desbloqueá más temas con Premium"
 msgstr "Unlock more themes with Premium"
 
-#: templates/accounts/profile.html:67
+#: templates/accounts/profile.html:91
 msgid "Historial"
 msgstr "History"
 
-#: templates/accounts/profile.html:78
+#: templates/accounts/profile.html:102
 msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:25
+#: templates/accounts/register.html:18 templates/base.html:26
 msgid "Crear cuenta"
 msgstr "Sign up"
 
@@ -186,11 +275,11 @@ msgstr "Already have an account?"
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:21
+#: templates/base.html:22
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:30
+#: templates/base.html:31
 msgid "Idioma"
 msgstr "Language"
 
@@ -459,18 +548,18 @@ msgstr "Game #%(id)s"
 msgid "Inicio"
 msgstr "Start"
 
-#: templates/game/game.html:14 templates/game/lobby.html:116
-#: templates/game/lobby.html:156
+#: templates/game/game.html:14 templates/game/lobby.html:163
+#: templates/game/lobby.html:203
 msgid "Anterior"
 msgstr "Previous"
 
 #: templates/game/game.html:15 templates/game/game.html:17
-#: templates/game/lobby.html:125
+#: templates/game/lobby.html:172
 msgid "En vivo"
 msgstr "Live"
 
-#: templates/game/game.html:16 templates/game/lobby.html:118
-#: templates/game/lobby.html:158
+#: templates/game/game.html:16 templates/game/lobby.html:165
+#: templates/game/lobby.html:205
 msgid "Siguiente"
 msgstr "Next"
 
@@ -530,11 +619,11 @@ msgstr "Lobby"
 msgid "Jugar al Scrabble online"
 msgstr "Play Scrabble online"
 
-#: templates/game/lobby.html:10 templates/game/lobby.html:89
+#: templates/game/lobby.html:10 templates/game/lobby.html:136
 msgid "Español"
 msgstr "Spanish"
 
-#: templates/game/lobby.html:11 templates/game/lobby.html:90
+#: templates/game/lobby.html:11 templates/game/lobby.html:137
 msgid "English"
 msgstr ""
 
@@ -574,7 +663,7 @@ msgstr "30 min"
 msgid "Partida rápida"
 msgstr "Quick match"
 
-#: templates/game/lobby.html:36 templates/game/lobby.html:94
+#: templates/game/lobby.html:36 templates/game/lobby.html:141
 msgid "Con rating"
 msgstr "Rated"
 
@@ -607,78 +696,96 @@ msgid "Experta"
 msgstr "Expert"
 
 #: templates/game/lobby.html:55
-msgid "Te toca jugar"
-msgstr "Your move"
+msgid "Desafíos recibidos"
+msgstr "Challenges received"
 
-#: templates/game/lobby.html:60
-msgid "tu turno"
-msgstr "your turn"
-
-#: templates/game/lobby.html:71
-msgid "Esperando rival"
-msgstr "Waiting for opponent"
-
-#: templates/game/lobby.html:85
-msgid "Partidas abiertas"
-msgstr "Open games"
-
-#: templates/game/lobby.html:88
-msgid "Idioma: todos"
-msgstr "Language: all"
-
-#: templates/game/lobby.html:93
-msgid "Rating: todas"
-msgstr "Rating: all"
-
-#: templates/game/lobby.html:95
-msgid "Sin rating"
-msgstr "Unrated"
-
-#: templates/game/lobby.html:97
-msgid "Filtrar"
-msgstr "Filter"
-
-#: templates/game/lobby.html:106
+#: templates/game/lobby.html:63 templates/game/lobby.html:153
 msgid "rated"
 msgstr "rated"
 
-#: templates/game/lobby.html:109
+#: templates/game/lobby.html:81
+msgid "Desafíos enviados"
+msgstr "Challenges sent"
+
+#: templates/game/lobby.html:87
+#, fuzzy
+#| msgid "Volver a la partida"
+msgid "Ir a la partida"
+msgstr "Go to game"
+
+#: templates/game/lobby.html:92
+msgid "Cancelar"
+msgstr "Cancel"
+
+#: templates/game/lobby.html:102
+msgid "Te toca jugar"
+msgstr "Your move"
+
+#: templates/game/lobby.html:107
+msgid "tu turno"
+msgstr "your turn"
+
+#: templates/game/lobby.html:118
+msgid "Esperando rival"
+msgstr "Waiting for opponent"
+
+#: templates/game/lobby.html:132
+msgid "Partidas abiertas"
+msgstr "Open games"
+
+#: templates/game/lobby.html:135
+msgid "Idioma: todos"
+msgstr "Language: all"
+
+#: templates/game/lobby.html:140
+msgid "Rating: todas"
+msgstr "Rating: all"
+
+#: templates/game/lobby.html:142
+msgid "Sin rating"
+msgstr "Unrated"
+
+#: templates/game/lobby.html:144
+msgid "Filtrar"
+msgstr "Filter"
+
+#: templates/game/lobby.html:156
 msgid "Unirse"
 msgstr "Join"
 
-#: templates/game/lobby.html:117 templates/game/lobby.html:157
+#: templates/game/lobby.html:164 templates/game/lobby.html:204
 #, python-format
 msgid "Página %(num)s de %(total)s"
 msgstr "Page %(num)s of %(total)s"
 
-#: templates/game/lobby.html:122
+#: templates/game/lobby.html:169
 msgid "No hay partidas abiertas con esos filtros. ¡Creá una!"
 msgstr "No open games with those filters. Create one!"
 
-#: templates/game/lobby.html:125
+#: templates/game/lobby.html:172
 msgid "(espectar)"
 msgstr "(spectate)"
 
-#: templates/game/lobby.html:138
+#: templates/game/lobby.html:185
 msgid "Ninguna partida en curso."
 msgstr "No games in progress."
 
-#: templates/game/lobby.html:141
+#: templates/game/lobby.html:188
 msgid "Partidas recientes"
 msgstr "Recent games"
 
-#: templates/game/lobby.html:149
+#: templates/game/lobby.html:196
 msgid "empate"
 msgstr "draw"
 
-#: templates/game/lobby.html:162
+#: templates/game/lobby.html:209
 msgid "Todavía no terminó ninguna partida."
 msgstr "No games finished yet."
 
-#: templates/game/lobby.html:167
+#: templates/game/lobby.html:214
 msgid "Ranking"
 msgstr "Leaderboard"
 
-#: templates/game/lobby.html:172
+#: templates/game/lobby.html:219
 msgid "Sin jugadores aún."
 msgstr "No players yet."

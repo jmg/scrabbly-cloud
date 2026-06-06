@@ -6,7 +6,9 @@ from django.views.decorators.http import require_POST
 
 from game.models import GamePlayer, Move
 
+from . import social
 from .forms import LoginForm, RegisterForm
+from .models import Friendship
 from .themes import THEMES, THEME_CODES, PREMIUM_THEMES
 
 User = get_user_model()
@@ -92,7 +94,87 @@ def profile(request, username):
         ctx["current_theme"] = user.board_theme
         ctx["can_use_premium_themes"] = user.has_perk("themes")
 
+    # Friend/challenge controls for an authenticated visitor on someone else.
+    if (request.user.is_authenticated and not request.user.is_guest
+            and not user.is_bot):
+        ctx["relationship"] = social.relationship(request.user, user)
+
     return render(request, "accounts/profile.html", ctx)
+
+
+def _real_user(request):
+    """The current non-guest user, or None."""
+    u = request.user
+    return u if (u.is_authenticated and not u.is_guest) else None
+
+
+def friends(request):
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    return render(request, "accounts/friends.html", {
+        "friends": social.friends_of(user),
+        "incoming": social.incoming_requests(user),
+        "outgoing": social.outgoing_requests(user),
+    })
+
+
+@require_POST
+def friend_request(request):
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    username = (request.POST.get("username") or "").strip()
+    target = User.objects.filter(username=username, is_guest=False, is_bot=False).first()
+    if target is None or target == user:
+        messages.error(request, _("No se encontró ese usuario."))
+        return redirect("friends")
+
+    # If the other side already sent a request, accept it instead of duplicating.
+    reverse = Friendship.objects.filter(from_user=target, to_user=user).first()
+    if reverse:
+        reverse.status = Friendship.ACCEPTED
+        reverse.save(update_fields=["status"])
+        messages.success(request, _("¡Ahora son amigos!"))
+    elif social.are_friends(user, target):
+        messages.info(request, _("Ya son amigos."))
+    else:
+        Friendship.objects.get_or_create(from_user=user, to_user=target)
+        messages.success(request, _("Solicitud enviada."))
+    return redirect(request.POST.get("next") or "friends")
+
+
+@require_POST
+def friend_respond(request):
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    fr = Friendship.objects.filter(
+        pk=request.POST.get("id"), to_user=user, status=Friendship.PENDING
+    ).first()
+    if fr:
+        if request.POST.get("accept") == "1":
+            fr.status = Friendship.ACCEPTED
+            fr.save(update_fields=["status"])
+            messages.success(request, _("¡Ahora son amigos!"))
+        else:
+            fr.delete()
+            messages.info(request, _("Solicitud rechazada."))
+    return redirect("friends")
+
+
+@require_POST
+def friend_remove(request):
+    user = _real_user(request)
+    if user is None:
+        return redirect("login")
+    from django.db.models import Q
+    Friendship.objects.filter(
+        Q(from_user=user, to_user_id=request.POST.get("id"))
+        | Q(to_user=user, from_user_id=request.POST.get("id"))
+    ).delete()
+    messages.info(request, _("Amistad eliminada."))
+    return redirect(request.POST.get("next") or "friends")
 
 
 def _advanced_stats(user):

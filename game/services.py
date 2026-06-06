@@ -593,6 +593,21 @@ def get_bot_user(level):
     return bot
 
 
+def accept_challenge(challenge):
+    """Create the game for an accepted direct challenge and link it."""
+    from .models import Challenge
+
+    game = create_game(
+        challenge.challenger, rated=challenge.rated, language=challenge.language,
+        clock_initial=challenge.clock_initial, clock_increment=challenge.clock_increment,
+    )
+    join_game(game, challenge.opponent)
+    challenge.status = Challenge.ACCEPTED
+    challenge.game = game
+    challenge.save(update_fields=["status", "game"])
+    return game
+
+
 def create_ai_game(user, level="medium", language=DEFAULT_LANGUAGE):
     """Start an unrated game between ``user`` and the computer."""
     if level not in BOT_USERNAMES:

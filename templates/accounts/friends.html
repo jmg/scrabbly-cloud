@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load avatars i18n %}
+{% block title %}{% trans "Amigos" %} · Scrabbly{% endblock %}
+{% block content %}
+<div class="friends-page">
+  <h1>{% trans "Amigos" %}</h1>
+
+  <form method="post" action="{% url 'friend_request' %}" class="filters">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="{% trans 'Usuario' %}" required>
+    <button class="btn-small" type="submit">{% trans "Agregar amigo" %}</button>
+  </form>
+
+  {% if incoming %}
+  <h2>{% trans "Solicitudes recibidas" %}</h2>
+  <ul class="game-list">
+    {% for f in incoming %}
+    <li>
+      <a href="{% url 'profile' f.from_user.username %}">{{ f.from_user.username|avatar:22 }} {{ f.from_user.display_name }}</a>
+      <span class="friend-actions">
+        <form method="post" action="{% url 'friend_respond' %}">
+          {% csrf_token %}<input type="hidden" name="id" value="{{ f.id }}"><input type="hidden" name="accept" value="1">
+          <button class="btn-small" type="submit">{% trans "Aceptar" %}</button>
+        </form>
+        <form method="post" action="{% url 'friend_respond' %}">
+          {% csrf_token %}<input type="hidden" name="id" value="{{ f.id }}">
+          <button class="btn-small" type="submit">{% trans "Rechazar" %}</button>
+        </form>
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <h2>{% trans "Mis amigos" %}</h2>
+  <ul class="game-list">
+    {% for fr in friends %}
+    <li>
+      <a href="{% url 'profile' fr.username %}">{{ fr.username|avatar:22 }} {{ fr.display_name }} · {{ fr.rating }}{% if fr.is_premium %} <span class="crown">👑</span>{% endif %}</a>
+      <span class="friend-actions">
+        <form method="post" action="{% url 'challenge_create' %}">
+          {% csrf_token %}<input type="hidden" name="opponent" value="{{ fr.username }}">
+          <input type="hidden" name="language" value="es"><input type="hidden" name="clock" value="0,0">
+          <input type="hidden" name="rated" value="1"><input type="hidden" name="next" value="{% url 'friends' %}">
+          <button class="btn-small" type="submit">⚔ {% trans "Desafiar" %}</button>
+        </form>
+        <form method="post" action="{% url 'friend_remove' %}">
+          {% csrf_token %}<input type="hidden" name="id" value="{{ fr.id }}">
+          <button class="btn-small btn-danger" type="submit">{% trans "Quitar" %}</button>
+        </form>
+      </span>
+    </li>
+    {% empty %}
+    <li class="muted">{% trans "Todavía no tenés amigos. ¡Agregá a alguien!" %}</li>
+    {% endfor %}
+  </ul>
+
+  {% if outgoing %}
+  <h2>{% trans "Solicitudes enviadas" %}</h2>
+  <ul class="game-list">
+    {% for f in outgoing %}
+    <li><a href="{% url 'profile' f.to_user.username %}">{{ f.to_user.username|avatar:22 }} {{ f.to_user.display_name }}</a> <span class="muted">{% trans "pendiente" %}</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endblock %}

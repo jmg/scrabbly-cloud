@@ -149,3 +149,35 @@ class Move(models.Model):
 
     def __str__(self):
         return f"Move {self.number} ({self.kind}) in game {self.game_id}"
+
+
+class Challenge(models.Model):
+    """A direct invitation from one user to play another with set conditions."""
+
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    DECLINED = "declined"
+    CANCELED = "canceled"
+    STATUS_CHOICES = [
+        (PENDING, "Pendiente"), (ACCEPTED, "Aceptado"),
+        (DECLINED, "Rechazado"), (CANCELED, "Cancelado"),
+    ]
+
+    challenger = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="challenges_sent")
+    opponent = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="challenges_received")
+    language = models.CharField(max_length=5, default="es")
+    rated = models.BooleanField(default=True)
+    clock_initial = models.PositiveIntegerField(default=0)
+    clock_increment = models.PositiveIntegerField(default=0)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
+    game = models.ForeignKey(
+        Game, null=True, blank=True, on_delete=models.SET_NULL, related_name="from_challenge")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.challenger} → {self.opponent} ({self.status})"

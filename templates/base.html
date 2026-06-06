@@ -17,6 +17,7 @@
         <a class="premium-link" href="{% url 'pricing' %}">👑 {% trans "Premium" %}</a>
       {% endif %}
       {% if user.is_authenticated and not user.is_guest %}
+        <a href="{% url 'friends' %}">{% trans "Amigos" %}{% if nav_friend_requests or nav_challenges %} <span class="nav-badge">{{ nav_friend_requests|add:nav_challenges }}</span>{% endif %}</a>
         <a class="me-link" href="{% url 'profile' user.username %}">{{ user.username|avatar:26 }} {% if user.is_premium %}<span class="crown" title="Premium">👑</span>{% endif %}{{ user.display_name }} · {{ user.rating }}</a>
         <a href="{% url 'logout' %}">{% trans "Salir" %}</a>
       {% else %}
