@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ci-secret-key
+      # DEBUG stays on so the static finders serve assets to the live-server
+      # E2E tests without needing a collectstatic manifest.
+      DEBUG: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install gettext (msgfmt for translations)
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Install Playwright Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Compile translations
+        run: python manage.py compilemessages -l en
+
+      - name: Run migrations check
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Run test suite (incl. Playwright E2E)
+        run: python manage.py test --verbosity 2
