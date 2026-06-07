@@ -49,7 +49,7 @@
 </head>
 <body data-theme="{{ user.effective_theme|default:'classic' }}">
   <header class="topbar">
-    <a class="brand" href="{% url 'lobby' %}">♟ Scrabbly</a>
+    <a class="brand" href="{% url 'lobby' %}"><img src="{% static 'icons/favicon.svg' %}" alt="" width="26" height="26">Scrabbly</a>
     <nav>
       <a href="{% url 'arenas' %}">🏆 {% trans "Torneos" %}</a>
       <a href="{% url 'puzzles' %}">🧩 {% trans "Puzzles" %}</a>
