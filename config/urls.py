@@ -4,7 +4,7 @@ from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
 from blog.sitemaps import SITEMAPS
-from blog.views import manifest, robots_txt
+from blog.views import manifest, robots_txt, site_og
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -13,6 +13,7 @@ urlpatterns = [
     path("sitemap.xml", sitemap, {"sitemaps": SITEMAPS}, name="sitemap"),
     path("robots.txt", robots_txt, name="robots"),
     path("site.webmanifest", manifest, name="manifest"),
+    path("og.png", site_og, name="site_og"),
     path("api/", include("game.api_urls")),
     path("", include("billing.urls")),
     path("", include("accounts.urls")),

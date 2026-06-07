@@ -21,7 +21,12 @@
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:title" content="{% block og_title %}Scrabbly{% endblock %}">
   <meta property="og:description" content="{% block og_description %}{% trans "Jugá al Scrabble online gratis." %}{% endblock %}">
-  <meta name="twitter:card" content="summary">
+  {% block og_image_tags %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% url 'site_og' %}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  {% endblock %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   {% if analytics_domain %}<script defer data-domain="{{ analytics_domain }}" src="https://plausible.io/js/script.js"></script>{% endif %}
   <script type="application/ld+json">

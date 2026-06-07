@@ -86,6 +86,24 @@ class BlogTests(TestCase):
         self.assertIn("/blog/how-to-play-scrabble-online/", html)
         self.assertIn("BreadcrumbList", html)
 
+    def test_site_og_image(self):
+        r = self.c.get("/og.png")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r["Content-Type"], "image/png")
+        self.assertTrue(r.content[:8] == b"\x89PNG\r\n\x1a\n")
+
+    def test_default_og_image_on_pages(self):
+        # A non-blog page advertises the site OG image.
+        html = Client().get("/").content.decode()
+        self.assertIn("/og.png", html)
+        self.assertIn('twitter:card" content="summary_large_image"', html)
+
+    def test_post_overrides_og_image(self):
+        post = Post.objects.first()
+        html = self.c.get(post.get_absolute_url()).content.decode()
+        self.assertIn("/og.png", html)        # the post's own og.png
+        self.assertNotIn('content="http://testserver/og.png"', html)  # not the site default
+
     def test_manifest(self):
         r = self.c.get("/site.webmanifest")
         self.assertEqual(r.status_code, 200)

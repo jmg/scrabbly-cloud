@@ -137,9 +137,23 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 .breadcrumb { font-size: 13px; margin-bottom: 12px; }
 
 /* Marketing landing */
-.hero { text-align: center; padding: 56px 16px 32px; }
-.hero h1 { font-size: 40px; margin: 0 0 12px; color: var(--text-strong); }
+.hero {
+  text-align: center; padding: 72px 16px 44px;
+  background:
+    radial-gradient(900px 380px at 50% -10%, rgba(98,153,36,.22), transparent 70%),
+    linear-gradient(180deg, var(--bg2), var(--bg));
+  border-bottom: 1px solid var(--line);
+}
+.hero h1 {
+  font-size: 46px; line-height: 1.1; margin: 0 0 14px; color: var(--text-strong);
+  letter-spacing: -0.5px;
+  background: linear-gradient(180deg, #fff, #cfe6b3);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
 .hero-sub { font-size: 19px; color: var(--muted); max-width: 620px; margin: 0 auto 24px; }
+.btn-primary.big { box-shadow: 0 6px 20px rgba(98,153,36,.35); }
+.feature { transition: transform .15s ease, border-color .15s ease; }
+.feature:hover { transform: translateY(-3px); border-color: var(--accent); }
 .hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .hero-cta form { display: inline; }
 .btn-primary.big, .btn-secondary.big { font-size: 18px; padding: 12px 24px; }

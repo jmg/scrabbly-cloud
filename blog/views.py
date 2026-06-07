@@ -85,9 +85,8 @@ def _wrap(draw, text, font, max_width):
     return lines
 
 
-def og_image(request, slug):
-    """A 1200×630 social share card rendered per post."""
-    post = get_object_or_404(Post, slug=slug, published=True)
+def _render_og(title, subtitle=""):
+    """Render a 1200×630 branded social card as a PNG HttpResponse."""
     from PIL import Image, ImageDraw
     W, H = 1200, 630
     img = Image.new("RGB", (W, H), (22, 21, 18))
@@ -96,14 +95,29 @@ def og_image(request, slug):
     d.text((60, 56), "♟ Scrabbly", font=_font(40), fill=(240, 180, 40))
     big = _font(66)
     y = 200
-    for line in _wrap(d, post.title, big, W - 120)[:4]:
+    for line in _wrap(d, title, big, W - 120)[:4]:
         d.text((60, y), line, font=big, fill=(245, 245, 245))
         y += 84
+    if subtitle:
+        for line in _wrap(d, subtitle, _font(34), W - 120)[:2]:
+            d.text((60, y + 8), line, font=_font(34), fill=(180, 180, 180))
+            y += 44
     d.text((60, H - 72), "scrabblycloud.com", font=_font(34), fill=(150, 150, 150))
     resp = HttpResponse(content_type="image/png")
     img.save(resp, "PNG")
     resp["Cache-Control"] = "public, max-age=86400"
     return resp
+
+
+def og_image(request, slug):
+    """A 1200×630 social share card rendered per post."""
+    post = get_object_or_404(Post, slug=slug, published=True)
+    return _render_og(post.title)
+
+
+def site_og(request):
+    """Default social card for the homepage and any non-post page."""
+    return _render_og("Scrabble online", "Jugá gratis: tiempo real, IA, torneos y puzzles")
 
 
 def blog_index(request):

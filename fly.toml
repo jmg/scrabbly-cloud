@@ -1,0 +1,30 @@
+# Fly.io deployment for Scrabbly. Build uses the repo Dockerfile (Daphne/ASGI).
+# Create the app and managed Postgres/Redis, set secrets, then `fly deploy`.
+app = "scrabbly"
+primary_region = "eze"  # Buenos Aires; change to your nearest region
+
+[build]
+  dockerfile = "Dockerfile"
+
+[deploy]
+  # Run migrations and compile translations on each release.
+  release_command = "sh -c 'python manage.py migrate --noinput && python manage.py compilemessages -l en'"
+
+[env]
+  DEBUG = "0"
+  ALLOWED_HOSTS = "scrabblycloud.com,www.scrabblycloud.com,scrabbly.fly.dev"
+  CSRF_TRUSTED_ORIGINS = "https://scrabblycloud.com,https://www.scrabblycloud.com"
+  PLAUSIBLE_DOMAIN = "scrabblycloud.com"
+  DB_CONN_MAX_AGE = "60"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

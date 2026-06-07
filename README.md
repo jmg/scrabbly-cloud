@@ -123,9 +123,17 @@ lobby normal. Todo el sitio incluye JSON-LD de **Organization** y **WebSite con
 SearchAction** (caja de búsqueda de sitelinks), respaldado por una búsqueda real
 en `/search/` (jugadores y artículos).
 
-También es una **PWA**: `site.webmanifest` + favicon SVG e íconos 192/512/180.
-Analítica opcional con **Plausible** (`PLAUSIBLE_DOMAIN` en el entorno). El
-dominio previsto es **scrabblycloud.com**.
+Cada página tiene **imagen Open Graph**: los posts una propia y el resto del
+sitio una por defecto generada en `/og.png` (Pillow). También es una **PWA**:
+`site.webmanifest` + favicon SVG e íconos 192/512/180. Analítica opcional con
+**Plausible** (`PLAUSIBLE_DOMAIN`). El dominio previsto es **scrabblycloud.com**.
+
+## Deploy
+
+Imagen Docker de producción lista (Daphne/ASGI). Ver **`DEPLOY.md`**: variables
+de entorno, **Fly.io** (`fly.toml` con `release_command` que migra y compila
+traducciones), dominio custom y webhook de Stripe. Requiere Postgres y, para
+WebSockets multi-worker, Redis (`REDIS_URL`).
 - **Premium (suscripción)**: monetización estilo chess.com con dos niveles —
   **Gold** (temas, estadísticas avanzadas, insignia, partidas ilimitadas) y
   **Diamond** (todo lo de Gold + análisis post-partida). Incluye **prueba
