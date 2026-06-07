@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-07 21:19+0000\n"
+"POT-Creation-Date: 2026-06-07 23:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -746,7 +746,7 @@ msgstr "Game"
 msgid "ver tablero"
 msgstr "view board"
 
-#: templates/game/analysis.html:14 templates/game/game.html:43
+#: templates/game/analysis.html:14 templates/game/game.html:44
 msgid "Jugadas"
 msgstr "Moves"
 
@@ -970,21 +970,61 @@ msgstr "Sound"
 msgid "Copiar enlace"
 msgstr "Copy link"
 
-#: templates/game/game.html:40
+#: templates/game/game.html:36
+#| msgid "mejor jugada"
+msgid "Cómo jugar"
+msgstr "How to play"
+
+#: templates/game/game.html:41
 msgid "Fichas en la bolsa:"
 msgstr "Tiles in the bag:"
 
-#: templates/game/game.html:41
+#: templates/game/game.html:42
 msgid "Siguiente partida del torneo"
 msgstr "Next tournament game"
 
-#: templates/game/game.html:46
+#: templates/game/game.html:47
 msgid "Chat"
 msgstr "Chat"
 
-#: templates/game/game.html:49
+#: templates/game/game.html:50
 msgid "Mensaje…"
 msgstr "Message…"
+
+#: templates/game/game.html:57
+#| msgid "Jugar al Scrabble online"
+msgid "Cómo jugar al Scrabble"
+msgstr "How to play Scrabble"
+
+#: templates/game/game.html:59
+msgid ""
+"Arrastrá fichas del atril al tablero (o tocá una ficha y luego una casilla)."
+msgstr ""
+"Drag tiles from your rack to the board (or tap a tile, then a square)."
+
+#: templates/game/game.html:60
+msgid ""
+"Formá una palabra conectada. La primera jugada pasa por la casilla central "
+"★."
+msgstr "Form a connected word. The first move must cross the centre square ★."
+
+#: templates/game/game.html:61
+msgid ""
+"Las casillas de color multiplican la letra (2L/3L) o la palabra (2P/3P)."
+msgstr ""
+"Coloured squares multiply the letter (2L/3L) or the whole word (2P/3P)."
+
+#: templates/game/game.html:62
+msgid ""
+"Tocá «Jugar» para confirmar. También podés Pasar, Cambiar fichas, ofrecer "
+"Tablas o Abandonar."
+msgstr ""
+"Tap «Play» to confirm. You can also Pass, Exchange tiles, offer a Draw or "
+"Resign."
+
+#: templates/game/game.html:64
+msgid "¡Entendido!"
+msgstr "Got it!"
 
 #: templates/game/lobby.html:3
 msgid "Lobby"
@@ -1439,7 +1479,6 @@ msgstr "Play free now"
 
 #: templates/marketing/landing.html:36
 #, python-format
-#| msgid "%(player_count)s jugadores · %(live_count)s partidas en vivo"
 msgid "%(online_count)s en línea · %(live_count)s partidas en vivo"
 msgstr "%(online_count)s online · %(live_count)s live games"
 

@@ -33,6 +33,7 @@
       <span id="conn" class="conn" title="{% trans 'Conexión' %}">●</span>
       <button id="btn-sound" class="icon-btn" title="{% trans 'Sonido' %}">🔊</button>
       <button id="btn-share" class="icon-btn" title="{% trans 'Copiar enlace' %}">🔗</button>
+      <button id="btn-help" class="icon-btn" title="{% trans 'Cómo jugar' %}">❔</button>
     </div>
     <div id="status-banner" class="status-banner"></div>
     <div id="offer-box" class="offer-box" hidden></div>
@@ -51,9 +52,38 @@
   </aside>
 </div>
 
+<div id="onboarding" class="onb-backdrop" hidden>
+  <div class="onb-card" role="dialog" aria-modal="true" aria-labelledby="onb-title">
+    <h2 id="onb-title">👋 {% trans "Cómo jugar al Scrabble" %}</h2>
+    <ol class="onb-steps">
+      <li>{% trans "Arrastrá fichas del atril al tablero (o tocá una ficha y luego una casilla)." %}</li>
+      <li>{% trans "Formá una palabra conectada. La primera jugada pasa por la casilla central ★." %}</li>
+      <li>{% trans "Las casillas de color multiplican la letra (2L/3L) o la palabra (2P/3P)." %}</li>
+      <li>{% trans "Tocá «Jugar» para confirmar. También podés Pasar, Cambiar fichas, ofrecer Tablas o Abandonar." %}</li>
+    </ol>
+    <button id="onb-ok" class="btn-primary">{% trans "¡Entendido!" %}</button>
+  </div>
+</div>
+
 <script id="bootstrap-state" type="application/json">{{ state_json|safe }}</script>
 <script id="bootstrap-rack" type="application/json">{{ rack_json|safe }}</script>
 <script>window.CSRF_TOKEN = "{{ csrf_token }}";</script>
+<script>
+(function () {
+  var layout = document.querySelector(".game-layout");
+  var modal = document.getElementById("onboarding");
+  var KEY = "scrabbly_onboarded";
+  function open() { modal.hidden = false; }
+  function close() { modal.hidden = true; try { localStorage.setItem(KEY, "1"); } catch (e) {} }
+  document.getElementById("onb-ok").addEventListener("click", close);
+  modal.addEventListener("click", function (e) { if (e.target === modal) close(); });
+  document.getElementById("btn-help").addEventListener("click", open);
+  // Auto-open once for players who haven't seen it.
+  var isPlayer = layout && layout.dataset.isPlayer === "1";
+  var seen = false; try { seen = localStorage.getItem(KEY) === "1"; } catch (e) {}
+  if (isPlayer && !seen) open();
+})();
+</script>
 {% endblock %}
 
 {% block scripts %}

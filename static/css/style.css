@@ -413,3 +413,13 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 .online-dot { display:inline-block; width:8px; height:8px; border-radius:50%;
   background:#3fb950; box-shadow:0 0 6px rgba(63,185,80,.55); vertical-align:middle; margin-right:4px; }
 .online-now { font-size:13px; margin:0 0 12px; color:var(--muted); }
+
+/* Onboarding modal */
+.onb-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: flex; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
+.onb-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 24px; max-width: 440px; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+.onb-card h2 { margin: 0 0 12px; }
+.onb-steps { margin: 0 0 18px; padding-left: 20px; }
+.onb-steps li { margin-bottom: 10px; line-height: 1.5; }
+.onb-card .btn-primary { width: 100%; }
