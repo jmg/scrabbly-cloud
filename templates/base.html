@@ -50,7 +50,8 @@
 <body data-theme="{{ user.effective_theme|default:'classic' }}">
   <header class="topbar">
     <a class="brand" href="{% url 'lobby' %}"><img src="{% static 'icons/favicon.svg' %}" alt="" width="26" height="26">Scrabbly</a>
-    <nav>
+    <button class="nav-toggle" id="nav-toggle" aria-label="{% trans 'Menú' %}" aria-expanded="false">☰</button>
+    <nav id="topnav">
       <a href="{% url 'arenas' %}">🏆 {% trans "Torneos" %}</a>
       <a href="{% url 'puzzles' %}">🧩 {% trans "Puzzles" %}</a>
       <a href="{% url 'blog' %}">📰 {% trans "Blog" %}</a>
@@ -101,6 +102,15 @@
   </footer>
 
   <div id="toast-host" class="toast-host"></div>
+  <script>
+    (function () {
+      var t = document.getElementById("nav-toggle"), bar = document.querySelector(".topbar");
+      if (t) t.addEventListener("click", function () {
+        var open = bar.classList.toggle("open");
+        t.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    })();
+  </script>
   {% if user.is_authenticated and not user.is_guest %}
     {% load static %}
     <script src="{% static 'js/notifications.js' %}"></script>

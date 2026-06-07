@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-07 23:21+0000\n"
+"POT-Creation-Date: 2026-06-07 23:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -184,7 +184,7 @@ msgid "Ir al inicio"
 msgstr "Go home"
 
 #: templates/accounts/friends.html:3 templates/accounts/friends.html:6
-#: templates/accounts/profile.html:27 templates/base.html:65
+#: templates/accounts/profile.html:27 templates/base.html:66
 msgid "Amigos"
 msgstr "Friends"
 
@@ -235,7 +235,7 @@ msgstr "pending"
 
 #: templates/accounts/login.html:3 templates/accounts/login.html:6
 #: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:71
+#: templates/base.html:72
 #: templates/registration/password_reset_complete.html:8
 msgid "Entrar"
 msgstr "Log in"
@@ -258,7 +258,7 @@ msgid "Registrate"
 msgstr "Sign up"
 
 #: templates/accounts/notifications.html:3
-#: templates/accounts/notifications.html:6 templates/base.html:64
+#: templates/accounts/notifications.html:6 templates/base.html:65
 msgid "Notificaciones"
 msgstr "Notifications"
 
@@ -335,7 +335,7 @@ msgstr "Apply"
 msgid "Desbloqueá más temas con Premium"
 msgstr "Unlock more themes with Premium"
 
-#: templates/accounts/profile.html:92 templates/base.html:54
+#: templates/accounts/profile.html:92 templates/base.html:55
 #: templates/game/arenas.html:3
 msgid "Torneos"
 msgstr "Tournaments"
@@ -371,7 +371,7 @@ msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:72
+#: templates/accounts/register.html:18 templates/base.html:73
 #: templates/marketing/landing.html:32
 msgid "Crear cuenta"
 msgstr "Sign up"
@@ -395,7 +395,7 @@ msgid "¿Ya tenés cuenta?"
 msgstr "Already have an account?"
 
 #: templates/accounts/settings.html:3 templates/accounts/settings.html:6
-#: templates/base.html:67
+#: templates/base.html:68
 msgid "Ajustes"
 msgstr "Settings"
 
@@ -457,37 +457,41 @@ msgstr ""
 msgid "Jugá al Scrabble online gratis."
 msgstr "Play Scrabble online for free."
 
-#: templates/base.html:55 templates/game/puzzles.html:3
+#: templates/base.html:53
+msgid "Menú"
+msgstr "Menu"
+
+#: templates/base.html:56 templates/game/puzzles.html:3
 #: templates/game/puzzles.html:6 templates/marketing/landing.html:44
 msgid "Puzzles"
 msgstr "Puzzles"
 
-#: templates/base.html:56 templates/base.html:97 templates/blog/post.html:50
+#: templates/base.html:57 templates/base.html:98 templates/blog/post.html:50
 msgid "Blog"
 msgstr "Blog"
 
-#: templates/base.html:57 templates/blog/search.html:3
+#: templates/base.html:58 templates/blog/search.html:3
 #: templates/blog/search.html:6 templates/blog/search.html:9
 msgid "Buscar"
 msgstr "Search"
 
-#: templates/base.html:61 templates/base.html:98
+#: templates/base.html:62 templates/base.html:99
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:68
+#: templates/base.html:69
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:77 templates/game/arenas.html:45
+#: templates/base.html:78 templates/game/arenas.html:45
 msgid "Idioma"
 msgstr "Language"
 
-#: templates/base.html:99
+#: templates/base.html:100
 msgid "Términos"
 msgstr "Terms"
 
-#: templates/base.html:100
+#: templates/base.html:101
 msgid "Privacidad"
 msgstr "Privacy"
 
@@ -971,7 +975,6 @@ msgid "Copiar enlace"
 msgstr "Copy link"
 
 #: templates/game/game.html:36
-#| msgid "mejor jugada"
 msgid "Cómo jugar"
 msgstr "How to play"
 
@@ -992,7 +995,6 @@ msgid "Mensaje…"
 msgstr "Message…"
 
 #: templates/game/game.html:57
-#| msgid "Jugar al Scrabble online"
 msgid "Cómo jugar al Scrabble"
 msgstr "How to play Scrabble"
 
