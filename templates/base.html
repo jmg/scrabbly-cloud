@@ -6,10 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Scrabbly — {% trans "Scrabble online" %}{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}{% trans "Jugá al Scrabble online gratis: partidas en tiempo real, contra la IA, torneos, puzzles y ranking ELO en español e inglés." %}{% endblock %}">
-  <link rel="canonical" href="{{ seo_canonical }}">
+  <link rel="canonical" href="{% block canonical %}{{ seo_canonical }}{% endblock %}">
+  {% block hreflang %}
   <link rel="alternate" hreflang="es" href="{{ seo_es }}">
   <link rel="alternate" hreflang="en" href="{{ seo_en }}">
   <link rel="alternate" hreflang="x-default" href="{{ seo_canonical }}">
+  {% endblock %}
+  <link rel="icon" href="{% static 'icons/favicon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}">
+  <link rel="manifest" href="{% url 'manifest' %}">
+  <meta name="theme-color" content="#629924">
   <meta property="og:site_name" content="Scrabbly">
   <meta property="og:url" content="{{ seo_canonical }}">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
@@ -17,6 +23,7 @@
   <meta property="og:description" content="{% block og_description %}{% trans "Jugá al Scrabble online gratis." %}{% endblock %}">
   <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% if analytics_domain %}<script defer data-domain="{{ analytics_domain }}" src="https://plausible.io/js/script.js"></script>{% endif %}
   {% block head_extra %}{% endblock %}
 </head>
 <body data-theme="{{ user.effective_theme|default:'classic' }}">

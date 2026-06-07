@@ -134,6 +134,7 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 .blog-post .post-body h2 { margin-top: 24px; }
 .blog-post .post-body p, .blog-post .post-body li { color: var(--text); }
 .post-cta { margin: 28px 0; text-align: center; }
+.breadcrumb { font-size: 13px; margin-bottom: 12px; }
 .premium-link { color: #f0b428 !important; font-weight: 600; }
 .pricing { max-width: 760px; margin: 0 auto; text-align: center; }
 .pricing .perks { list-style: none; padding: 0; display: inline-flex; flex-direction: column; gap: 8px; text-align: left; margin: 16px auto 24px; }

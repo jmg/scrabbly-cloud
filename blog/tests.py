@@ -68,3 +68,32 @@ class BlogTests(TestCase):
     def test_hl_query_switches_language(self):
         r = self.c.get("/blog/?hl=en")
         self.assertContains(r, "Scrabble Blog")
+
+    def test_english_posts_exist_and_paired(self):
+        es = Post.objects.get(slug="como-jugar-scrabble-online")
+        en = Post.objects.get(slug="how-to-play-scrabble-online")
+        self.assertEqual(es.translation_group, en.translation_group)
+        self.assertEqual(en.language, "en")
+
+    def test_index_filters_by_language(self):
+        en_html = self.c.get("/blog/?hl=en").content.decode()
+        self.assertIn("How to play Scrabble online", en_html)
+        self.assertNotIn("Cómo jugar al Scrabble online", en_html)
+
+    def test_post_hreflang_points_to_translation(self):
+        html = self.c.get("/blog/como-jugar-scrabble-online/").content.decode()
+        self.assertIn('hreflang="en"', html)
+        self.assertIn("/blog/how-to-play-scrabble-online/", html)
+        self.assertIn("BreadcrumbList", html)
+
+    def test_manifest(self):
+        r = self.c.get("/site.webmanifest")
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("application/manifest+json", r["Content-Type"])
+        self.assertContains(r, "Scrabbly")
+
+    def test_favicon_and_manifest_linked(self):
+        html = self.c.get("/blog/").content.decode()
+        self.assertIn("favicon.svg", html)
+        self.assertIn("/site.webmanifest", html)
+        self.assertIn('name="theme-color"', html)

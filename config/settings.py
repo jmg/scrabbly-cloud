@@ -183,6 +183,10 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Scrabbly <no-reply@sc
 
 # Billing / premium. With Stripe keys set, real Stripe Checkout is used;
 # otherwise a mock provider activates subscriptions instantly (dev/demo).
+# Privacy-friendly analytics: set to your site domain to enable the Plausible
+# snippet (e.g. "scrabblycloud.com"). Empty = no analytics.
+PLAUSIBLE_DOMAIN = os.environ.get("PLAUSIBLE_DOMAIN", "")
+
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")

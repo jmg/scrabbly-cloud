@@ -12,6 +12,8 @@ class Post(models.Model):
     meta_description = models.CharField(max_length=160, blank=True)
     body = models.TextField(help_text="HTML")
     language = models.CharField(max_length=5, default="es")
+    # Posts that are translations of one another share a translation_group key.
+    translation_group = models.CharField(max_length=80, blank=True)
     published = models.BooleanField(default=True)
     published_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)

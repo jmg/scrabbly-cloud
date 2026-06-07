@@ -4,6 +4,27 @@ from django.shortcuts import get_object_or_404, render
 from .models import Post
 
 
+def manifest(request):
+    from django.http import JsonResponse
+    from django.templatetags.static import static
+    data = {
+        "name": "Scrabbly",
+        "short_name": "Scrabbly",
+        "description": "Jugá al Scrabble online: tiempo real, IA, torneos y puzzles.",
+        "start_url": "/",
+        "scope": "/",
+        "display": "standalone",
+        "background_color": "#161512",
+        "theme_color": "#629924",
+        "icons": [
+            {"src": static("icons/icon-192.png"), "sizes": "192x192", "type": "image/png"},
+            {"src": static("icons/icon-512.png"), "sizes": "512x512", "type": "image/png",
+             "purpose": "any maskable"},
+        ],
+    }
+    return JsonResponse(data, content_type="application/manifest+json")
+
+
 def robots_txt(request):
     lines = [
         "User-agent: *",
@@ -68,11 +89,24 @@ def og_image(request, slug):
 
 
 def blog_index(request):
-    posts = Post.objects.filter(published=True)
+    from django.utils import translation
+    lang = translation.get_language() or "es"
+    lang = lang[:2]
+    posts = Post.objects.filter(published=True, language=lang)
+    if not posts.exists():
+        posts = Post.objects.filter(published=True, language="es")
     return render(request, "blog/index.html", {"posts": posts})
 
 
 def blog_post(request, slug):
     post = get_object_or_404(Post, slug=slug, published=True)
-    related = Post.objects.filter(published=True).exclude(pk=post.pk)[:4]
-    return render(request, "blog/post.html", {"post": post, "related": related})
+    related = Post.objects.filter(
+        published=True, language=post.language).exclude(pk=post.pk)[:4]
+    alternate = None
+    if post.translation_group:
+        alternate = (Post.objects.filter(
+            published=True, translation_group=post.translation_group)
+            .exclude(pk=post.pk).first())
+    return render(request, "blog/post.html", {
+        "post": post, "related": related, "alternate": alternate,
+    })

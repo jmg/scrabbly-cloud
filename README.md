@@ -106,12 +106,19 @@ batería **incluidos los E2E de navegador**.
 
 ## SEO / Blog
 
-Hay un blog (`/blog/`) con artículos optimizados para SEO (editables en el
-admin), `sitemap.xml` (`django.contrib.sitemaps`), `robots.txt` y **feed RSS**
-(`/blog/feed/`). Cada página incluye `meta description`, `canonical`, Open Graph
-y **hreflang es/en** (`?hl=es|en`); los posts agregan JSON-LD (`BlogPosting`) y
-una **imagen Open Graph generada dinámicamente** (`/blog/<slug>/og.png`, vía
-Pillow). El dominio previsto es **scrabblycloud.com**.
+Hay un blog (`/blog/`) con artículos optimizados para SEO **en español e inglés**
+(emparejados por `translation_group`; el índice filtra por idioma y los posts se
+enlazan entre sí con hreflang real), editables en el admin. Incluye `sitemap.xml`
+(`django.contrib.sitemaps`), `robots.txt` y **feed RSS** (`/blog/feed/`).
+
+Cada página emite `meta description`, `canonical`, Open Graph y **hreflang
+es/en** (`?hl=es|en`); los posts agregan JSON-LD `BlogPosting` + `BreadcrumbList`,
+una **imagen Open Graph generada dinámicamente** (`/blog/<slug>/og.png`, Pillow) y
+breadcrumbs visibles.
+
+También es una **PWA**: `site.webmanifest` + favicon SVG e íconos 192/512/180.
+Analítica opcional con **Plausible** (`PLAUSIBLE_DOMAIN` en el entorno). El
+dominio previsto es **scrabblycloud.com**.
 - **Premium (suscripción)**: monetización estilo chess.com con dos niveles —
   **Gold** (temas, estadísticas avanzadas, insignia, partidas ilimitadas) y
   **Diamond** (todo lo de Gold + análisis post-partida). Incluye **prueba
