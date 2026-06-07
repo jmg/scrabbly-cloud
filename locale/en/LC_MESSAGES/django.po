@@ -111,6 +111,7 @@ msgstr "We're confirming your payment…"
 msgid ""
 "Tu suscripción no se renovará. Conservás Premium hasta el fin del período."
 msgstr ""
+"Your subscription won't renew. You keep Premium until the end of the period."
 
 #: billing/views.py:136
 #, python-format
@@ -127,6 +128,8 @@ msgid ""
 "Las cuentas gratuitas pueden tener hasta %(n)s partidas a la vez. Pasate a "
 "Premium para partidas ilimitadas."
 msgstr ""
+"Free accounts can have up to %(n)s games at once. Go Premium for unlimited "
+"games."
 
 #: game/views.py:122
 msgid "Arena"
@@ -427,6 +430,8 @@ msgid ""
 "Jugá al Scrabble online gratis: partidas en tiempo real, contra la IA, "
 "torneos, puzzles y ranking ELO en español e inglés."
 msgstr ""
+"Play Scrabble online for free: real-time games, vs the AI, tournaments, "
+"puzzles and ELO rating in Spanish and English."
 
 #: templates/base.html:23
 msgid "Jugá al Scrabble online gratis."
@@ -634,6 +639,8 @@ msgid ""
 "Pagos seguros vía Stripe. La suscripción se renueva automáticamente hasta "
 "que canceles."
 msgstr ""
+"Secure payments via Stripe. Your subscription renews automatically until you"
+" cancel."
 
 #: templates/billing/success.html:6
 msgid "¡Listo!"
@@ -661,6 +668,8 @@ msgid ""
 "Consejos, estrategias y trucos de Scrabble: cómo jugar, mejores palabras, y "
 "guías para mejorar tu juego."
 msgstr ""
+"Scrabble tips, strategies and tricks: how to play, the best words, and "
+"guides to improve your game."
 
 #: templates/blog/index.html:10
 msgid "Estrategias, trucos y guías para dominar el tablero."
@@ -755,7 +764,7 @@ msgstr "rated"
 #: templates/game/arena.html:11
 #, python-format
 msgid "empieza %(t)s"
-msgstr ""
+msgstr "starts %(t)s"
 
 #: templates/game/arena.html:12
 msgid "EN VIVO"
@@ -764,7 +773,7 @@ msgstr "LIVE"
 #: templates/game/arena.html:12
 #, python-format
 msgid "hasta %(t)s"
-msgstr ""
+msgstr "until %(t)s"
 
 #: templates/game/arena.html:13
 msgid "finalizado"
@@ -1200,6 +1209,8 @@ msgstr "Is it free to play Scrabble on Scrabbly?"
 msgid ""
 "Sí. Podés jugar gratis sin registrarte. Premium agrega funciones opcionales."
 msgstr ""
+"Yes. You can play for free without signing up. Premium adds optional "
+"features."
 
 #: templates/marketing/landing.html:13
 #| msgid "¿No tenés cuenta?"
@@ -1211,6 +1222,8 @@ msgid ""
 "No es obligatorio: podés jugar como invitado. Una cuenta guarda tu rating y "
 "tu historial."
 msgstr ""
+"Not required: you can play as a guest. An account saves your rating and "
+"history."
 
 #: templates/marketing/landing.html:15
 msgid "¿Puedo jugar contra la computadora?"
@@ -1225,6 +1238,7 @@ msgid ""
 "Partidas en tiempo real, contra la IA, torneos y puzzles. En español e "
 "inglés."
 msgstr ""
+"Real-time games, vs the AI, tournaments and puzzles. In Spanish and English."
 
 #: templates/marketing/landing.html:30
 #| msgid "Jugá al Scrabble ahora"

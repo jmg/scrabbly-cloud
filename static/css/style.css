@@ -47,8 +47,9 @@ h1, h2, h3 { color: var(--text-strong); font-weight: 700; letter-spacing: -0.2px
 }
 .brand { font-size: 20px; font-weight: 800; color: var(--text-strong); display: inline-flex; align-items: center; gap: 8px; letter-spacing: -0.3px; }
 .brand img { width: 26px; height: 26px; border-radius: 6px; }
-.topbar nav { display: flex; gap: 16px; align-items: center; }
-.topbar nav a { color: var(--text); }
+.topbar nav { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.topbar nav a { color: var(--text); white-space: nowrap; }
+.topbar .guest { padding-left: 12px; margin-left: 2px; border-left: 1px solid var(--line); }
 .topbar nav a:hover { color: var(--text-strong); text-decoration: none; }
 .topbar .guest { color: var(--muted); }
 
@@ -76,7 +77,7 @@ input:focus, select:focus { outline: none; border-color: var(--accent); }
 
 .muted { color: var(--muted); }
 .avatar { border-radius: 6px; vertical-align: middle; }
-.me-link { display: inline-flex; align-items: center; gap: 6px; }
+.me-link { display: inline-flex; align-items: center; gap: 6px; padding-left: 12px; border-left: 1px solid var(--line); }
 .leaderboard li a { display: inline-flex; align-items: center; gap: 6px; }
 
 /* Profile */
