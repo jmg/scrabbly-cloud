@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-07 20:49+0000\n"
+"POT-Creation-Date: 2026-06-07 21:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Account created!"
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:177 game/views.py:408
+#: accounts/views.py:177 game/views.py:411
 msgid "No se encontró ese usuario."
 msgstr "User not found."
 
@@ -135,43 +135,43 @@ msgstr ""
 "Free accounts can have up to %(n)s games at once. Go Premium for unlimited "
 "games."
 
-#: game/views.py:122
+#: game/views.py:125
 msgid "Arena"
 msgstr "Arena"
 
-#: game/views.py:186
+#: game/views.py:189
 msgid "El torneo no está activo."
 msgstr "The tournament isn't active."
 
-#: game/views.py:205 game/views.py:215
+#: game/views.py:208 game/views.py:218
 msgid "No se pudo generar el puzzle. Probá de nuevo."
 msgstr "Couldn't generate the puzzle. Try again."
 
-#: game/views.py:287
+#: game/views.py:290
 #, python-format
 msgid "Te toca jugar en la partida #%(id)s"
 msgstr "It's your turn in game #%(id)s"
 
-#: game/views.py:418
+#: game/views.py:421
 #, python-format
 msgid "%(u)s te desafió a una partida."
 msgstr "%(u)s challenged you to a game."
 
-#: game/views.py:420
+#: game/views.py:423
 msgid "Desafío enviado."
 msgstr "Challenge sent."
 
-#: game/views.py:438
+#: game/views.py:441
 #, python-format
 msgid "%(u)s aceptó tu desafío. ¡A jugar!"
 msgstr "%(u)s accepted your challenge. Let's play!"
 
-#: game/views.py:443
+#: game/views.py:446
 #, python-format
 msgid "%(u)s rechazó tu desafío."
 msgstr "%(u)s declined your challenge."
 
-#: game/views.py:444
+#: game/views.py:447
 msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
@@ -180,7 +180,6 @@ msgid "No encontramos esta página."
 msgstr "We couldn't find this page."
 
 #: templates/404.html:8
-#| msgid "Inicio"
 msgid "Ir al inicio"
 msgstr "Go home"
 
@@ -247,7 +246,6 @@ msgid "Contraseña"
 msgstr "Password"
 
 #: templates/accounts/login.html:13
-#| msgid "Nueva contraseña"
 msgid "¿Olvidaste tu contraseña?"
 msgstr "Forgot your password?"
 
@@ -460,7 +458,7 @@ msgid "Jugá al Scrabble online gratis."
 msgstr "Play Scrabble online for free."
 
 #: templates/base.html:55 templates/game/puzzles.html:3
-#: templates/game/puzzles.html:6 templates/marketing/landing.html:43
+#: templates/game/puzzles.html:6 templates/marketing/landing.html:44
 msgid "Puzzles"
 msgstr "Puzzles"
 
@@ -1150,10 +1148,15 @@ msgid "Todavía no terminó ninguna partida."
 msgstr "No games finished yet."
 
 #: templates/game/lobby.html:214
+#, python-format
+msgid "%(online_count)s en línea"
+msgstr "%(online_count)s online"
+
+#: templates/game/lobby.html:215
 msgid "Ranking"
 msgstr "Leaderboard"
 
-#: templates/game/lobby.html:219
+#: templates/game/lobby.html:220
 msgid "Sin jugadores aún."
 msgstr "No players yet."
 
@@ -1166,7 +1169,6 @@ msgstr ""
 "play the AI."
 
 #: templates/game/matchmaking.html:15
-#| msgid "Jugar vs IA:"
 msgid "Jugar vs IA ahora"
 msgstr "Play vs AI now"
 
@@ -1313,12 +1315,10 @@ msgid "Este es un texto de referencia y no constituye asesoramiento legal."
 msgstr "This is a reference text and does not constitute legal advice."
 
 #: templates/legal/terms.html:3 templates/legal/terms.html:6
-#| msgid "Métricas de negocio"
 msgid "Términos del servicio"
 msgstr "Terms of Service"
 
 #: templates/legal/terms.html:9
-#| msgid "Aceptar"
 msgid "Aceptación"
 msgstr "Acceptance"
 
@@ -1331,7 +1331,6 @@ msgstr ""
 "service."
 
 #: templates/legal/terms.html:12
-#| msgid "Crear cuenta"
 msgid "Tu cuenta"
 msgstr "Your account"
 
@@ -1359,7 +1358,6 @@ msgstr ""
 "games is prohibited, as is any attempt to manipulate results or the ranking."
 
 #: templates/legal/terms.html:18
-#| msgid "suscripciones activas"
 msgid "Suscripciones Premium"
 msgstr "Premium subscriptions"
 
@@ -1439,94 +1437,93 @@ msgstr ""
 msgid "Jugar gratis ahora"
 msgstr "Play free now"
 
-#: templates/marketing/landing.html:35
+#: templates/marketing/landing.html:36
 #, python-format
-msgid "%(player_count)s jugadores · %(live_count)s partidas en vivo"
-msgstr "%(player_count)s players · %(live_count)s live games"
+#| msgid "%(player_count)s jugadores · %(live_count)s partidas en vivo"
+msgid "%(online_count)s en línea · %(live_count)s partidas en vivo"
+msgstr "%(online_count)s online · %(live_count)s live games"
 
-#: templates/marketing/landing.html:40
+#: templates/marketing/landing.html:41
 msgid "Tiempo real"
 msgstr "Real-time"
 
-#: templates/marketing/landing.html:40
+#: templates/marketing/landing.html:41
 msgid "Relojes, arrastrar y soltar, chat y revancha."
 msgstr "Clocks, drag and drop, chat and rematch."
 
-#: templates/marketing/landing.html:41
+#: templates/marketing/landing.html:42
 msgid "IA en 5 niveles"
 msgstr "AI in 5 levels"
 
-#: templates/marketing/landing.html:41
+#: templates/marketing/landing.html:42
 msgid "Practicá contra una inteligencia artificial fuerte."
 msgstr "Practise against a strong AI."
 
-#: templates/marketing/landing.html:42
+#: templates/marketing/landing.html:43
 msgid "Torneos arena"
 msgstr "Arena tournaments"
 
-#: templates/marketing/landing.html:42
+#: templates/marketing/landing.html:43
 msgid "Competí con emparejamiento automático y ranking en vivo."
 msgstr "Compete with automatic pairing and a live leaderboard."
 
-#: templates/marketing/landing.html:43
+#: templates/marketing/landing.html:44
 msgid "Un desafío diario para encontrar la mejor jugada."
 msgstr "A daily challenge to find the best move."
 
-#: templates/marketing/landing.html:44
+#: templates/marketing/landing.html:45
 msgid "Multi-idioma"
 msgstr "Multi-language"
 
-#: templates/marketing/landing.html:44
+#: templates/marketing/landing.html:45
 msgid "Diccionarios oficiales en español e inglés."
 msgstr "Official dictionaries in Spanish and English."
 
-#: templates/marketing/landing.html:45
+#: templates/marketing/landing.html:46
 msgid "Rating ELO"
 msgstr "ELO rating"
 
-#: templates/marketing/landing.html:45
+#: templates/marketing/landing.html:46
 msgid "Seguí tu progreso y subí en la clasificación."
 msgstr "Track your progress and climb the ranking."
 
-#: templates/marketing/landing.html:49
+#: templates/marketing/landing.html:50
 msgid "Lo que dicen los jugadores"
 msgstr "What players say"
 
-#: templates/marketing/landing.html:51
+#: templates/marketing/landing.html:52
 msgid "La mejor forma de practicar Scrabble. La IA experta es un hueso duro."
 msgstr "The best way to practise Scrabble. The expert AI is tough."
 
-#: templates/marketing/landing.html:52
+#: templates/marketing/landing.html:53
 msgid "Los torneos arena son adictivos y el emparejamiento es instantáneo."
 msgstr "The arena tournaments are addictive and pairing is instant."
 
-#: templates/marketing/landing.html:53
+#: templates/marketing/landing.html:54
 msgid "Juego en español y en inglés para entrenar vocabulario. Impecable."
 msgstr "I play in Spanish and English to train vocabulary. Flawless."
 
-#: templates/marketing/landing.html:59
+#: templates/marketing/landing.html:60
 msgid "Mejores jugadores"
 msgstr "Top players"
 
-#: templates/marketing/landing.html:67
+#: templates/marketing/landing.html:68
 msgid "¿Listo para jugar?"
 msgstr "Ready to play?"
 
-#: templates/marketing/landing.html:71
+#: templates/marketing/landing.html:72
 msgid "Empezar una partida"
 msgstr "Start a game"
 
-#: templates/marketing/landing.html:73
+#: templates/marketing/landing.html:74
 msgid "Leé nuestras guías de Scrabble"
 msgstr "Read our Scrabble guides"
 
 #: templates/registration/password_reset_complete.html:3
-#| msgid "Contraseña actualizada."
 msgid "Contraseña actualizada"
 msgstr "Password updated"
 
 #: templates/registration/password_reset_complete.html:6
-#| msgid "Contraseña actualizada."
 msgid "¡Contraseña actualizada!"
 msgstr "Password updated!"
 
@@ -1535,17 +1532,14 @@ msgid "Ya podés entrar con tu nueva contraseña."
 msgstr "You can now log in with your new password."
 
 #: templates/registration/password_reset_confirm.html:7
-#| msgid "Nueva contraseña"
 msgid "Elegí una nueva contraseña"
 msgstr "Choose a new password"
 
 #: templates/registration/password_reset_confirm.html:11
-#| msgid "Nueva contraseña"
 msgid "Repetí la contraseña"
 msgstr "Repeat the password"
 
 #: templates/registration/password_reset_confirm.html:15
-#| msgid "Cambiar contraseña"
 msgid "Guardar contraseña"
 msgstr "Save password"
 
@@ -1554,7 +1548,6 @@ msgid "Enlace inválido"
 msgstr "Invalid link"
 
 #: templates/registration/password_reset_confirm.html:19
-#| msgid "Código de regalo inválido o ya usado."
 msgid "El enlace de restablecimiento no es válido o ya fue usado."
 msgstr "The reset link is invalid or has already been used."
 
@@ -1576,13 +1569,11 @@ msgstr ""
 
 #: templates/registration/password_reset_done.html:8
 #: templates/registration/password_reset_form.html:13
-#| msgid "Volver al torneo"
 msgid "Volver a entrar"
 msgstr "Back to log in"
 
 #: templates/registration/password_reset_form.html:3
 #: templates/registration/password_reset_form.html:6
-#| msgid "Cambiar contraseña"
 msgid "Restablecer contraseña"
 msgstr "Reset password"
 
@@ -1592,6 +1583,5 @@ msgid ""
 msgstr "Enter your email and we'll send you a link to set a new password."
 
 #: templates/registration/password_reset_form.html:11
-#| msgid "Copiar enlace"
 msgid "Enviar enlace"
 msgstr "Send link"

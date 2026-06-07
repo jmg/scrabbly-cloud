@@ -32,7 +32,8 @@
     <a class="btn-secondary big" href="{% url 'register' %}">{% trans "Crear cuenta" %}</a>
   </div>
   <p class="hero-stats muted">
-    {% blocktrans %}{{ player_count }} jugadores · {{ live_count }} partidas en vivo{% endblocktrans %}
+    <span class="online-dot"></span>
+    {% blocktrans %}{{ online_count }} en línea · {{ live_count }} partidas en vivo{% endblocktrans %}
   </p>
 </section>
 

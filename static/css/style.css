@@ -408,3 +408,8 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 @keyframes mm-spin { to { transform: rotate(360deg); } }
 .mm-actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
 .mm-actions form { display: inline; }
+
+/* Online presence indicator */
+.online-dot { display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:#3fb950; box-shadow:0 0 6px rgba(63,185,80,.55); vertical-align:middle; margin-right:4px; }
+.online-now { font-size:13px; margin:0 0 12px; color:var(--muted); }

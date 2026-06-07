@@ -29,6 +29,7 @@ class User(AbstractUser):
     has_used_trial = models.BooleanField(default=False)
     board_theme = models.CharField(max_length=20, default="classic")
     email_opt_in = models.BooleanField(default=True)  # receipts & notifications
+    last_seen = models.DateTimeField(null=True, blank=True, db_index=True)
 
     @property
     def display_name(self):

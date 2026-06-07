@@ -211,6 +211,7 @@
   </section>
 
   <aside class="lobby-side">
+    <p class="online-now"><span class="online-dot"></span> {% blocktrans %}{{ online_count }} en línea{% endblocktrans %}</p>
     <h2>{% trans "Ranking" %}</h2>
     <ol class="leaderboard">
       {% for u in leaders %}

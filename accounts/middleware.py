@@ -41,6 +41,9 @@ class GuestUserMiddleware:
             user.save(update_fields=["password"])
             login(request, user)
             request.user = user
+        if request.user.is_authenticated:
+            from .presence import touch
+            touch(request.user)
         return self.get_response(request)
 
 

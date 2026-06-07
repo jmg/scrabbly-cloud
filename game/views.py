@@ -30,9 +30,10 @@ def lobby(request):
         and not Game.objects.filter(players__player=request.user).exists()
     )
     if new_visitor:
+        from accounts.presence import online_count
         return render(request, "marketing/landing.html", {
             "live_count": Game.objects.filter(status=Game.ACTIVE).count(),
-            "player_count": User.objects.filter(is_guest=False, is_bot=False).count(),
+            "online_count": online_count(),
             "leaders": User.objects.filter(is_guest=False, is_bot=False)
                        .order_by("-rating")[:5],
         })
@@ -91,12 +92,14 @@ def lobby(request):
             .filter(Q(status=Challenge.PENDING) | Q(status=Challenge.ACCEPTED))
             .select_related("opponent", "game")[:10])
 
+    from accounts.presence import online_count
     return render(request, "game/lobby.html", {
         "waiting": waiting_page, "active": active,
         "my_turn": my_turn, "my_waiting": my_waiting,
         "recent": recent_page, "leaders": leaders,
         "f_lang": f_lang, "f_rated": f_rated,
         "incoming_challenges": incoming_ch, "outgoing_challenges": outgoing_ch,
+        "online_count": online_count(),
     })
 
 

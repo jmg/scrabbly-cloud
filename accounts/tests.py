@@ -131,6 +131,29 @@ class PasswordResetTests(TestCase):
         self.assertTrue(hits[-1])  # tripped within the window
 
 
+class PresenceTests(TestCase):
+    def test_touch_then_online_count(self):
+        from django.core.cache import cache
+        from accounts.presence import touch, online_count
+        u = User.objects.create_user("on", password="x")
+        bot = User.objects.create(username="IA-x", is_bot=True)
+        from accounts.presence import touch as t
+        t(bot)  # bots are excluded even if seen
+        cache.clear()
+        self.assertEqual(online_count(), 0)  # nobody human seen yet
+        touch(u)
+        cache.clear()
+        self.assertEqual(online_count(), 1)
+
+    def test_lobby_exposes_online_count(self):
+        u = User.objects.create_user("p", password="x")
+        # give the guest-less user a game so / shows the lobby, not the landing
+        from game import services
+        services.create_game(u, rated=False)
+        c = Client(); c.force_login(u)
+        self.assertIn("online_count", c.get("/").context)
+
+
 class TournamentHistoryTests(TestCase):
     def test_profile_shows_arena_entry(self):
         from datetime import timedelta
