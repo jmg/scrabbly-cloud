@@ -318,6 +318,30 @@ class LobbyTests(TestCase):
         self.assertEqual(len(c2.get("/").context["my_turn"]), 1)
 
 
+class MatchmakingTests(TestCase):
+    def test_quick_pair_picks_closest_rating(self):
+        from accounts.models import User
+        from game import services
+        low = User.objects.create_user("low", password="x"); low.rating = 1000; low.save()
+        high = User.objects.create_user("high", password="x"); high.rating = 1500; high.save()
+        seeker = User.objects.create_user("seeker", password="x"); seeker.rating = 1460; seeker.save()
+        # Two open games waiting; the seeker should join the closer-rated host.
+        g_low = services.create_game(low, rated=True)
+        g_high = services.create_game(high, rated=True)
+        joined = services.quick_pair(seeker, rated=True)
+        self.assertEqual(joined.pk, g_high.pk)
+        self.assertIn(seeker.id, {s.player_id for s in joined.seats})
+
+    def test_quick_pair_creates_when_none(self):
+        from accounts.models import User
+        from game import services
+        from game.models import Game
+        u = User.objects.create_user("solo", password="x")
+        g = services.quick_pair(u, rated=True)
+        self.assertEqual(g.status, Game.WAITING)
+        self.assertEqual({s.player_id for s in g.seats}, {u.id})
+
+
 class LandingTests(TestCase):
     def test_new_guest_sees_landing_then_lobby(self):
         c = Client()

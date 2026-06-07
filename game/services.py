@@ -127,21 +127,30 @@ def join_game(game, user, check_quota=True):
 
 def quick_pair(user, rated=True, language=DEFAULT_LANGUAGE,
                clock_initial=0, clock_increment=0):
-    """Join the oldest compatible waiting game, or open a new one.
+    """Join the waiting opponent with the closest rating, or open a new game.
 
-    Compatibility means same language and identical time control.
+    Compatibility means same language, rated flag and identical time control.
+    Among compatible waiting games we pick the one whose host's rating is
+    nearest to the player's (skill-based), falling back to a new game.
     """
-    with transaction.atomic():
-        candidate = (
-            Game.objects.select_for_update(skip_locked=True)
-            .filter(status=Game.WAITING, rated=rated, language=language,
-                    clock_initial=clock_initial, clock_increment=clock_increment)
-            .exclude(players__player=user)
-            .order_by("created_at")
-            .first()
-        )
-    if candidate:
-        return join_game(candidate, user)
+    from django.db.models import Min
+
+    candidates = list(
+        Game.objects.filter(
+            status=Game.WAITING, rated=rated, language=language,
+            clock_initial=clock_initial, clock_increment=clock_increment)
+        .exclude(players__player=user)
+        .annotate(host_rating=Min("players__player__rating"))
+    )
+    candidates = [g for g in candidates if g.host_rating is not None]
+    candidates.sort(key=lambda g: (abs(g.host_rating - user.rating), g.created_at))
+
+    # join_game locks the row and re-checks status, so races just fall through.
+    for game in candidates[:5]:
+        try:
+            return join_game(game, user)
+        except InvalidMove:
+            continue
     return create_game(user, rated=rated, language=language,
                        clock_initial=clock_initial, clock_increment=clock_increment)
 
