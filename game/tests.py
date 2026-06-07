@@ -341,6 +341,68 @@ class MatchmakingTests(TestCase):
         self.assertEqual(g.status, Game.WAITING)
         self.assertEqual({s.player_id for s in g.seats}, {u.id})
 
+    def test_matchmaking_shows_search_when_alone(self):
+        from accounts.models import User
+        from game.models import Game
+        u = User.objects.create_user("a", password="x")
+        c = Client(); c.force_login(u)
+        r = c.post("/play/", {"clock": "0,0"})
+        self.assertTemplateUsed(r, "game/matchmaking.html")
+        self.assertTrue(Game.objects.filter(players__player=u, status=Game.WAITING).exists())
+
+    def test_matchmaking_pairs_existing_opponent(self):
+        from accounts.models import User
+        from game import services
+        from game.models import Game
+        host = User.objects.create_user("host", password="x")
+        services.create_game(host, rated=True)  # waiting, clock 0/0, es
+        u = User.objects.create_user("b", password="x")
+        c = Client(); c.force_login(u)
+        r = c.post("/play/", {"clock": "0,0"})
+        self.assertEqual(r.status_code, 302)  # straight into the game
+        self.assertTrue(Game.objects.filter(
+            players__player=u, status=Game.ACTIVE).exists())
+
+    def test_match_bot_now(self):
+        from accounts.models import User
+        from game.models import Game
+        u = User.objects.create_user("a", password="x")
+        c = Client(); c.force_login(u)
+        c.post("/play/", {"clock": "0,0"})
+        g = Game.objects.get(players__player=u, status=Game.WAITING)
+        c.post(f"/play/{g.id}/bot/")
+        g.refresh_from_db()
+        self.assertEqual(g.status, Game.ACTIVE)
+        self.assertTrue(g.ai_level)
+        self.assertTrue(g.players.filter(player__is_bot=True).exists())
+
+    def test_poll_falls_back_to_bot_after_timeout(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        from accounts.models import User
+        from game.models import Game
+        u = User.objects.create_user("a", password="x")
+        c = Client(); c.force_login(u)
+        c.post("/play/", {"clock": "0,0"})
+        g = Game.objects.get(players__player=u, status=Game.WAITING)
+        Game.objects.filter(pk=g.pk).update(created_at=timezone.now() - timedelta(seconds=30))
+        r = c.get(f"/play/{g.id}/poll/")
+        self.assertEqual(r.json()["status"], "matched")
+        g.refresh_from_db()
+        self.assertEqual(g.status, Game.ACTIVE)
+        self.assertTrue(g.players.filter(player__is_bot=True).exists())
+
+    def test_match_cancel(self):
+        from accounts.models import User
+        from game.models import Game
+        u = User.objects.create_user("a", password="x")
+        c = Client(); c.force_login(u)
+        c.post("/play/", {"clock": "0,0"})
+        g = Game.objects.get(players__player=u, status=Game.WAITING)
+        c.post(f"/play/{g.id}/cancel/")
+        g.refresh_from_db()
+        self.assertEqual(g.status, Game.ABORTED)
+
 
 class LandingTests(TestCase):
     def test_new_guest_sees_landing_then_lobby(self):

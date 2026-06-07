@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-07 18:21+0000\n"
+"POT-Creation-Date: 2026-06-07 20:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Account created!"
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:177 game/views.py:349
+#: accounts/views.py:177 game/views.py:408
 msgid "No se encontró ese usuario."
 msgstr "User not found."
 
@@ -152,26 +152,26 @@ msgstr "Couldn't generate the puzzle. Try again."
 msgid "Te toca jugar en la partida #%(id)s"
 msgstr "It's your turn in game #%(id)s"
 
-#: game/views.py:359
+#: game/views.py:418
 #, python-format
 msgid "%(u)s te desafió a una partida."
 msgstr "%(u)s challenged you to a game."
 
-#: game/views.py:361
+#: game/views.py:420
 msgid "Desafío enviado."
 msgstr "Challenge sent."
 
-#: game/views.py:379
+#: game/views.py:438
 #, python-format
 msgid "%(u)s aceptó tu desafío. ¡A jugar!"
 msgstr "%(u)s accepted your challenge. Let's play!"
 
-#: game/views.py:384
+#: game/views.py:443
 #, python-format
 msgid "%(u)s rechazó tu desafío."
 msgstr "%(u)s declined your challenge."
 
-#: game/views.py:385
+#: game/views.py:444
 msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
@@ -180,10 +180,9 @@ msgid "No encontramos esta página."
 msgstr "We couldn't find this page."
 
 #: templates/404.html:8
-#, fuzzy
 #| msgid "Inicio"
 msgid "Ir al inicio"
-msgstr "Start"
+msgstr "Go home"
 
 #: templates/accounts/friends.html:3 templates/accounts/friends.html:6
 #: templates/accounts/profile.html:27 templates/base.html:65
@@ -248,10 +247,9 @@ msgid "Contraseña"
 msgstr "Password"
 
 #: templates/accounts/login.html:13
-#, fuzzy
 #| msgid "Nueva contraseña"
 msgid "¿Olvidaste tu contraseña?"
-msgstr "New password"
+msgstr "Forgot your password?"
 
 #: templates/accounts/login.html:14
 msgid "¿No tenés cuenta?"
@@ -828,13 +826,13 @@ msgstr "Standings"
 msgid "Nadie inscripto todavía."
 msgstr "No one has joined yet."
 
-#: templates/game/arena_waiting.html:3
+#: templates/game/arena_waiting.html:3 templates/game/matchmaking.html:3
 msgid "Buscando rival"
 msgstr "Finding opponent"
 
-#: templates/game/arena_waiting.html:7
+#: templates/game/arena_waiting.html:7 templates/game/matchmaking.html:8
 msgid "Buscando rival…"
-msgstr "Finding opponent…"
+msgstr "Finding an opponent…"
 
 #: templates/game/arena_waiting.html:8
 msgid "Te emparejaremos en cuanto haya otro jugador libre."
@@ -1082,7 +1080,7 @@ msgstr "Challenges sent"
 msgid "Ir a la partida"
 msgstr "Go to game"
 
-#: templates/game/lobby.html:92
+#: templates/game/lobby.html:92 templates/game/matchmaking.html:19
 msgid "Cancelar"
 msgstr "Cancel"
 
@@ -1158,6 +1156,19 @@ msgstr "Leaderboard"
 #: templates/game/lobby.html:219
 msgid "Sin jugadores aún."
 msgstr "No players yet."
+
+#: templates/game/matchmaking.html:9
+msgid ""
+"Te emparejamos con alguien de nivel similar. Si no aparece nadie, jugás "
+"contra la IA."
+msgstr ""
+"We'll match you with someone of a similar level. If no one shows up, you'll "
+"play the AI."
+
+#: templates/game/matchmaking.html:15
+#| msgid "Jugar vs IA:"
+msgid "Jugar vs IA ahora"
+msgstr "Play vs AI now"
 
 #: templates/game/puzzle.html:3
 msgid "Puzzle"
@@ -1302,16 +1313,14 @@ msgid "Este es un texto de referencia y no constituye asesoramiento legal."
 msgstr "This is a reference text and does not constitute legal advice."
 
 #: templates/legal/terms.html:3 templates/legal/terms.html:6
-#, fuzzy
 #| msgid "Métricas de negocio"
 msgid "Términos del servicio"
-msgstr "Business metrics"
+msgstr "Terms of Service"
 
 #: templates/legal/terms.html:9
-#, fuzzy
 #| msgid "Aceptar"
 msgid "Aceptación"
-msgstr "Accept"
+msgstr "Acceptance"
 
 #: templates/legal/terms.html:10
 msgid ""
@@ -1322,10 +1331,9 @@ msgstr ""
 "service."
 
 #: templates/legal/terms.html:12
-#, fuzzy
 #| msgid "Crear cuenta"
 msgid "Tu cuenta"
-msgstr "Sign up"
+msgstr "Your account"
 
 #: templates/legal/terms.html:13
 msgid ""
@@ -1351,10 +1359,9 @@ msgstr ""
 "games is prohibited, as is any attempt to manipulate results or the ranking."
 
 #: templates/legal/terms.html:18
-#, fuzzy
 #| msgid "suscripciones activas"
 msgid "Suscripciones Premium"
-msgstr "active subscriptions"
+msgstr "Premium subscriptions"
 
 #: templates/legal/terms.html:19
 msgid ""
@@ -1514,48 +1521,42 @@ msgid "Leé nuestras guías de Scrabble"
 msgstr "Read our Scrabble guides"
 
 #: templates/registration/password_reset_complete.html:3
-#, fuzzy
 #| msgid "Contraseña actualizada."
 msgid "Contraseña actualizada"
-msgstr "Password updated."
+msgstr "Password updated"
 
 #: templates/registration/password_reset_complete.html:6
-#, fuzzy
 #| msgid "Contraseña actualizada."
 msgid "¡Contraseña actualizada!"
-msgstr "Password updated."
+msgstr "Password updated!"
 
 #: templates/registration/password_reset_complete.html:7
 msgid "Ya podés entrar con tu nueva contraseña."
 msgstr "You can now log in with your new password."
 
 #: templates/registration/password_reset_confirm.html:7
-#, fuzzy
 #| msgid "Nueva contraseña"
 msgid "Elegí una nueva contraseña"
-msgstr "New password"
+msgstr "Choose a new password"
 
 #: templates/registration/password_reset_confirm.html:11
-#, fuzzy
 #| msgid "Nueva contraseña"
 msgid "Repetí la contraseña"
-msgstr "New password"
+msgstr "Repeat the password"
 
 #: templates/registration/password_reset_confirm.html:15
-#, fuzzy
 #| msgid "Cambiar contraseña"
 msgid "Guardar contraseña"
-msgstr "Change password"
+msgstr "Save password"
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "Enlace inválido"
 msgstr "Invalid link"
 
 #: templates/registration/password_reset_confirm.html:19
-#, fuzzy
 #| msgid "Código de regalo inválido o ya usado."
 msgid "El enlace de restablecimiento no es válido o ya fue usado."
-msgstr "Invalid or already-used gift code."
+msgstr "The reset link is invalid or has already been used."
 
 #: templates/registration/password_reset_confirm.html:20
 msgid "Pedir uno nuevo"
@@ -1575,17 +1576,15 @@ msgstr ""
 
 #: templates/registration/password_reset_done.html:8
 #: templates/registration/password_reset_form.html:13
-#, fuzzy
 #| msgid "Volver al torneo"
 msgid "Volver a entrar"
-msgstr "Back to tournament"
+msgstr "Back to log in"
 
 #: templates/registration/password_reset_form.html:3
 #: templates/registration/password_reset_form.html:6
-#, fuzzy
 #| msgid "Cambiar contraseña"
 msgid "Restablecer contraseña"
-msgstr "Change password"
+msgstr "Reset password"
 
 #: templates/registration/password_reset_form.html:7
 msgid ""
@@ -1593,7 +1592,6 @@ msgid ""
 msgstr "Enter your email and we'll send you a link to set a new password."
 
 #: templates/registration/password_reset_form.html:11
-#, fuzzy
 #| msgid "Copiar enlace"
 msgid "Enviar enlace"
-msgstr "Copy link"
+msgstr "Send link"

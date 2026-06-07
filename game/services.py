@@ -669,6 +669,15 @@ def get_bot_user(level):
     return bot
 
 
+def add_bot_opponent(game, level="medium"):
+    """Seat a bot in a waiting game so the host can play immediately."""
+    if game.status != Game.WAITING:
+        return game
+    game.ai_level = level
+    game.save(update_fields=["ai_level"])
+    return join_game(game, get_bot_user(level), check_quota=False)
+
+
 def accept_challenge(challenge):
     """Create the game for an accepted direct challenge and link it."""
     from .models import Challenge

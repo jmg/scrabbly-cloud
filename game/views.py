@@ -324,6 +324,65 @@ def quick_pair(request):
     return redirect("game_detail", game_id=game.pk)
 
 
+# Seconds a quick-match host waits before we offer/auto-pair a bot.
+MATCH_BOT_FALLBACK_SECS = 20
+
+
+@require_POST
+@ACTION_LIMIT
+def matchmaking(request):
+    """Find a rating-matched opponent; show a search screen if none yet."""
+    initial, increment = _clock(request)
+    game = services.quick_pair(
+        request.user, language=_language(request),
+        clock_initial=initial, clock_increment=increment,
+    )
+    notify_update(game.pk)
+    if game.status == Game.ACTIVE:
+        return redirect("game_detail", game_id=game.pk)
+    return render(request, "game/matchmaking.html", {
+        "game": game, "fallback": MATCH_BOT_FALLBACK_SECS,
+    })
+
+
+def match_poll(request, game_id):
+    """Polled by the search screen: matched yet, or auto-pair a bot on timeout."""
+    from django.utils import timezone
+    game = get_object_or_404(Game, pk=game_id)
+    if game.status in (Game.ACTIVE, Game.FINISHED):
+        return JsonResponse({"status": "matched", "game_id": game.pk})
+    seat = game.seat_for(request.user)
+    if not seat or game.status != Game.WAITING:
+        return JsonResponse({"status": "searching", "waited": 0})
+    waited = (timezone.now() - game.created_at).total_seconds()
+    if waited >= MATCH_BOT_FALLBACK_SECS:
+        services.add_bot_opponent(game)
+        notify_update(game.pk)
+        return JsonResponse({"status": "matched", "game_id": game.pk})
+    return JsonResponse({"status": "searching", "waited": int(waited)})
+
+
+@require_POST
+@ACTION_LIMIT
+def match_bot(request, game_id):
+    """Stop waiting and play a bot now."""
+    game = get_object_or_404(Game, pk=game_id)
+    if game.seat_for(request.user) and game.status == Game.WAITING:
+        game = services.add_bot_opponent(game)
+        notify_update(game.pk)
+    return redirect("game_detail", game_id=game.pk)
+
+
+@require_POST
+@ACTION_LIMIT
+def match_cancel(request, game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    if game.seat_for(request.user) and game.status == Game.WAITING:
+        game.status = Game.ABORTED
+        game.save(update_fields=["status"])
+    return redirect("lobby")
+
+
 @require_POST
 @ACTION_LIMIT
 def create_ai_game(request):

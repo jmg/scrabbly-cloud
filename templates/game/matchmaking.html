@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Buscando rival" %} · Scrabbly{% endblock %}
+{% block content %}
+<div class="auth-card center matchmaking"
+     data-poll="{% url 'match_poll' game.id %}" data-fallback="{{ fallback }}">
+  <div class="mm-spinner" aria-hidden="true"></div>
+  <h1>{% trans "Buscando rival…" %}</h1>
+  <p class="muted" id="mm-status">{% blocktrans %}Te emparejamos con alguien de nivel similar. Si no aparece nadie, jugás contra la IA.{% endblocktrans %}</p>
+  <p class="muted"><b id="mm-timer">0</b>s</p>
+
+  <div class="mm-actions">
+    <form method="post" action="{% url 'match_bot' game.id %}">
+      {% csrf_token %}
+      <button class="btn-primary" type="submit">🤖 {% trans "Jugar vs IA ahora" %}</button>
+    </form>
+    <form method="post" action="{% url 'match_cancel' game.id %}">
+      {% csrf_token %}
+      <button class="btn-secondary" type="submit">{% trans "Cancelar" %}</button>
+    </form>
+  </div>
+</div>
+<script>
+(function () {
+  var box = document.querySelector(".matchmaking");
+  var pollUrl = box.dataset.poll;
+  var timerEl = document.getElementById("mm-timer");
+  var t0 = Date.now();
+  setInterval(function () { timerEl.textContent = Math.floor((Date.now() - t0) / 1000); }, 1000);
+  function poll() {
+    fetch(pollUrl, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.status === "matched") { location.href = "/game/" + d.game_id + "/"; }
+        else { setTimeout(poll, 2000); }
+      })
+      .catch(function () { setTimeout(poll, 3000); });
+  }
+  setTimeout(poll, 2000);
+})();
+</script>
+{% endblock %}

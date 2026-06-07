@@ -23,7 +23,7 @@
           </select>
         </label>
       </div>
-      <form id="quickform" method="post" action="{% url 'quick_pair' %}">
+      <form id="quickform" method="post" action="{% url 'matchmaking' %}">
         {% csrf_token %}
         <input type="hidden" name="language" value="es" class="lang-field">
         <input type="hidden" name="clock" value="0,0" class="clock-field">
