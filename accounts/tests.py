@@ -108,6 +108,29 @@ class NotificationTests(TestCase):
         self.assertFalse(Notification.objects.filter(user=b).exists())
 
 
+class PasswordResetTests(TestCase):
+    def test_reset_sends_email(self):
+        from django.core import mail
+        User.objects.create_user("resetme", password="x", email="r@example.com")
+        mail.outbox = []
+        r = Client().post("/password/reset/", {"email": "r@example.com"})
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("/reset/", mail.outbox[0].body)
+
+    def test_login_has_reset_link(self):
+        self.assertContains(Client().get("/login/"), "/password/reset/")
+
+    def test_auth_throttle_blocks_after_limit(self):
+        from django.core.cache import cache
+        from accounts.views import _auth_throttled
+        cache.clear()
+        rf = Client().get("/login/").wsgi_request
+        hits = [_auth_throttled(rf, "probe") for _ in range(31)]
+        self.assertFalse(hits[0])
+        self.assertTrue(hits[-1])  # tripped within the window
+
+
 class TournamentHistoryTests(TestCase):
     def test_profile_shows_arena_entry(self):
         from datetime import timedelta

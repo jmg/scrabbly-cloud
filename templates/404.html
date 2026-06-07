@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}404 · Scrabbly{% endblock %}
+{% block content %}
+<div class="auth-card center">
+  <h1>404</h1>
+  <p>{% trans "No encontramos esta página." %}</p>
+  <a class="btn-primary" href="{% url 'lobby' %}">{% trans "Ir al inicio" %}</a>
+</div>
+{% endblock %}

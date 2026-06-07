@@ -91,6 +91,15 @@
   {% endif %}
 
   <main>{% block content %}{% endblock %}</main>
+
+  <footer class="site-footer">
+    <span class="muted">© Scrabbly</span>
+    <a href="{% url 'blog' %}">{% trans "Blog" %}</a>
+    <a href="{% url 'pricing' %}">{% trans "Premium" %}</a>
+    <a href="{% url 'terms' %}">{% trans "Términos" %}</a>
+    <a href="{% url 'privacy' %}">{% trans "Privacidad" %}</a>
+  </footer>
+
   <div id="toast-host" class="toast-host"></div>
   {% if user.is_authenticated and not user.is_guest %}
     {% load static %}

@@ -43,6 +43,24 @@ def manifest(request):
     return JsonResponse(data, content_type="application/manifest+json")
 
 
+def healthz(request):
+    """Liveness probe for load balancers: 200 if the DB answers."""
+    from django.db import connection
+    try:
+        connection.cursor().execute("SELECT 1")
+    except Exception:
+        return HttpResponse("db error", status=503, content_type="text/plain")
+    return HttpResponse("ok", content_type="text/plain")
+
+
+def terms(request):
+    return render(request, "legal/terms.html")
+
+
+def privacy(request):
+    return render(request, "legal/privacy.html")
+
+
 def robots_txt(request):
     lines = [
         "User-agent: *",

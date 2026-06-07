@@ -55,16 +55,23 @@ h1, h2, h3 { color: var(--text-strong); font-weight: 700; letter-spacing: -0.2px
 
 main { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
 
-/* Buttons */
-button { font: inherit; cursor: pointer; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 600; transition: background .15s ease, transform .1s ease, box-shadow .15s ease; }
+/* Buttons (work as <button> and as <a> link-buttons) */
+button, .btn-primary, .btn-secondary, .btn-danger, .btn-small {
+  display: inline-block; font: inherit; font-weight: 600; cursor: pointer;
+  border: none; border-radius: 6px; padding: 8px 16px; text-align: center;
+  text-decoration: none; line-height: 1.2;
+  transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
+}
+a.btn-primary, a.btn-secondary, a.btn-danger, a.btn-small { text-decoration: none; }
+a.btn-primary:hover, a.btn-secondary:hover, a.btn-danger:hover, a.btn-small:hover { text-decoration: none; }
 .btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: var(--accent-h); }
+.btn-primary:hover { background: var(--accent-h); color: #fff; }
 .btn-primary:active { transform: translateY(1px); }
 .btn-secondary { background: var(--panel2); color: var(--text-strong); border: 1px solid var(--line); }
 .btn-secondary:hover { background: var(--line); }
 .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
 .btn-danger:hover { background: var(--danger); color: #fff; }
-.btn-small { background: var(--panel2); color: var(--text-strong); padding: 4px 12px; font-size: 13px; border: 1px solid var(--line); border-radius: 6px; font-weight: 600; }
+.btn-small { background: var(--panel2); color: var(--text-strong); padding: 4px 12px; font-size: 13px; border: 1px solid var(--line); }
 .btn-small:hover { background: var(--line); }
 button:disabled { opacity: .4; cursor: not-allowed; }
 
@@ -385,3 +392,10 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 .game-list li:hover { background: var(--panel2); }
 .leaderboard { counter-reset: rank; }
 .crown-diamond { filter: drop-shadow(0 0 4px rgba(91,200,230,.5)); }
+
+/* Site footer */
+.site-footer { max-width: 1100px; margin: 40px auto 24px; padding: 16px 20px 0;
+  border-top: 1px solid var(--line); display: flex; gap: 18px; flex-wrap: wrap;
+  align-items: center; font-size: 14px; }
+.site-footer a { color: var(--muted); }
+.site-footer a:hover { color: var(--text-strong); }

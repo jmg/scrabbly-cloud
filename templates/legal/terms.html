@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Términos del servicio" %} · Scrabbly{% endblock %}
+{% block content %}
+<article class="blog-post">
+  <h1>{% trans "Términos del servicio" %}</h1>
+  <p class="muted">{% trans "Última actualización: 2026" %}</p>
+
+  <h2>1. {% trans "Aceptación" %}</h2>
+  <p>{% trans "Al usar Scrabbly aceptás estos términos. Si no estás de acuerdo, no uses el servicio." %}</p>
+
+  <h2>2. {% trans "Tu cuenta" %}</h2>
+  <p>{% trans "Sos responsable de la actividad de tu cuenta y de mantener tu contraseña segura. Podés jugar como invitado o crear una cuenta. No suplantes a otras personas ni uses lenguaje abusivo en el chat." %}</p>
+
+  <h2>3. {% trans "Juego limpio" %}</h2>
+  <p>{% trans "Está prohibido usar asistencia externa (diccionarios, bots o software de ayuda) en partidas con rating, así como cualquier intento de manipular resultados o el ranking." %}</p>
+
+  <h2>4. {% trans "Suscripciones Premium" %}</h2>
+  <p>{% trans "Las suscripciones se cobran de forma recurrente hasta que las canceles. Podés cancelar en cualquier momento desde tu cuenta; conservás el acceso hasta el fin del período pagado. Los pagos se procesan a través de Stripe." %}</p>
+
+  <h2>5. {% trans "Disponibilidad" %}</h2>
+  <p>{% trans "El servicio se ofrece «tal cual», sin garantías de disponibilidad ininterrumpida. Podemos modificar o discontinuar funciones." %}</p>
+
+  <h2>6. {% trans "Contacto" %}</h2>
+  <p>{% trans "Por consultas, escribinos a soporte@scrabblycloud.com." %}</p>
+
+  <p class="muted small">{% trans "Este es un texto de referencia y no constituye asesoramiento legal." %}</p>
+</article>
+{% endblock %}

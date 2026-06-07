@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Política de privacidad" %} · Scrabbly{% endblock %}
+{% block content %}
+<article class="blog-post">
+  <h1>{% trans "Política de privacidad" %}</h1>
+  <p class="muted">{% trans "Última actualización: 2026" %}</p>
+
+  <h2>1. {% trans "Qué datos recopilamos" %}</h2>
+  <p>{% trans "Datos de cuenta (usuario y, opcionalmente, email), tu actividad de juego (partidas, rating, jugadas) y datos técnicos básicos (como la dirección IP) para seguridad y prevención de abuso." %}</p>
+
+  <h2>2. {% trans "Cómo los usamos" %}</h2>
+  <p>{% trans "Para ofrecer el juego, calcular tu rating, enviarte avisos del servicio y recibos de pago, y para mantener la plataforma segura." %}</p>
+
+  <h2>3. {% trans "Pagos" %}</h2>
+  <p>{% trans "Los pagos los procesa Stripe. No almacenamos los datos de tu tarjeta en nuestros servidores." %}</p>
+
+  <h2>4. {% trans "Cookies" %}</h2>
+  <p>{% trans "Usamos cookies necesarias para la sesión y la preferencia de idioma. La analítica, si está activa, es respetuosa de la privacidad y sin seguimiento personal." %}</p>
+
+  <h2>5. {% trans "Tus derechos" %}</h2>
+  <p>{% trans "Podés acceder a tus datos, corregirlos o eliminar tu cuenta en cualquier momento desde Ajustes. Para otras solicitudes, escribinos a soporte@scrabblycloud.com." %}</p>
+
+  <p class="muted small">{% trans "Este es un texto de referencia y no constituye asesoramiento legal." %}</p>
+</article>
+{% endblock %}

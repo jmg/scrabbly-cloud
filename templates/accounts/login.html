@@ -10,6 +10,7 @@
     <label>{% trans "Contraseña" %}<input type="password" name="password" required></label>
     <button class="btn-primary" type="submit">{% trans "Entrar" %}</button>
   </form>
+  <p class="muted small"><a href="{% url 'password_reset' %}">{% trans "¿Olvidaste tu contraseña?" %}</a></p>
   <p class="muted">{% blocktrans %}¿No tenés cuenta?{% endblocktrans %} <a href="{% url 'register' %}">{% trans "Registrate" %}</a></p>
 </div>
 {% endblock %}

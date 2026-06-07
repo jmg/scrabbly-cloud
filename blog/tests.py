@@ -127,6 +127,20 @@ class BlogTests(TestCase):
         self.assertContains(self.c.get("/search/?q=findme"), "findme")
         self.assertContains(self.c.get("/search/?q=Scrabble"), "Scrabble")
 
+    def test_healthz(self):
+        r = self.c.get("/healthz")
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content, b"ok")
+
+    def test_legal_pages(self):
+        self.assertContains(self.c.get("/terms/"), "Scrabbly")
+        self.assertContains(self.c.get("/privacy/"), "Stripe")
+
+    def test_footer_legal_links(self):
+        html = self.c.get("/blog/").content.decode()
+        self.assertIn("/terms/", html)
+        self.assertIn("/privacy/", html)
+
     def test_favicon_and_manifest_linked(self):
         html = self.c.get("/blog/").content.decode()
         self.assertIn("favicon.svg", html)

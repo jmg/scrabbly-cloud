@@ -30,6 +30,7 @@ class GuestUserMiddleware:
             or path == "/sitemap.xml"
             or path == "/site.webmanifest"
             or path == "/og.png"
+            or path == "/healthz"
         )
         if not skip and not request.user.is_authenticated:
             user = User.objects.create(

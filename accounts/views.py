@@ -7,6 +7,8 @@ from django.views.decorators.http import require_POST
 
 from game.models import GamePlayer, Move
 
+from django.core.cache import cache
+
 from . import social
 from .forms import LoginForm, RegisterForm
 from .models import Friendship
@@ -16,8 +18,25 @@ from .themes import THEMES, THEME_CODES, PREMIUM_THEMES
 User = get_user_model()
 
 
+def _auth_throttled(request, name, limit=30, window=300):
+    """Per-IP fixed-window throttle for auth endpoints (brute-force guard)."""
+    ip = request.META.get("REMOTE_ADDR", "anon")
+    key = f"rl:auth:{name}:{ip}"
+    if cache.add(key, 1, window):
+        return False
+    try:
+        count = cache.incr(key)
+    except ValueError:
+        cache.add(key, 1, window)
+        count = 1
+    return count > limit
+
+
 def register(request):
     if request.method == "POST":
+        if _auth_throttled(request, "register"):
+            messages.error(request, _("Demasiados intentos. Esperá unos minutos."))
+            return render(request, "accounts/register.html", {"form": RegisterForm()})
         form = RegisterForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
@@ -48,6 +67,9 @@ def register(request):
 
 def login_view(request):
     if request.method == "POST":
+        if _auth_throttled(request, "login"):
+            messages.error(request, _("Demasiados intentos. Esperá unos minutos."))
+            return render(request, "accounts/login.html", {"form": LoginForm()})
         form = LoginForm(request.POST)
         if form.is_valid():
             user = authenticate(

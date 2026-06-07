@@ -70,7 +70,11 @@ necesidad de registrarse (cuentas de invitado).
 - **Notificaciones**: bandeja persistente (🔔 con contador) y **avisos en vivo
   por WebSocket** (toasts) para solicitudes de amistad y desafíos, vía un socket
   por usuario sobre Channels.
-- **Anti-spam**: rate-limiting por usuario en las acciones de juego.
+- **Anti-spam**: rate-limiting por usuario en las acciones de juego y por IP en
+  login/registro (anti fuerza bruta).
+- **Cuenta y legal**: recuperación de contraseña por email, páginas de
+  Términos y Privacidad, footer con enlaces, páginas de error 404/500
+  personalizadas y endpoint de salud `/healthz`.
 
 ## Traducciones (i18n)
 

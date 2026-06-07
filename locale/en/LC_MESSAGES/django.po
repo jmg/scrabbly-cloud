@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-07 00:27+0000\n"
+"POT-Creation-Date: 2026-06-07 18:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,77 +17,81 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: accounts/views.py:42
+#: accounts/views.py:38 accounts/views.py:71
+msgid "Demasiados intentos. Esperá unos minutos."
+msgstr "Too many attempts. Please wait a few minutes."
+
+#: accounts/views.py:61
 msgid "¡Cuenta creada!"
 msgstr "Account created!"
 
-#: accounts/views.py:61
+#: accounts/views.py:83
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:155 game/views.py:349
+#: accounts/views.py:177 game/views.py:349
 msgid "No se encontró ese usuario."
 msgstr "User not found."
 
-#: accounts/views.py:163 accounts/views.py:188
+#: accounts/views.py:185 accounts/views.py:210
 #, python-format
 msgid "%(u)s aceptó tu solicitud de amistad."
 msgstr "%(u)s accepted your friend request."
 
-#: accounts/views.py:165 accounts/views.py:190
+#: accounts/views.py:187 accounts/views.py:212
 msgid "¡Ahora son amigos!"
 msgstr "You're now friends!"
 
-#: accounts/views.py:167
+#: accounts/views.py:189
 msgid "Ya son amigos."
 msgstr "You're already friends."
 
-#: accounts/views.py:170
+#: accounts/views.py:192
 #, python-format
 msgid "%(u)s te envió una solicitud de amistad."
 msgstr "%(u)s sent you a friend request."
 
-#: accounts/views.py:172
+#: accounts/views.py:194
 msgid "Solicitud enviada."
 msgstr "Request sent."
 
-#: accounts/views.py:193
+#: accounts/views.py:215
 msgid "Solicitud rechazada."
 msgstr "Request declined."
 
-#: accounts/views.py:207
+#: accounts/views.py:229
 msgid "Amistad eliminada."
 msgstr "Friend removed."
 
-#: accounts/views.py:282
+#: accounts/views.py:304
 msgid "Datos actualizados."
 msgstr "Details updated."
 
-#: accounts/views.py:295
+#: accounts/views.py:317
 msgid "La contraseña actual es incorrecta."
 msgstr "The current password is incorrect."
 
-#: accounts/views.py:297
+#: accounts/views.py:319
 msgid "La nueva contraseña es demasiado corta."
 msgstr "The new password is too short."
 
-#: accounts/views.py:302
+#: accounts/views.py:324
 msgid "Contraseña actualizada."
 msgstr "Password updated."
 
-#: accounts/views.py:312
+#: accounts/views.py:334
 msgid "Contraseña incorrecta. La cuenta no se eliminó."
 msgstr "Incorrect password. The account was not deleted."
 
-#: accounts/views.py:316
+#: accounts/views.py:338
 msgid "Tu cuenta fue eliminada."
 msgstr "Your account was deleted."
 
-#: accounts/views.py:328
+#: accounts/views.py:350
 msgid "Ese tema es exclusivo de Premium. 👑"
 msgstr "That theme is Premium-only. 👑"
 
-#: accounts/views.py:332
+#: accounts/views.py:354
 msgid "Tema actualizado."
 msgstr "Theme updated."
 
@@ -171,8 +175,18 @@ msgstr "%(u)s declined your challenge."
 msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
+#: templates/404.html:7
+msgid "No encontramos esta página."
+msgstr "We couldn't find this page."
+
+#: templates/404.html:8
+#, fuzzy
+#| msgid "Inicio"
+msgid "Ir al inicio"
+msgstr "Start"
+
 #: templates/accounts/friends.html:3 templates/accounts/friends.html:6
-#: templates/accounts/profile.html:27 templates/base.html:60
+#: templates/accounts/profile.html:27 templates/base.html:65
 msgid "Amigos"
 msgstr "Friends"
 
@@ -223,7 +237,8 @@ msgstr "pending"
 
 #: templates/accounts/login.html:3 templates/accounts/login.html:6
 #: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:66
+#: templates/base.html:71
+#: templates/registration/password_reset_complete.html:8
 msgid "Entrar"
 msgstr "Log in"
 
@@ -233,15 +248,21 @@ msgid "Contraseña"
 msgstr "Password"
 
 #: templates/accounts/login.html:13
+#, fuzzy
+#| msgid "Nueva contraseña"
+msgid "¿Olvidaste tu contraseña?"
+msgstr "New password"
+
+#: templates/accounts/login.html:14
 msgid "¿No tenés cuenta?"
 msgstr "Don't have an account?"
 
-#: templates/accounts/login.html:13
+#: templates/accounts/login.html:14
 msgid "Registrate"
 msgstr "Sign up"
 
 #: templates/accounts/notifications.html:3
-#: templates/accounts/notifications.html:6 templates/base.html:59
+#: templates/accounts/notifications.html:6 templates/base.html:64
 msgid "Notificaciones"
 msgstr "Notifications"
 
@@ -318,7 +339,7 @@ msgstr "Apply"
 msgid "Desbloqueá más temas con Premium"
 msgstr "Unlock more themes with Premium"
 
-#: templates/accounts/profile.html:92 templates/base.html:49
+#: templates/accounts/profile.html:92 templates/base.html:54
 #: templates/game/arenas.html:3
 msgid "Torneos"
 msgstr "Tournaments"
@@ -354,7 +375,7 @@ msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:67
+#: templates/accounts/register.html:18 templates/base.html:72
 #: templates/marketing/landing.html:32
 msgid "Crear cuenta"
 msgstr "Sign up"
@@ -365,6 +386,7 @@ msgid "Tu progreso como invitado (rating %(rating)s) se conservará."
 msgstr "Your guest progress (rating %(rating)s) will be kept."
 
 #: templates/accounts/register.html:13 templates/accounts/settings.html:12
+#: templates/registration/password_reset_form.html:10
 msgid "Email"
 msgstr "Email"
 
@@ -377,7 +399,7 @@ msgid "¿Ya tenés cuenta?"
 msgstr "Already have an account?"
 
 #: templates/accounts/settings.html:3 templates/accounts/settings.html:6
-#: templates/base.html:62
+#: templates/base.html:67
 msgid "Ajustes"
 msgstr "Settings"
 
@@ -402,6 +424,8 @@ msgid "Contraseña actual"
 msgstr "Current password"
 
 #: templates/accounts/settings.html:23
+#: templates/registration/password_reset_confirm.html:3
+#: templates/registration/password_reset_confirm.html:10
 msgid "Nueva contraseña"
 msgstr "New password"
 
@@ -437,32 +461,39 @@ msgstr ""
 msgid "Jugá al Scrabble online gratis."
 msgstr "Play Scrabble online for free."
 
-#: templates/base.html:50 templates/game/puzzles.html:3
+#: templates/base.html:55 templates/game/puzzles.html:3
 #: templates/game/puzzles.html:6 templates/marketing/landing.html:43
 msgid "Puzzles"
 msgstr "Puzzles"
 
-#: templates/base.html:51 templates/blog/post.html:48
+#: templates/base.html:56 templates/base.html:97 templates/blog/post.html:50
 msgid "Blog"
 msgstr "Blog"
 
-#: templates/base.html:52 templates/blog/search.html:3
+#: templates/base.html:57 templates/blog/search.html:3
 #: templates/blog/search.html:6 templates/blog/search.html:9
-#| msgid "Buscando rival"
 msgid "Buscar"
 msgstr "Search"
 
-#: templates/base.html:56
+#: templates/base.html:61 templates/base.html:98
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:63
+#: templates/base.html:68
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:72 templates/game/arenas.html:45
+#: templates/base.html:77 templates/game/arenas.html:45
 msgid "Idioma"
 msgstr "Language"
+
+#: templates/base.html:99
+msgid "Términos"
+msgstr "Terms"
+
+#: templates/base.html:100
+msgid "Privacidad"
+msgstr "Privacy"
 
 #: templates/billing/gift.html:6 templates/billing/pricing.html:53
 msgid "Regalar Premium"
@@ -683,11 +714,11 @@ msgstr "Read more"
 msgid "Todavía no hay artículos."
 msgstr "No articles yet."
 
-#: templates/blog/post.html:54
+#: templates/blog/post.html:56
 msgid "Jugá al Scrabble ahora"
 msgstr "Play Scrabble now"
 
-#: templates/blog/post.html:57
+#: templates/blog/post.html:59
 msgid "Seguí leyendo"
 msgstr "Keep reading"
 
@@ -696,12 +727,10 @@ msgid "Jugadores o artículos…"
 msgstr "Players or articles…"
 
 #: templates/blog/search.html:13
-#| msgid "Jugadas"
 msgid "Jugadores"
 msgstr "Players"
 
 #: templates/blog/search.html:17 templates/blog/search.html:25
-#| msgid "Sin reloj"
 msgid "Sin resultados."
 msgstr "No results."
 
@@ -1196,8 +1225,168 @@ msgstr "New puzzle (ES)"
 msgid "Nuevo puzzle (EN)"
 msgstr "New puzzle (EN)"
 
+#: templates/legal/privacy.html:3 templates/legal/privacy.html:6
+msgid "Política de privacidad"
+msgstr "Privacy Policy"
+
+#: templates/legal/privacy.html:7 templates/legal/terms.html:7
+msgid "Última actualización: 2026"
+msgstr "Last updated: 2026"
+
+#: templates/legal/privacy.html:9
+msgid "Qué datos recopilamos"
+msgstr "What data we collect"
+
+#: templates/legal/privacy.html:10
+msgid ""
+"Datos de cuenta (usuario y, opcionalmente, email), tu actividad de juego "
+"(partidas, rating, jugadas) y datos técnicos básicos (como la dirección IP) "
+"para seguridad y prevención de abuso."
+msgstr ""
+"Account data (username and, optionally, email), your game activity (games, "
+"rating, moves) and basic technical data (such as IP address) for security "
+"and abuse prevention."
+
+#: templates/legal/privacy.html:12
+msgid "Cómo los usamos"
+msgstr "How we use it"
+
+#: templates/legal/privacy.html:13
+msgid ""
+"Para ofrecer el juego, calcular tu rating, enviarte avisos del servicio y "
+"recibos de pago, y para mantener la plataforma segura."
+msgstr ""
+"To provide the game, compute your rating, send you service notices and "
+"payment receipts, and keep the platform secure."
+
+#: templates/legal/privacy.html:15
+msgid "Pagos"
+msgstr "Payments"
+
+#: templates/legal/privacy.html:16
+msgid ""
+"Los pagos los procesa Stripe. No almacenamos los datos de tu tarjeta en "
+"nuestros servidores."
+msgstr ""
+"Payments are processed by Stripe. We don't store your card details on our "
+"servers."
+
+#: templates/legal/privacy.html:18
+msgid "Cookies"
+msgstr "Cookies"
+
+#: templates/legal/privacy.html:19
+msgid ""
+"Usamos cookies necesarias para la sesión y la preferencia de idioma. La "
+"analítica, si está activa, es respetuosa de la privacidad y sin seguimiento "
+"personal."
+msgstr ""
+"We use cookies necessary for the session and language preference. Analytics,"
+" if enabled, is privacy-friendly with no personal tracking."
+
+#: templates/legal/privacy.html:21
+msgid "Tus derechos"
+msgstr "Your rights"
+
+#: templates/legal/privacy.html:22
+msgid ""
+"Podés acceder a tus datos, corregirlos o eliminar tu cuenta en cualquier "
+"momento desde Ajustes. Para otras solicitudes, escribinos a "
+"soporte@scrabblycloud.com."
+msgstr ""
+"You can access your data, correct it or delete your account anytime from "
+"Settings. For other requests, email us at soporte@scrabblycloud.com."
+
+#: templates/legal/privacy.html:24 templates/legal/terms.html:27
+msgid "Este es un texto de referencia y no constituye asesoramiento legal."
+msgstr "This is a reference text and does not constitute legal advice."
+
+#: templates/legal/terms.html:3 templates/legal/terms.html:6
+#, fuzzy
+#| msgid "Métricas de negocio"
+msgid "Términos del servicio"
+msgstr "Business metrics"
+
+#: templates/legal/terms.html:9
+#, fuzzy
+#| msgid "Aceptar"
+msgid "Aceptación"
+msgstr "Accept"
+
+#: templates/legal/terms.html:10
+msgid ""
+"Al usar Scrabbly aceptás estos términos. Si no estás de acuerdo, no uses el "
+"servicio."
+msgstr ""
+"By using Scrabbly you accept these terms. If you disagree, don't use the "
+"service."
+
+#: templates/legal/terms.html:12
+#, fuzzy
+#| msgid "Crear cuenta"
+msgid "Tu cuenta"
+msgstr "Sign up"
+
+#: templates/legal/terms.html:13
+msgid ""
+"Sos responsable de la actividad de tu cuenta y de mantener tu contraseña "
+"segura. Podés jugar como invitado o crear una cuenta. No suplantes a otras "
+"personas ni uses lenguaje abusivo en el chat."
+msgstr ""
+"You're responsible for your account's activity and for keeping your password"
+" safe. You can play as a guest or create an account. Don't impersonate "
+"others or use abusive language in chat."
+
+#: templates/legal/terms.html:15
+msgid "Juego limpio"
+msgstr "Fair play"
+
+#: templates/legal/terms.html:16
+msgid ""
+"Está prohibido usar asistencia externa (diccionarios, bots o software de "
+"ayuda) en partidas con rating, así como cualquier intento de manipular "
+"resultados o el ranking."
+msgstr ""
+"Using external assistance (dictionaries, bots or helper software) in rated "
+"games is prohibited, as is any attempt to manipulate results or the ranking."
+
+#: templates/legal/terms.html:18
+#, fuzzy
+#| msgid "suscripciones activas"
+msgid "Suscripciones Premium"
+msgstr "active subscriptions"
+
+#: templates/legal/terms.html:19
+msgid ""
+"Las suscripciones se cobran de forma recurrente hasta que las canceles. "
+"Podés cancelar en cualquier momento desde tu cuenta; conservás el acceso "
+"hasta el fin del período pagado. Los pagos se procesan a través de Stripe."
+msgstr ""
+"Subscriptions are billed recurrently until you cancel. You can cancel "
+"anytime from your account; you keep access until the end of the paid period."
+" Payments are processed through Stripe."
+
+#: templates/legal/terms.html:21
+msgid "Disponibilidad"
+msgstr "Availability"
+
+#: templates/legal/terms.html:22
+msgid ""
+"El servicio se ofrece «tal cual», sin garantías de disponibilidad "
+"ininterrumpida. Podemos modificar o discontinuar funciones."
+msgstr ""
+"The service is provided \"as is\", with no guarantee of uninterrupted "
+"availability. We may modify or discontinue features."
+
+#: templates/legal/terms.html:24
+msgid "Contacto"
+msgstr "Contact"
+
+#: templates/legal/terms.html:25
+msgid "Por consultas, escribinos a soporte@scrabblycloud.com."
+msgstr "For questions, email us at soporte@scrabblycloud.com."
+
 #: templates/marketing/landing.html:3 templates/marketing/landing.html:23
-#| msgid "Jugá al Scrabble online gratis."
 msgid "Jugá al Scrabble online gratis"
 msgstr "Play Scrabble online for free"
 
@@ -1213,7 +1402,6 @@ msgstr ""
 "features."
 
 #: templates/marketing/landing.html:13
-#| msgid "¿No tenés cuenta?"
 msgid "¿Necesito crear una cuenta?"
 msgstr "Do I need an account?"
 
@@ -1241,7 +1429,6 @@ msgstr ""
 "Real-time games, vs the AI, tournaments and puzzles. In Spanish and English."
 
 #: templates/marketing/landing.html:30
-#| msgid "Jugá al Scrabble ahora"
 msgid "Jugar gratis ahora"
 msgstr "Play free now"
 
@@ -1267,7 +1454,6 @@ msgid "Practicá contra una inteligencia artificial fuerte."
 msgstr "Practise against a strong AI."
 
 #: templates/marketing/landing.html:42
-#| msgid "Torneos Arena"
 msgid "Torneos arena"
 msgstr "Arena tournaments"
 
@@ -1288,7 +1474,6 @@ msgid "Diccionarios oficiales en español e inglés."
 msgstr "Official dictionaries in Spanish and English."
 
 #: templates/marketing/landing.html:45
-#| msgid "Rating: todas"
 msgid "Rating ELO"
 msgstr "ELO rating"
 
@@ -1313,7 +1498,6 @@ msgid "Juego en español y en inglés para entrenar vocabulario. Impecable."
 msgstr "I play in Spanish and English to train vocabulary. Flawless."
 
 #: templates/marketing/landing.html:59
-#| msgid "Mejor jugada"
 msgid "Mejores jugadores"
 msgstr "Top players"
 
@@ -1322,10 +1506,94 @@ msgid "¿Listo para jugar?"
 msgstr "Ready to play?"
 
 #: templates/marketing/landing.html:71
-#| msgid "mejor partida"
 msgid "Empezar una partida"
 msgstr "Start a game"
 
 #: templates/marketing/landing.html:73
 msgid "Leé nuestras guías de Scrabble"
 msgstr "Read our Scrabble guides"
+
+#: templates/registration/password_reset_complete.html:3
+#, fuzzy
+#| msgid "Contraseña actualizada."
+msgid "Contraseña actualizada"
+msgstr "Password updated."
+
+#: templates/registration/password_reset_complete.html:6
+#, fuzzy
+#| msgid "Contraseña actualizada."
+msgid "¡Contraseña actualizada!"
+msgstr "Password updated."
+
+#: templates/registration/password_reset_complete.html:7
+msgid "Ya podés entrar con tu nueva contraseña."
+msgstr "You can now log in with your new password."
+
+#: templates/registration/password_reset_confirm.html:7
+#, fuzzy
+#| msgid "Nueva contraseña"
+msgid "Elegí una nueva contraseña"
+msgstr "New password"
+
+#: templates/registration/password_reset_confirm.html:11
+#, fuzzy
+#| msgid "Nueva contraseña"
+msgid "Repetí la contraseña"
+msgstr "New password"
+
+#: templates/registration/password_reset_confirm.html:15
+#, fuzzy
+#| msgid "Cambiar contraseña"
+msgid "Guardar contraseña"
+msgstr "Change password"
+
+#: templates/registration/password_reset_confirm.html:18
+msgid "Enlace inválido"
+msgstr "Invalid link"
+
+#: templates/registration/password_reset_confirm.html:19
+#, fuzzy
+#| msgid "Código de regalo inválido o ya usado."
+msgid "El enlace de restablecimiento no es válido o ya fue usado."
+msgstr "Invalid or already-used gift code."
+
+#: templates/registration/password_reset_confirm.html:20
+msgid "Pedir uno nuevo"
+msgstr "Request a new one"
+
+#: templates/registration/password_reset_done.html:3
+#: templates/registration/password_reset_done.html:6
+msgid "Revisá tu email"
+msgstr "Check your email"
+
+#: templates/registration/password_reset_done.html:7
+msgid ""
+"Si hay una cuenta con ese email, te enviamos un enlace para restablecer la "
+"contraseña."
+msgstr ""
+"If an account exists for that email, we sent a link to reset the password."
+
+#: templates/registration/password_reset_done.html:8
+#: templates/registration/password_reset_form.html:13
+#, fuzzy
+#| msgid "Volver al torneo"
+msgid "Volver a entrar"
+msgstr "Back to tournament"
+
+#: templates/registration/password_reset_form.html:3
+#: templates/registration/password_reset_form.html:6
+#, fuzzy
+#| msgid "Cambiar contraseña"
+msgid "Restablecer contraseña"
+msgstr "Change password"
+
+#: templates/registration/password_reset_form.html:7
+msgid ""
+"Ingresá tu email y te enviaremos un enlace para crear una nueva contraseña."
+msgstr "Enter your email and we'll send you a link to set a new password."
+
+#: templates/registration/password_reset_form.html:11
+#, fuzzy
+#| msgid "Copiar enlace"
+msgid "Enviar enlace"
+msgstr "Copy link"
