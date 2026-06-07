@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block title %}{% blocktrans with id=game.id %}Partida #{{ id }}{% endblocktrans %} · Scrabbly{% endblock %}
 {% block content %}
-<div class="game-layout"
+<div class="game-layout{% if not is_player %} spectator{% endif %}"
      data-game-id="{{ game.id }}"
      data-me-id="{{ me_id }}"
      data-is-player="{{ is_player|yesno:'1,0' }}">
