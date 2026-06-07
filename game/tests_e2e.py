@@ -14,7 +14,13 @@ The whole suite skips cleanly if Playwright or a browser isn't available, so
     python manage.py test game.tests_e2e
 """
 
+import glob
+import os
 import unittest
+
+# Playwright's sync API keeps an event loop on the thread; allow Django's sync
+# ORM (used by the test DB setup/teardown) to run alongside it.
+os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "1")
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
@@ -27,13 +33,21 @@ except Exception:  # pragma: no cover - optional dependency
 _LAUNCH_ARGS = ["--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"]
 
 
+def _candidate_executables():
+    # Pre-installed Playwright builds (version may not match the pip package),
+    # then common system browsers.
+    paths = sorted(glob.glob("/opt/pw-browsers/chromium-*/chrome-linux/chrome"))
+    paths += sorted(glob.glob("/opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell"))
+    paths += ["/usr/bin/chromium", "/usr/bin/google-chrome"]
+    return paths
+
+
 def _launch(pw):
-    """Launch Chromium: the Playwright-managed build, else a system browser."""
+    """Launch Chromium: the Playwright-managed build, else a known binary."""
     try:
         return pw.chromium.launch(args=_LAUNCH_ARGS)
     except Exception:
-        for path in ("/usr/bin/chromium", "/usr/bin/chromium-browser",
-                     "/usr/bin/google-chrome"):
+        for path in _candidate_executables():
             try:
                 return pw.chromium.launch(executable_path=path, args=_LAUNCH_ARGS)
             except Exception:
