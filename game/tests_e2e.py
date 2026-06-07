@@ -66,11 +66,11 @@ class BrowserE2ETests(StaticLiveServerTestCase):
         self.page.close()
 
     # -- tests ---------------------------------------------------------------
-    def test_lobby_loads_for_guest(self):
+    def test_landing_loads_for_guest(self):
         self.page.goto(self.live_server_url + "/")
-        # A guest is provisioned automatically; the play CTA is visible.
+        # Guests see the marketing landing with a prominent play CTA.
         self.assertTrue(self.page.locator("text=Scrabbly").first.is_visible())
-        self.assertTrue(self.page.get_by_role("button", name="Partida rápida").is_visible())
+        self.assertTrue(self.page.locator(".hero h1").is_visible())
 
     def test_register_flow(self):
         self.page.goto(self.live_server_url + "/register/")

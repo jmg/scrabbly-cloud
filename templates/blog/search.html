@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load avatars i18n %}
+{% block title %}{% trans "Buscar" %} · Scrabbly{% endblock %}
+{% block content %}
+<div class="friends-page">
+  <h1>{% trans "Buscar" %}</h1>
+  <form method="get" action="{% url 'search' %}" class="filters">
+    <input type="text" name="q" value="{{ q }}" placeholder="{% trans 'Jugadores o artículos…' %}" autofocus>
+    <button class="btn-small" type="submit">{% trans "Buscar" %}</button>
+  </form>
+
+  {% if q %}
+  <h2>{% trans "Jugadores" %}</h2>
+  <ul class="game-list">
+    {% for u in players %}
+    <li><a href="{% url 'profile' u.username %}">{{ u.username|avatar:22 }} {{ u.username }}</a> <span class="muted">{{ u.rating }}</span></li>
+    {% empty %}<li class="muted">{% trans "Sin resultados." %}</li>
+    {% endfor %}
+  </ul>
+
+  <h2>{% trans "Artículos" %}</h2>
+  <ul class="game-list">
+    {% for p in posts %}
+    <li><a href="{{ p.get_absolute_url }}">{{ p.title }}</a></li>
+    {% empty %}<li class="muted">{% trans "Sin resultados." %}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endblock %}

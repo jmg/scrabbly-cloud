@@ -135,6 +135,27 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 .blog-post .post-body p, .blog-post .post-body li { color: var(--text); }
 .post-cta { margin: 28px 0; text-align: center; }
 .breadcrumb { font-size: 13px; margin-bottom: 12px; }
+
+/* Marketing landing */
+.hero { text-align: center; padding: 56px 16px 32px; }
+.hero h1 { font-size: 40px; margin: 0 0 12px; color: var(--text-strong); }
+.hero-sub { font-size: 19px; color: var(--muted); max-width: 620px; margin: 0 auto 24px; }
+.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.hero-cta form { display: inline; }
+.btn-primary.big, .btn-secondary.big { font-size: 18px; padding: 12px 24px; }
+.hero-stats { margin-top: 16px; }
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 920px; margin: 32px auto; padding: 0 16px; }
+.feature { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; text-align: center; }
+.feature .fi { font-size: 32px; }
+.feature h3 { margin: 10px 0 6px; }
+.feature p { color: var(--muted); font-size: 14px; margin: 0; }
+.testimonials { max-width: 920px; margin: 40px auto; padding: 0 16px; text-align: center; }
+.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+.testi-grid blockquote { background: var(--panel2); border-radius: 10px; padding: 18px; margin: 0; font-style: italic; }
+.testi-grid cite { display: block; margin-top: 10px; color: var(--muted); font-style: normal; font-size: 13px; }
+.landing-leaders { max-width: 480px; margin: 32px auto; padding: 0 16px; }
+.final-cta { text-align: center; padding: 40px 16px 56px; }
+@media (max-width: 700px) { .features, .testi-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 30px; } }
 .premium-link { color: #f0b428 !important; font-weight: 600; }
 .pricing { max-width: 760px; margin: 0 auto; text-align: center; }
 .pricing .perks { list-style: none; padding: 0; display: inline-flex; flex-direction: column; gap: 8px; text-align: left; margin: 16px auto 24px; }

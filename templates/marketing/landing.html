@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Scrabbly — {% trans "Jugá al Scrabble online gratis" %}{% endblock %}
+{% block og_title %}Scrabbly — {% trans "Scrabble online" %}{% endblock %}
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "{% trans '¿Es gratis jugar al Scrabble en Scrabbly?' %}",
+     "acceptedAnswer": {"@type": "Answer", "text": "{% trans 'Sí. Podés jugar gratis sin registrarte. Premium agrega funciones opcionales.' %}"}},
+    {"@type": "Question", "name": "{% trans '¿Necesito crear una cuenta?' %}",
+     "acceptedAnswer": {"@type": "Answer", "text": "{% trans 'No es obligatorio: podés jugar como invitado. Una cuenta guarda tu rating y tu historial.' %}"}},
+    {"@type": "Question", "name": "{% trans '¿Puedo jugar contra la computadora?' %}",
+     "acceptedAnswer": {"@type": "Answer", "text": "{% trans 'Sí, contra una IA en cinco niveles, de principiante a experto.' %}"}}
+  ]
+}
+</script>
+{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>{% trans "Jugá al Scrabble online gratis" %}</h1>
+  <p class="hero-sub">{% trans "Partidas en tiempo real, contra la IA, torneos y puzzles. En español e inglés." %}</p>
+  <div class="hero-cta">
+    <form method="post" action="{% url 'quick_pair' %}">
+      {% csrf_token %}
+      <input type="hidden" name="language" value="{{ LANGUAGE_CODE }}">
+      <input type="hidden" name="clock" value="0,0">
+      <button class="btn-primary big" type="submit">▶ {% trans "Jugar gratis ahora" %}</button>
+    </form>
+    <a class="btn-secondary big" href="{% url 'register' %}">{% trans "Crear cuenta" %}</a>
+  </div>
+  <p class="hero-stats muted">
+    {% blocktrans %}{{ player_count }} jugadores · {{ live_count }} partidas en vivo{% endblocktrans %}
+  </p>
+</section>
+
+<section class="features">
+  <div class="feature"><span class="fi">⚡</span><h3>{% trans "Tiempo real" %}</h3><p>{% trans "Relojes, arrastrar y soltar, chat y revancha." %}</p></div>
+  <div class="feature"><span class="fi">🤖</span><h3>{% trans "IA en 5 niveles" %}</h3><p>{% trans "Practicá contra una inteligencia artificial fuerte." %}</p></div>
+  <div class="feature"><span class="fi">🏆</span><h3>{% trans "Torneos arena" %}</h3><p>{% trans "Competí con emparejamiento automático y ranking en vivo." %}</p></div>
+  <div class="feature"><span class="fi">🧩</span><h3>{% trans "Puzzles" %}</h3><p>{% trans "Un desafío diario para encontrar la mejor jugada." %}</p></div>
+  <div class="feature"><span class="fi">🌍</span><h3>{% trans "Multi-idioma" %}</h3><p>{% trans "Diccionarios oficiales en español e inglés." %}</p></div>
+  <div class="feature"><span class="fi">📈</span><h3>{% trans "Rating ELO" %}</h3><p>{% trans "Seguí tu progreso y subí en la clasificación." %}</p></div>
+</section>
+
+<section class="testimonials">
+  <h2>{% trans "Lo que dicen los jugadores" %}</h2>
+  <div class="testi-grid">
+    <blockquote>“{% trans "La mejor forma de practicar Scrabble. La IA experta es un hueso duro." %}”<cite>— Marta G.</cite></blockquote>
+    <blockquote>“{% trans "Los torneos arena son adictivos y el emparejamiento es instantáneo." %}”<cite>— Diego R.</cite></blockquote>
+    <blockquote>“{% trans "Juego en español y en inglés para entrenar vocabulario. Impecable." %}”<cite>— Sofía L.</cite></blockquote>
+  </div>
+</section>
+
+{% if leaders %}
+<section class="landing-leaders">
+  <h2>{% trans "Mejores jugadores" %}</h2>
+  <ol class="leaderboard">
+    {% for u in leaders %}<li><a href="{% url 'profile' u.username %}">{{ u.username }}</a> <span>{{ u.rating }}</span></li>{% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+<section class="final-cta">
+  <h2>{% trans "¿Listo para jugar?" %}</h2>
+  <form method="post" action="{% url 'quick_pair' %}">
+    {% csrf_token %}
+    <input type="hidden" name="clock" value="0,0">
+    <button class="btn-primary big" type="submit">▶ {% trans "Empezar una partida" %}</button>
+  </form>
+  <p class="muted"><a href="{% url 'blog' %}">{% trans "Leé nuestras guías de Scrabble" %}</a></p>
+</section>
+{% endblock %}

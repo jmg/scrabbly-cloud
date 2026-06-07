@@ -318,6 +318,15 @@ class LobbyTests(TestCase):
         self.assertEqual(len(c2.get("/").context["my_turn"]), 1)
 
 
+class LandingTests(TestCase):
+    def test_new_guest_sees_landing_then_lobby(self):
+        c = Client()
+        c.get("/")  # provision a guest
+        self.assertTemplateUsed(c.get("/"), "marketing/landing.html")
+        c.post("/game/quick/", {"clock": "0,0"})  # now has a game
+        self.assertTemplateUsed(c.get("/"), "game/lobby.html")
+
+
 class ApiTests(TestCase):
     def test_public_endpoints(self):
         from django.test import Client

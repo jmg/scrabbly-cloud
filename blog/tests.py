@@ -92,6 +92,23 @@ class BlogTests(TestCase):
         self.assertIn("application/manifest+json", r["Content-Type"])
         self.assertContains(r, "Scrabbly")
 
+    def test_landing_for_new_guest(self):
+        html = Client().get("/").content.decode()
+        self.assertIn("hero", html)
+        self.assertIn("FAQPage", html)
+
+    def test_website_searchaction_present(self):
+        html = self.c.get("/blog/").content.decode()
+        self.assertIn('"WebSite"', html)
+        self.assertIn("/search/?q={search_term_string}", html)
+        self.assertIn('"Organization"', html)
+
+    def test_search_finds_player_and_post(self):
+        from django.contrib.auth import get_user_model
+        get_user_model().objects.create_user("findme", password="x")
+        self.assertContains(self.c.get("/search/?q=findme"), "findme")
+        self.assertContains(self.c.get("/search/?q=Scrabble"), "Scrabble")
+
     def test_favicon_and_manifest_linked(self):
         html = self.c.get("/blog/").content.decode()
         self.assertIn("favicon.svg", html)

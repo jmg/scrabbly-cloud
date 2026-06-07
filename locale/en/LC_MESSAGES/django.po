@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 20:54+0000\n"
+"POT-Creation-Date: 2026-06-07 00:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr "Account created!"
 msgid "Usuario o contraseña inválidos."
 msgstr "Invalid username or password."
 
-#: accounts/views.py:155 game/views.py:335
+#: accounts/views.py:155 game/views.py:349
 msgid "No se encontró ese usuario."
 msgstr "User not found."
 
@@ -128,48 +128,48 @@ msgid ""
 "Premium para partidas ilimitadas."
 msgstr ""
 
-#: game/views.py:108
+#: game/views.py:122
 msgid "Arena"
 msgstr "Arena"
 
-#: game/views.py:172
+#: game/views.py:186
 msgid "El torneo no está activo."
 msgstr "The tournament isn't active."
 
-#: game/views.py:191 game/views.py:201
+#: game/views.py:205 game/views.py:215
 msgid "No se pudo generar el puzzle. Probá de nuevo."
 msgstr "Couldn't generate the puzzle. Try again."
 
-#: game/views.py:273
+#: game/views.py:287
 #, python-format
 msgid "Te toca jugar en la partida #%(id)s"
 msgstr "It's your turn in game #%(id)s"
 
-#: game/views.py:345
+#: game/views.py:359
 #, python-format
 msgid "%(u)s te desafió a una partida."
 msgstr "%(u)s challenged you to a game."
 
-#: game/views.py:347
+#: game/views.py:361
 msgid "Desafío enviado."
 msgstr "Challenge sent."
 
-#: game/views.py:365
+#: game/views.py:379
 #, python-format
 msgid "%(u)s aceptó tu desafío. ¡A jugar!"
 msgstr "%(u)s accepted your challenge. Let's play!"
 
-#: game/views.py:370
+#: game/views.py:384
 #, python-format
 msgid "%(u)s rechazó tu desafío."
 msgstr "%(u)s declined your challenge."
 
-#: game/views.py:371
+#: game/views.py:385
 msgid "Desafío rechazado."
 msgstr "Challenge declined."
 
 #: templates/accounts/friends.html:3 templates/accounts/friends.html:6
-#: templates/accounts/profile.html:27 templates/base.html:32
+#: templates/accounts/profile.html:27 templates/base.html:60
 msgid "Amigos"
 msgstr "Friends"
 
@@ -220,7 +220,7 @@ msgstr "pending"
 
 #: templates/accounts/login.html:3 templates/accounts/login.html:6
 #: templates/accounts/login.html:11 templates/accounts/register.html:20
-#: templates/base.html:38
+#: templates/base.html:66
 msgid "Entrar"
 msgstr "Log in"
 
@@ -238,7 +238,7 @@ msgid "Registrate"
 msgstr "Sign up"
 
 #: templates/accounts/notifications.html:3
-#: templates/accounts/notifications.html:6 templates/base.html:31
+#: templates/accounts/notifications.html:6 templates/base.html:59
 msgid "Notificaciones"
 msgstr "Notifications"
 
@@ -315,7 +315,7 @@ msgstr "Apply"
 msgid "Desbloqueá más temas con Premium"
 msgstr "Unlock more themes with Premium"
 
-#: templates/accounts/profile.html:92 templates/base.html:22
+#: templates/accounts/profile.html:92 templates/base.html:49
 #: templates/game/arenas.html:3
 msgid "Torneos"
 msgstr "Tournaments"
@@ -351,7 +351,8 @@ msgid "Sin partidas terminadas todavía."
 msgstr "No finished games yet."
 
 #: templates/accounts/register.html:3 templates/accounts/register.html:6
-#: templates/accounts/register.html:18 templates/base.html:39
+#: templates/accounts/register.html:18 templates/base.html:67
+#: templates/marketing/landing.html:32
 msgid "Crear cuenta"
 msgstr "Sign up"
 
@@ -373,7 +374,7 @@ msgid "¿Ya tenés cuenta?"
 msgstr "Already have an account?"
 
 #: templates/accounts/settings.html:3 templates/accounts/settings.html:6
-#: templates/base.html:34
+#: templates/base.html:62
 msgid "Ajustes"
 msgstr "Settings"
 
@@ -417,8 +418,7 @@ msgstr "Are you sure you want to delete your account?"
 msgid "Eliminar mi cuenta"
 msgstr "Delete my account"
 
-#: templates/base.html:7
-#| msgid "Jugar al Scrabble online"
+#: templates/base.html:7 templates/marketing/landing.html:4
 msgid "Scrabble online"
 msgstr "Scrabble online"
 
@@ -428,29 +428,34 @@ msgid ""
 "torneos, puzzles y ranking ELO en español e inglés."
 msgstr ""
 
-#: templates/base.html:13
-#| msgid "Jugar al Scrabble online"
+#: templates/base.html:23
 msgid "Jugá al Scrabble online gratis."
 msgstr "Play Scrabble online for free."
 
-#: templates/base.html:23 templates/game/puzzles.html:3
-#: templates/game/puzzles.html:6
+#: templates/base.html:50 templates/game/puzzles.html:3
+#: templates/game/puzzles.html:6 templates/marketing/landing.html:43
 msgid "Puzzles"
 msgstr "Puzzles"
 
-#: templates/base.html:24
+#: templates/base.html:51 templates/blog/post.html:48
 msgid "Blog"
 msgstr "Blog"
 
-#: templates/base.html:28
+#: templates/base.html:52 templates/blog/search.html:3
+#: templates/blog/search.html:6 templates/blog/search.html:9
+#| msgid "Buscando rival"
+msgid "Buscar"
+msgstr "Search"
+
+#: templates/base.html:56
 msgid "Premium"
 msgstr "Premium"
 
-#: templates/base.html:35
+#: templates/base.html:63
 msgid "Salir"
 msgstr "Log out"
 
-#: templates/base.html:44 templates/game/arenas.html:45
+#: templates/base.html:72 templates/game/arenas.html:45
 msgid "Idioma"
 msgstr "Language"
 
@@ -647,7 +652,7 @@ msgid "Gestionar suscripción"
 msgstr "Manage subscription"
 
 #: templates/blog/index.html:3 templates/blog/index.html:5
-#: templates/blog/index.html:8
+#: templates/blog/index.html:9
 msgid "Blog de Scrabble"
 msgstr "Scrabble Blog"
 
@@ -657,26 +662,43 @@ msgid ""
 "guías para mejorar tu juego."
 msgstr ""
 
-#: templates/blog/index.html:9
+#: templates/blog/index.html:10
 msgid "Estrategias, trucos y guías para dominar el tablero."
 msgstr "Strategies, tricks and guides to master the board."
 
-#: templates/blog/index.html:16
+#: templates/blog/index.html:17
 msgid "Leer más"
 msgstr "Read more"
 
-#: templates/blog/index.html:19
+#: templates/blog/index.html:20
 msgid "Todavía no hay artículos."
 msgstr "No articles yet."
 
-#: templates/blog/post.html:28
-#| msgid "Jugar al Scrabble online"
+#: templates/blog/post.html:54
 msgid "Jugá al Scrabble ahora"
 msgstr "Play Scrabble now"
 
-#: templates/blog/post.html:31
+#: templates/blog/post.html:57
 msgid "Seguí leyendo"
 msgstr "Keep reading"
+
+#: templates/blog/search.html:8
+msgid "Jugadores o artículos…"
+msgstr "Players or articles…"
+
+#: templates/blog/search.html:13
+#| msgid "Jugadas"
+msgid "Jugadores"
+msgstr "Players"
+
+#: templates/blog/search.html:17 templates/blog/search.html:25
+#| msgid "Sin reloj"
+msgid "Sin resultados."
+msgstr "No results."
+
+#: templates/blog/search.html:21
+msgid "Artículos"
+msgstr "Articles"
 
 #: templates/game/analysis.html:6
 msgid "Análisis"
@@ -1164,3 +1186,132 @@ msgstr "New puzzle (ES)"
 #: templates/game/puzzles.html:26
 msgid "Nuevo puzzle (EN)"
 msgstr "New puzzle (EN)"
+
+#: templates/marketing/landing.html:3 templates/marketing/landing.html:23
+#| msgid "Jugá al Scrabble online gratis."
+msgid "Jugá al Scrabble online gratis"
+msgstr "Play Scrabble online for free"
+
+#: templates/marketing/landing.html:11
+msgid "¿Es gratis jugar al Scrabble en Scrabbly?"
+msgstr "Is it free to play Scrabble on Scrabbly?"
+
+#: templates/marketing/landing.html:12
+msgid ""
+"Sí. Podés jugar gratis sin registrarte. Premium agrega funciones opcionales."
+msgstr ""
+
+#: templates/marketing/landing.html:13
+#| msgid "¿No tenés cuenta?"
+msgid "¿Necesito crear una cuenta?"
+msgstr "Do I need an account?"
+
+#: templates/marketing/landing.html:14
+msgid ""
+"No es obligatorio: podés jugar como invitado. Una cuenta guarda tu rating y "
+"tu historial."
+msgstr ""
+
+#: templates/marketing/landing.html:15
+msgid "¿Puedo jugar contra la computadora?"
+msgstr "Can I play against the computer?"
+
+#: templates/marketing/landing.html:16
+msgid "Sí, contra una IA en cinco niveles, de principiante a experto."
+msgstr "Yes, against an AI in five levels, from beginner to expert."
+
+#: templates/marketing/landing.html:24
+msgid ""
+"Partidas en tiempo real, contra la IA, torneos y puzzles. En español e "
+"inglés."
+msgstr ""
+
+#: templates/marketing/landing.html:30
+#| msgid "Jugá al Scrabble ahora"
+msgid "Jugar gratis ahora"
+msgstr "Play free now"
+
+#: templates/marketing/landing.html:35
+#, python-format
+msgid "%(player_count)s jugadores · %(live_count)s partidas en vivo"
+msgstr "%(player_count)s players · %(live_count)s live games"
+
+#: templates/marketing/landing.html:40
+msgid "Tiempo real"
+msgstr "Real-time"
+
+#: templates/marketing/landing.html:40
+msgid "Relojes, arrastrar y soltar, chat y revancha."
+msgstr "Clocks, drag and drop, chat and rematch."
+
+#: templates/marketing/landing.html:41
+msgid "IA en 5 niveles"
+msgstr "AI in 5 levels"
+
+#: templates/marketing/landing.html:41
+msgid "Practicá contra una inteligencia artificial fuerte."
+msgstr "Practise against a strong AI."
+
+#: templates/marketing/landing.html:42
+#| msgid "Torneos Arena"
+msgid "Torneos arena"
+msgstr "Arena tournaments"
+
+#: templates/marketing/landing.html:42
+msgid "Competí con emparejamiento automático y ranking en vivo."
+msgstr "Compete with automatic pairing and a live leaderboard."
+
+#: templates/marketing/landing.html:43
+msgid "Un desafío diario para encontrar la mejor jugada."
+msgstr "A daily challenge to find the best move."
+
+#: templates/marketing/landing.html:44
+msgid "Multi-idioma"
+msgstr "Multi-language"
+
+#: templates/marketing/landing.html:44
+msgid "Diccionarios oficiales en español e inglés."
+msgstr "Official dictionaries in Spanish and English."
+
+#: templates/marketing/landing.html:45
+#| msgid "Rating: todas"
+msgid "Rating ELO"
+msgstr "ELO rating"
+
+#: templates/marketing/landing.html:45
+msgid "Seguí tu progreso y subí en la clasificación."
+msgstr "Track your progress and climb the ranking."
+
+#: templates/marketing/landing.html:49
+msgid "Lo que dicen los jugadores"
+msgstr "What players say"
+
+#: templates/marketing/landing.html:51
+msgid "La mejor forma de practicar Scrabble. La IA experta es un hueso duro."
+msgstr "The best way to practise Scrabble. The expert AI is tough."
+
+#: templates/marketing/landing.html:52
+msgid "Los torneos arena son adictivos y el emparejamiento es instantáneo."
+msgstr "The arena tournaments are addictive and pairing is instant."
+
+#: templates/marketing/landing.html:53
+msgid "Juego en español y en inglés para entrenar vocabulario. Impecable."
+msgstr "I play in Spanish and English to train vocabulary. Flawless."
+
+#: templates/marketing/landing.html:59
+#| msgid "Mejor jugada"
+msgid "Mejores jugadores"
+msgstr "Top players"
+
+#: templates/marketing/landing.html:67
+msgid "¿Listo para jugar?"
+msgstr "Ready to play?"
+
+#: templates/marketing/landing.html:71
+#| msgid "mejor partida"
+msgid "Empezar una partida"
+msgstr "Start a game"
+
+#: templates/marketing/landing.html:73
+msgid "Leé nuestras guías de Scrabble"
+msgstr "Read our Scrabble guides"

@@ -24,6 +24,22 @@
   <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   {% if analytics_domain %}<script defer data-domain="{{ analytics_domain }}" src="https://plausible.io/js/script.js"></script>{% endif %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {"@type": "Organization", "name": "Scrabbly",
+       "url": "{{ request.scheme }}://{{ request.get_host }}/",
+       "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'icons/icon-512.png' %}"},
+      {"@type": "WebSite", "name": "Scrabbly",
+       "url": "{{ request.scheme }}://{{ request.get_host }}/",
+       "potentialAction": {"@type": "SearchAction",
+         "target": {"@type": "EntryPoint",
+           "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}/search/?q={search_term_string}"},
+         "query-input": "required name=search_term_string"}}
+    ]
+  }
+  </script>
   {% block head_extra %}{% endblock %}
 </head>
 <body data-theme="{{ user.effective_theme|default:'classic' }}">
@@ -33,6 +49,7 @@
       <a href="{% url 'arenas' %}">🏆 {% trans "Torneos" %}</a>
       <a href="{% url 'puzzles' %}">🧩 {% trans "Puzzles" %}</a>
       <a href="{% url 'blog' %}">📰 {% trans "Blog" %}</a>
+      <a href="{% url 'search' %}" title="{% trans 'Buscar' %}">🔎</a>
       {% if user.is_authenticated and user.is_premium %}
         <a class="premium-link crown-{{ user.tier }}" href="{% url 'billing_manage' %}">👑 {{ user.tier|capfirst }}</a>
       {% else %}

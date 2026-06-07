@@ -4,6 +4,24 @@ from django.shortcuts import get_object_or_404, render
 from .models import Post
 
 
+def search(request):
+    """Site search over players and blog posts (powers the WebSite SearchAction)."""
+    from django.contrib.auth import get_user_model
+    from django.db.models import Q
+    User = get_user_model()
+    q = (request.GET.get("q") or "").strip()
+    players, posts = [], []
+    if q:
+        players = list(User.objects.filter(
+            is_guest=False, is_bot=False, username__icontains=q)
+            .order_by("-rating")[:20])
+        posts = list(Post.objects.filter(published=True).filter(
+            Q(title__icontains=q) | Q(body__icontains=q))[:20])
+    return render(request, "blog/search.html", {
+        "q": q, "players": players, "posts": posts,
+    })
+
+
 def manifest(request):
     from django.http import JsonResponse
     from django.templatetags.static import static

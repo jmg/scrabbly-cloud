@@ -23,6 +23,20 @@ User = get_user_model()
 
 
 def lobby(request):
+    # Brand-new visitors (anonymous, or a guest with no games yet) get the
+    # marketing landing; members and active guests get the real lobby.
+    new_visitor = not request.user.is_authenticated or (
+        request.user.is_guest
+        and not Game.objects.filter(players__player=request.user).exists()
+    )
+    if new_visitor:
+        return render(request, "marketing/landing.html", {
+            "live_count": Game.objects.filter(status=Game.ACTIVE).count(),
+            "player_count": User.objects.filter(is_guest=False, is_bot=False).count(),
+            "leaders": User.objects.filter(is_guest=False, is_bot=False)
+                       .order_by("-rating")[:5],
+        })
+
     # Optional filters for the open-games list.
     f_lang = request.GET.get("lang", "")
     f_rated = request.GET.get("rated", "")

@@ -116,6 +116,13 @@ es/en** (`?hl=es|en`); los posts agregan JSON-LD `BlogPosting` + `BreadcrumbList
 una **imagen Open Graph generada dinámicamente** (`/blog/<slug>/og.png`, Pillow) y
 breadcrumbs visibles.
 
+Los visitantes nuevos (anónimos o invitados sin partidas) ven una **landing de
+marketing** en `/` (hero, features, testimonios, FAQ con `FAQPage` JSON-LD y CTAs
+para jugar/registrarse); los miembros y los invitados con partidas en curso ven el
+lobby normal. Todo el sitio incluye JSON-LD de **Organization** y **WebSite con
+SearchAction** (caja de búsqueda de sitelinks), respaldado por una búsqueda real
+en `/search/` (jugadores y artículos).
+
 También es una **PWA**: `site.webmanifest` + favicon SVG e íconos 192/512/180.
 Analítica opcional con **Plausible** (`PLAUSIBLE_DOMAIN` en el entorno). El
 dominio previsto es **scrabblycloud.com**.
