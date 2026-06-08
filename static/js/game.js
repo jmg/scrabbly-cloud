@@ -92,6 +92,8 @@
         }
         cell.dataset.row = r;
         cell.dataset.col = c;
+        cell.setAttribute("role", "button");
+        cell.tabIndex = -1;  // roving tabindex; arrow keys move focus
         cell.addEventListener("click", onCellClick);
         cell.addEventListener("dragstart", onCellDragStart);
         cell.addEventListener("dragover", function (e) { e.preventDefault(); });
@@ -100,7 +102,41 @@
         cells[r + "," + c] = cell;
       }
     }
+    boardEl.setAttribute("aria-label", gettext("Tablero de Scrabble"));
+    var center = cells["7,7"];
+    if (center) center.tabIndex = 0;  // first arrow-key entry point
   }
+
+  // ---- Keyboard navigation (accessibility) ---------------------------------
+  var kb = { r: 7, c: 7 };
+  function coordLabel(r, c) { return String.fromCharCode(65 + c) + (r + 1); }
+  function premiumName(cell) {
+    if (cell.classList.contains("center")) return gettext("centro");
+    if (cell.classList.contains("tw")) return gettext("triple palabra");
+    if (cell.classList.contains("dw")) return gettext("doble palabra");
+    if (cell.classList.contains("tl")) return gettext("triple letra");
+    if (cell.classList.contains("dl")) return gettext("doble letra");
+    return "";
+  }
+  function focusCell(r, c) {
+    r = Math.max(0, Math.min(14, r));
+    c = Math.max(0, Math.min(14, c));
+    var cur = cells[kb.r + "," + kb.c];
+    if (cur) cur.tabIndex = -1;
+    kb = { r: r, c: c };
+    var el = cells[r + "," + c];
+    if (el) { el.tabIndex = 0; el.focus(); }
+  }
+  boardEl.addEventListener("keydown", function (e) {
+    var cell = e.target.closest && e.target.closest(".cell");
+    if (!cell) return;
+    var r = parseInt(cell.dataset.row, 10), c = parseInt(cell.dataset.col, 10);
+    if (e.key === "ArrowUp") { e.preventDefault(); focusCell(r - 1, c); }
+    else if (e.key === "ArrowDown") { e.preventDefault(); focusCell(r + 1, c); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); focusCell(r, c - 1); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); focusCell(r, c + 1); }
+    else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onCellClick({ currentTarget: cell }); }
+  });
 
   function tileHTML(letter, isBlank) {
     var pts = isBlank ? 0 : (POINTS[letter] || 0);
@@ -160,6 +196,21 @@
         }
       });
     }
+    // Accessible labels reflecting the current square state.
+    Object.keys(cells).forEach(function (key) {
+      var cell = cells[key];
+      var coord = coordLabel(+cell.dataset.row, +cell.dataset.col);
+      var label;
+      if (cell.classList.contains("filled")) {
+        var tl = cell.querySelector(".tl");
+        label = coord + ", " + (tl ? tl.textContent : "");
+        if (cell.classList.contains("pending")) label += " " + gettext("(pendiente)");
+      } else {
+        var pn = premiumName(cell);
+        label = coord + ", " + (pn || gettext("vacía"));
+      }
+      cell.setAttribute("aria-label", label);
+    });
   }
 
   function occupied(row, col) {
@@ -179,7 +230,16 @@
       if (exchangeMode && exchangeSel.indexOf(idx) !== -1) tile.classList.add("ex-selected");
       var display = letter === BLANK ? "·" : letter;
       tile.innerHTML = tileHTML(display, letter === BLANK);
+      tile.setAttribute("role", "button");
+      tile.tabIndex = 0;
+      var pts = letter === BLANK ? 0 : (POINTS[letter] || 0);
+      tile.setAttribute("aria-label",
+        (letter === BLANK ? gettext("Comodín") : letter) + ", " + pts + " " + gettext("puntos"));
+      if (selectedRackIdx === idx) tile.setAttribute("aria-pressed", "true");
       tile.addEventListener("click", function () { onRackClick(idx, used); });
+      tile.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onRackClick(idx, used); }
+      });
       if (!used && isPlayer && !exchangeMode && reviewIndex === null) {
         tile.draggable = true;
         tile.addEventListener("dragstart", function (e) {

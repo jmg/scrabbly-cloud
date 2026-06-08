@@ -436,3 +436,7 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 .onb-steps { margin: 0 0 18px; padding-left: 20px; }
 .onb-steps li { margin-bottom: 10px; line-height: 1.5; }
 .onb-card .btn-primary { width: 100%; }
+
+/* Keyboard focus ring on board cells / rack tiles */
+.board .cell:focus-visible { outline: 3px solid #fff; outline-offset: -3px; z-index: 3; }
+.rack-tile:focus-visible { outline: 3px solid var(--accent); }

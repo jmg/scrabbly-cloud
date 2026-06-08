@@ -94,6 +94,26 @@ class BrowserE2ETests(StaticLiveServerTestCase):
         self.page.wait_for_url("**/")
         self.assertIn("e2euser", self.page.content())
 
+    def test_board_keyboard_navigation(self):
+        from accounts.models import User
+        from game import services
+        User.objects.create_user("kbuser", password="kbpass1234")
+        g = services.create_ai_game(
+            User.objects.get(username="kbuser"), level="easy", language="es")
+        pg = self.page
+        pg.goto(self.live_server_url + "/login/")
+        pg.fill("input[name=username]", "kbuser")
+        pg.fill("input[name=password]", "kbpass1234")
+        pg.click("button[type=submit]")
+        pg.wait_for_load_state("networkidle")
+        pg.goto(f"{self.live_server_url}/game/{g.id}/")
+        pg.wait_for_selector("#board .cell")
+        pg.click("#onb-ok")  # dismiss onboarding
+        pg.eval_on_selector('#board .cell[data-row="7"][data-col="7"]', "el => el.focus()")
+        pg.keyboard.press("ArrowRight")
+        self.assertEqual(
+            pg.evaluate("document.activeElement.getAttribute('data-col')"), "8")
+
     def test_puzzle_place_and_reveal(self):
         from game import puzzles
         from game.services import get_wordlist

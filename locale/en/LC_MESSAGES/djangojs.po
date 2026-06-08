@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-06 18:07+0000\n"
+"POT-Creation-Date: 2026-06-08 00:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,153 +17,193 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: static/js/game.js:229 static/js/puzzle.js:97
+#: static/js/game.js:105
+msgid "Tablero de Scrabble"
+msgstr "Scrabble board"
+
+#: static/js/game.js:114
+msgid "centro"
+msgstr "centre"
+
+#: static/js/game.js:115
+msgid "triple palabra"
+msgstr "triple word"
+
+#: static/js/game.js:116
+msgid "doble palabra"
+msgstr "double word"
+
+#: static/js/game.js:117
+msgid "triple letra"
+msgstr "triple letter"
+
+#: static/js/game.js:118
+msgid "doble letra"
+msgstr "double letter"
+
+#: static/js/game.js:207
+msgid "(pendiente)"
+msgstr "(pending)"
+
+#: static/js/game.js:210
+msgid "vacía"
+msgstr "empty"
+
+#: static/js/game.js:237
+msgid "Comodín"
+msgstr "Blank"
+
+#: static/js/game.js:237
+msgid "puntos"
+msgstr "points"
+
+#: static/js/game.js:289 static/js/puzzle.js:97
 msgid "Letra para la ficha comodín:"
 msgstr "Letter for the blank tile:"
 
-#: static/js/game.js:340
+#: static/js/game.js:400
 msgid "pasó"
 msgstr "passed"
 
-#: static/js/game.js:341
+#: static/js/game.js:401
 msgid "cambió fichas"
 msgstr "exchanged tiles"
 
-#: static/js/game.js:342
+#: static/js/game.js:402
 msgid "abandonó"
 msgstr "resigned"
 
-#: static/js/game.js:348
+#: static/js/game.js:408
 msgid "Esperando rival…"
 msgstr "Waiting for opponent…"
 
-#: static/js/game.js:351
+#: static/js/game.js:411
 #, javascript-format
 msgid "Ganó %s"
 msgstr "%s won"
 
-#: static/js/game.js:351
+#: static/js/game.js:411
 msgid "Empate"
 msgstr "Draw"
 
-#: static/js/game.js:352
+#: static/js/game.js:412
 msgid "Partida abortada"
 msgstr "Game aborted"
 
-#: static/js/game.js:353 static/js/game.js:477
+#: static/js/game.js:413 static/js/game.js:537
 msgid "¡Es tu turno!"
 msgstr "It's your turn!"
 
-#: static/js/game.js:354
+#: static/js/game.js:414
 msgid "Turno del rival"
 msgstr "Opponent's turn"
 
-#: static/js/game.js:368
+#: static/js/game.js:428
 msgid "Ofreciste tablas…"
 msgstr "You offered a draw…"
 
-#: static/js/game.js:370
+#: static/js/game.js:430
 msgid "El rival ofrece tablas"
 msgstr "Your opponent offers a draw"
 
-#: static/js/game.js:371 static/js/game.js:385
+#: static/js/game.js:431 static/js/game.js:445
 msgid "Aceptar"
 msgstr "Accept"
 
-#: static/js/game.js:372
+#: static/js/game.js:432
 msgid "Rechazar"
 msgstr "Decline"
 
-#: static/js/game.js:376
+#: static/js/game.js:436
 msgid "Ver análisis"
 msgstr "View analysis"
 
-#: static/js/game.js:378
+#: static/js/game.js:438
 msgid "Revancha lista."
 msgstr "Rematch ready."
 
-#: static/js/game.js:379
+#: static/js/game.js:439
 msgid "Ir"
 msgstr "Go"
 
-#: static/js/game.js:382
+#: static/js/game.js:442
 msgid "Esperando que el rival acepte la revancha…"
 msgstr "Waiting for your opponent to accept the rematch…"
 
-#: static/js/game.js:384
+#: static/js/game.js:444
 msgid "El rival quiere revancha"
 msgstr "Your opponent wants a rematch"
 
-#: static/js/game.js:387
+#: static/js/game.js:447
 msgid "Revancha"
 msgstr "Rematch"
 
-#: static/js/game.js:415
+#: static/js/game.js:475
 msgid "En vivo"
 msgstr "Live"
 
-#: static/js/game.js:418
+#: static/js/game.js:478
 msgid "Jugada %(n)s / %(t)s"
 msgstr "Move %(n)s / %(t)s"
 
-#: static/js/game.js:482
+#: static/js/game.js:542
 msgid "Tu turno"
 msgstr "Your turn"
 
-#: static/js/game.js:483
+#: static/js/game.js:543
 #, javascript-format
 msgid "Partida #%s"
 msgstr "Game #%s"
 
-#: static/js/game.js:586
+#: static/js/game.js:646
 msgid "Jugada enviada"
 msgstr "Move sent"
 
-#: static/js/game.js:587 static/js/puzzle.js:134
+#: static/js/game.js:647 static/js/puzzle.js:134
 msgid "Jugada inválida"
 msgstr "Invalid move"
 
-#: static/js/game.js:594
+#: static/js/game.js:654
 msgid "Elegí fichas para cambiar y tocá «Cambiar» de nuevo."
 msgstr "Pick tiles to exchange and tap «Exchange» again."
 
-#: static/js/game.js:595
+#: static/js/game.js:655
 msgid "Confirmar cambio"
 msgstr "Confirm exchange"
 
-#: static/js/game.js:601
+#: static/js/game.js:661
 msgid "Cambiar"
 msgstr "Exchange"
 
-#: static/js/game.js:604
+#: static/js/game.js:664
 msgid "No se pudo cambiar"
 msgstr "Couldn't exchange"
 
-#: static/js/game.js:613
+#: static/js/game.js:673
 msgid "Conectado"
 msgstr "Connected"
 
-#: static/js/game.js:614
+#: static/js/game.js:674
 msgid "Reconectando…"
 msgstr "Reconnecting…"
 
-#: static/js/game.js:614
+#: static/js/game.js:674
 msgid "Conectando…"
 msgstr "Connecting…"
 
-#: static/js/game.js:738 static/js/game.js:744
+#: static/js/game.js:798 static/js/game.js:804
 msgid "Error"
 msgstr "Error"
 
-#: static/js/game.js:748
+#: static/js/game.js:808
 msgid "¿Abandonar la partida?"
 msgstr "Resign the game?"
 
-#: static/js/game.js:759
+#: static/js/game.js:819
 msgid "Enlace copiado"
 msgstr "Link copied"
 
-#: static/js/game.js:760
+#: static/js/game.js:820
 msgid "Copiá el enlace:"
 msgstr "Copy the link:"
 
