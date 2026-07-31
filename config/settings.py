@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -97,7 +98,23 @@ else:
 
 # Postgres when POSTGRES_DB is configured (production), else SQLite for dev.
 # DATABASE_DIR lets a SQLite container keep the file on a persistent volume.
-if os.environ.get("POSTGRES_DB"):
+_DATABASE_URL = os.environ.get("DATABASE_URL", "")
+if _DATABASE_URL.startswith(("postgres://", "postgresql://")):
+    # PaaS-style single-variable config (deploycloud, Heroku, Fly…): one URL
+    # instead of the POSTGRES_* set.
+    _db = urlsplit(_DATABASE_URL)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": unquote(_db.path.lstrip("/")),
+            "USER": unquote(_db.username or "postgres"),
+            "PASSWORD": unquote(_db.password or ""),
+            "HOST": _db.hostname or "db",
+            "PORT": str(_db.port or 5432),
+            "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
+        }
+    }
+elif os.environ.get("POSTGRES_DB"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
