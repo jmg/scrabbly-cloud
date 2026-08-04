@@ -357,6 +357,7 @@
   function recall() {
     pending = [];
     selectedRackIdx = null;
+    feedbackEl.textContent = "";
     savePending();
     refreshControls();
     renderBoard();

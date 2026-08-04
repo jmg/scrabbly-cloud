@@ -22,6 +22,7 @@ body[data-theme="forest"]   { --tile: #d8e8c0; --tile-text: #1b2a14; --board-bg:
 body[data-theme="contrast"] { --tile: #ffffff; --tile-text: #000000; --board-bg: #000000; --cell-bg: #2a2a2a; }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   margin: 0;
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
