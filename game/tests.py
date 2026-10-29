@@ -296,8 +296,8 @@ class LobbyTests(TestCase):
         from game import services
 
         c1, c2 = Client(), Client()
-        c1.get("/")
-        c2.get("/")
+        c1.get("/puzzles/")  # provisions a guest ("/" doesn't)
+        c2.get("/puzzles/")
         u1 = User.objects.get(pk=c1.session["_auth_user_id"])
         gid = c1.post("/game/quick/", {"clock": "0,0"}).url.split("/")[-2]
         c2.post("/game/quick/", {"clock": "0,0"})

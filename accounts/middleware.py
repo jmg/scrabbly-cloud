@@ -21,7 +21,13 @@ class GuestUserMiddleware:
     def __call__(self, request):
         path = request.path
         skip = (
-            path.startswith("/static/")
+            # The lobby renders the same landing for an anonymous visitor as
+            # for a brand-new guest, so "/" doesn't need one. It is also what
+            # health checks, uptime monitors and most crawlers hit, none of
+            # which send the session cookie back: a guest per hit filled the
+            # users and sessions tables and the DB's connection slots.
+            path == "/"
+            or path.startswith("/static/")
             or path.startswith("/admin/")
             or path.startswith("/ws/")
             or path.startswith("/api/")

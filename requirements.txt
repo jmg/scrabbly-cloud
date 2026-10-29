@@ -1,4 +1,5 @@
-Django>=5.0,<5.2
+# 5.2 is the LTS (fixes until April 2028); 5.1 stopped getting them in Dec 2025.
+Django>=5.2.18,<5.3
 channels>=4.0
 daphne>=4.0
 whitenoise>=6.0

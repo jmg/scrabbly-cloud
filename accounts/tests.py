@@ -272,6 +272,31 @@ class ChallengeTests(TestCase):
     def test_guest_cannot_challenge(self):
         cb, b = _login("bob")
         guest = Client()
-        guest.get("/")  # provisions a guest
+        guest.get("/puzzles/")  # provisions a guest ("/" doesn't)
         guest.post("/challenge/new/", {"opponent": "bob", "language": "es", "clock": "0,0"})
         self.assertFalse(Challenge.objects.exists())
+
+
+class GuestProvisioningTests(TestCase):
+    """The landing creates no guest; the first real action still does."""
+
+    def test_landing_creates_no_guest(self):
+        before = User.objects.count()
+        for _ in range(3):  # a health check / uptime monitor / crawler
+            r = Client().get("/")
+            self.assertEqual(r.status_code, 200)
+        self.assertEqual(User.objects.count(), before)
+
+    def test_other_pages_still_provision_a_guest(self):
+        c = Client()
+        c.get("/puzzles/")
+        self.assertTrue(User.objects.get(pk=c.session["_auth_user_id"]).is_guest)
+
+    def test_play_from_the_landing_passes_csrf_and_logs_in_a_guest(self):
+        # The guest is created (and the CSRF token rotated by login) on the
+        # POST itself: Django checks the token against the original cookie.
+        c = Client(enforce_csrf_checks=True)
+        token = str(c.get("/").context["csrf_token"])
+        r = c.post("/play/", {"csrfmiddlewaretoken": token, "language": "es", "clock": "0,0"})
+        self.assertNotEqual(r.status_code, 403)
+        self.assertTrue(User.objects.get(pk=c.session["_auth_user_id"]).is_guest)

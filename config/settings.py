@@ -98,6 +98,11 @@ else:
 
 # Postgres when POSTGRES_DB is configured (production), else SQLite for dev.
 # DATABASE_DIR lets a SQLite container keep the file on a persistent volume.
+# Daphne serves Django over ASGI, where each request runs in its own thread and
+# a persistent connection is never reused: with CONN_MAX_AGE > 0 every burst
+# left one idle Postgres backend per request until "too many clients" took the
+# site down. Django's docs: under ASGI, persistent connections should be off.
+_CONN_MAX_AGE = int(os.environ.get("DB_CONN_MAX_AGE", "0"))
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 if _DATABASE_URL.startswith(("postgres://", "postgresql://")):
     # PaaS-style single-variable config (deploycloud, Heroku, Fly…): one URL
@@ -111,7 +116,7 @@ if _DATABASE_URL.startswith(("postgres://", "postgresql://")):
             "PASSWORD": unquote(_db.password or ""),
             "HOST": _db.hostname or "db",
             "PORT": str(_db.port or 5432),
-            "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
+            "CONN_MAX_AGE": _CONN_MAX_AGE,
         }
     }
 elif os.environ.get("POSTGRES_DB"):
@@ -123,7 +128,7 @@ elif os.environ.get("POSTGRES_DB"):
             "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
             "HOST": os.environ.get("POSTGRES_HOST", "db"),
             "PORT": os.environ.get("POSTGRES_PORT", "5432"),
-            "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
+            "CONN_MAX_AGE": _CONN_MAX_AGE,
         }
     }
 else:

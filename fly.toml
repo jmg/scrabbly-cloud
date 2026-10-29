@@ -15,7 +15,7 @@ primary_region = "eze"  # Buenos Aires; change to your nearest region
   ALLOWED_HOSTS = "scrabblycloud.com,www.scrabblycloud.com,scrabbly.fly.dev"
   CSRF_TRUSTED_ORIGINS = "https://scrabblycloud.com,https://www.scrabblycloud.com"
   PLAUSIBLE_DOMAIN = "scrabblycloud.com"
-  DB_CONN_MAX_AGE = "60"
+  DB_CONN_MAX_AGE = "0"
 
 [http_service]
   internal_port = 8000
