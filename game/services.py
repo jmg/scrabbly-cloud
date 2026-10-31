@@ -646,29 +646,14 @@ def rack_for(game, user):
     return list(seat.rack) if seat else []
 
 
-BOT_USERNAMES = {
-    "beginner": "IA-Principiante",
-    "easy": "IA-Fácil",
-    "medium": "IA-Media",
-    "hard": "IA-Difícil",
-    "expert": "IA-Experta",
-}
-BOT_RATINGS = {"beginner": 700, "easy": 1000, "medium": 1400, "hard": 1800, "expert": 2100}
-
-
 def get_bot_user(level):
-    """Return (creating if needed) the bot account for a difficulty level."""
-    from accounts.models import User
+    """Return (creating if needed) the bot account for a difficulty level.
 
-    username = BOT_USERNAMES.get(level, BOT_USERNAMES["medium"])
-    bot, created = User.objects.get_or_create(
-        username=username,
-        defaults={"is_bot": True, "rating": BOT_RATINGS.get(level, 1400)},
-    )
-    if created:
-        bot.set_unusable_password()
-        bot.save(update_fields=["password"])
-    return bot
+    Found by its flags, never by username: see accounts.bots.
+    """
+    from accounts.bots import get_bot
+
+    return get_bot(level)
 
 
 def add_bot_opponent(game, level="medium"):
@@ -697,8 +682,10 @@ def accept_challenge(challenge):
 
 def create_ai_game(user, level="medium", language=DEFAULT_LANGUAGE):
     """Start an unrated game between ``user`` and the computer."""
-    if level not in BOT_USERNAMES:
-        level = "medium"
+    from accounts.bots import BOT_LEVELS, DEFAULT_LEVEL
+
+    if level not in BOT_LEVELS:
+        level = DEFAULT_LEVEL
     game = create_game(user, rated=False, language=language)
     game.ai_level = level
     game.save(update_fields=["ai_level"])

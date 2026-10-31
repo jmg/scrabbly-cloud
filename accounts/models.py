@@ -17,6 +17,9 @@ class User(AbstractUser):
 
     is_guest = models.BooleanField(default=False)
     is_bot = models.BooleanField(default=False)
+    # Which computer opponent this is ("beginner" … "expert"); blank for
+    # people. Bots are found by this, never by username (see accounts.bots).
+    bot_level = models.CharField(max_length=12, blank=True, default="")
     rating = models.IntegerField(default=DEFAULT_RATING)
     games_played = models.IntegerField(default=0)
     wins = models.IntegerField(default=0)
@@ -31,8 +34,19 @@ class User(AbstractUser):
     email_opt_in = models.BooleanField(default=True)  # receipts & notifications
     last_seen = models.DateTimeField(null=True, blank=True, db_index=True)
 
+    class Meta(AbstractUser.Meta):
+        constraints = [
+            models.UniqueConstraint(
+                fields=["bot_level"], condition=~models.Q(bot_level=""),
+                name="unique_bot_level",
+            ),
+        ]
+
     @property
     def display_name(self):
+        if self.is_bot and self.bot_level:
+            from .bots import bot_display_name
+            return bot_display_name(self.bot_level)
         if self.is_guest:
             return f"Invitado-{self.pk}"
         return self.username

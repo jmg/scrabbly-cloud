@@ -300,3 +300,78 @@ class GuestProvisioningTests(TestCase):
         r = c.post("/play/", {"csrfmiddlewaretoken": token, "language": "es", "clock": "0,0"})
         self.assertNotEqual(r.status_code, 403)
         self.assertTrue(User.objects.get(pk=c.session["_auth_user_id"]).is_guest)
+
+
+class BotIdentityTests(TestCase):
+    """Bots are found by flag and level, never by a name someone can register."""
+
+    def test_register_rejects_bot_names(self):
+        before = User.objects.filter(is_guest=False).count()
+        for name in ["IA-Experta", "ia-experta", "IA-Nueva", "ＩＡ-Experta",
+                     "ІА-Experta"]:  # full-width; Cyrillic look-alikes
+            r = Client().post("/register/", {"username": name, "password": "secreto1"})
+            self.assertEqual(r.status_code, 200, name)  # form re-rendered with the error
+        self.assertEqual(User.objects.filter(is_guest=False).count(), before)
+
+    def test_guest_cannot_upgrade_into_a_bot_name(self):
+        guest = User.objects.create(username="guest_x", is_guest=True)
+        c = Client()
+        c.force_login(guest)
+        c.post("/register/", {"username": "IA-Difícil", "password": "secreto1"})
+        guest.refresh_from_db()
+        self.assertTrue(guest.is_guest)
+        self.assertEqual(guest.username, "guest_x")
+
+    def test_ordinary_names_still_register(self):
+        r = Client().post("/register/", {"username": "Iara-ok", "password": "secreto1"})
+        self.assertEqual(r.status_code, 302)
+        self.assertTrue(User.objects.filter(username="Iara-ok", is_bot=False).exists())
+
+    def test_person_named_like_a_bot_is_never_the_ai(self):
+        from game import services
+        User.objects.filter(is_bot=True).delete()
+        squatter = User.objects.create_user("IA-Experta", password="x")
+        human = User.objects.create_user("human", password="x")
+
+        game = services.create_ai_game(human, level="expert", language="es")
+        opponent = game.players.exclude(player=human).get().player
+        self.assertNotEqual(opponent.pk, squatter.pk)
+        self.assertTrue(opponent.is_bot)
+        self.assertEqual(opponent.bot_level, "expert")
+        self.assertEqual(opponent.username, "IA-Experta-bot")
+        self.assertEqual(opponent.display_name, "IA-Experta")
+        squatter.refresh_from_db()
+        self.assertFalse(squatter.is_bot)
+        # The same bot account is reused for the next game.
+        game2 = services.create_ai_game(human, level="expert", language="es")
+        self.assertEqual(game2.players.exclude(player=human).get().player_id, opponent.pk)
+
+    def test_bots_exist_after_migrate(self):
+        from accounts.bots import BOT_LEVELS
+        levels = set(User.objects.filter(is_bot=True).exclude(bot_level="")
+                     .values_list("bot_level", flat=True))
+        self.assertEqual(levels, set(BOT_LEVELS))
+
+    def test_data_migration_tags_legacy_bot_and_spares_people(self):
+        import importlib
+        from django.apps import apps
+        mig = importlib.import_module("accounts.migrations.0010_create_bots")
+
+        User.objects.filter(is_bot=True).delete()
+        legacy = User.objects.create(username="IA-Media", is_bot=True, rating=1450)
+        person = User.objects.create_user("IA-Experta", password="x")
+
+        mig.create_bots(apps, None)
+        mig.create_bots(apps, None)  # idempotent
+
+        legacy.refresh_from_db()
+        self.assertEqual(legacy.bot_level, "medium")
+        self.assertEqual(legacy.rating, 1450)
+        person.refresh_from_db()
+        self.assertFalse(person.is_bot)
+        self.assertEqual(person.bot_level, "")
+        expert = User.objects.get(is_bot=True, bot_level="expert")
+        self.assertEqual(expert.username, "IA-Experta-bot")
+        self.assertFalse(expert.has_usable_password())
+        self.assertEqual(User.objects.filter(is_bot=True).exclude(bot_level="").count(), 5)
+        self.assertEqual(User.objects.get(is_bot=True, bot_level="hard").username, "IA-Difícil")
