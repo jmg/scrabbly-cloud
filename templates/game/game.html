@@ -65,8 +65,8 @@
   </div>
 </div>
 
-<script id="bootstrap-state" type="application/json">{{ state_json|safe }}</script>
-<script id="bootstrap-rack" type="application/json">{{ rack_json|safe }}</script>
+{{ state|json_script:"bootstrap-state" }}
+{{ rack|json_script:"bootstrap-rack" }}
 <script>window.CSRF_TOKEN = "{{ csrf_token }}";</script>
 <script>
 (function () {

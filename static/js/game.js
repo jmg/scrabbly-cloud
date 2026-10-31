@@ -140,7 +140,7 @@
 
   function tileHTML(letter, isBlank) {
     var pts = isBlank ? 0 : (POINTS[letter] || 0);
-    return '<span class="tl">' + letter + "</span><span class=\"pt\">" + pts + "</span>";
+    return '<span class="tl">' + esc(letter) + "</span><span class=\"pt\">" + pts + "</span>";
   }
 
   // Rebuild the board grid as it stood right after move index `idx`.

@@ -17,12 +17,14 @@ import os
 from .engine import (
     BLANK,
     DEFAULT_LANGUAGE,
+    PLACEMENT_FIELDS,
     RACK_SIZE,
     Bag,
     Board,
     InvalidMove,
     Placement,
     WordList,
+    clean_placements,
     get_ruleset,
     validate_and_score,
 )
@@ -194,21 +196,17 @@ def _charge_clock(game, seat):
 
 
 def make_play(game, user, placements_data):
-    """placements_data: list of {letter, row, col, is_blank}."""
+    """placements_data: list of {letter, row, col, is_blank}, as sent by the client."""
     with transaction.atomic():
         game = Game.objects.select_for_update().get(pk=game.pk)
         seat = _require_turn(game, user)
         game.draw_offer_by = None
 
-        placements = [
-            Placement(
-                letter=str(d["letter"]).upper(),
-                row=int(d["row"]), col=int(d["col"]),
-                is_blank=bool(d.get("is_blank")),
-            )
-            for d in placements_data
-        ]
         ruleset = get_ruleset(game.language)
+        # Only the cleaned copy is used and stored: the move record is sent
+        # verbatim to everyone watching the game.
+        placements_data = clean_placements(placements_data, ruleset)
+        placements = [Placement(**d) for d in placements_data]
         board = Board.deserialize(game.board)
         result = validate_and_score(
             board, placements, get_wordlist(game.language), ruleset
@@ -632,7 +630,11 @@ def public_state(game):
                 "kind": m.kind,
                 "words": m.words,
                 "points": m.points,
-                "placements": m.placements,
+                # Moves stored before clean_placements may carry extra keys.
+                "placements": [
+                    {k: p.get(k) for k in PLACEMENT_FIELDS}
+                    for p in (m.placements or []) if isinstance(p, dict)
+                ],
             }
             for m in game.moves.select_related("player")
         ],

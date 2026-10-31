@@ -22,7 +22,7 @@
     <div id="puzzle-result"></div>
   </aside>
 </div>
-<script id="puzzle-state" type="application/json">{{ state_json|safe }}</script>
+{{ state|json_script:"puzzle-state" }}
 <script>window.CSRF_TOKEN = "{{ csrf_token }}";</script>
 {% endblock %}
 {% block scripts %}

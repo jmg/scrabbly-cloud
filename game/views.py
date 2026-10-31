@@ -233,7 +233,7 @@ def puzzle_detail(request, puzzle_id):
         "best_score": puzzle.best_score,
     }
     return render(request, "game/puzzle.html", {
-        "puzzle": puzzle, "state_json": json.dumps(state),
+        "puzzle": puzzle, "state": state,
     })
 
 
@@ -477,8 +477,8 @@ def game_detail(request, game_id):
     return render(request, "game/game.html", {
         "game": game,
         "is_player": seat is not None,
-        "state_json": json.dumps(state),
-        "rack_json": json.dumps(rack),
+        "state": state,
+        "rack": rack,
         "me_id": request.user.pk,
     })
 

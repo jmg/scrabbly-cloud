@@ -691,3 +691,120 @@ class RatingTests(TestCase):
             {"rating": 1500, "points": 200},
         ])
         self.assertEqual(new, [1500, 1500])
+
+
+class StoredMoveXssTests(TestCase):
+    """A move's placements are sent to everyone who opens the game page."""
+
+    PAYLOAD = "</script><script>alert(document.cookie)</script>"
+
+    def setUp(self):
+        from accounts.models import User
+        from game import services
+        # A guest is enough to play; the rival is who would run the payload.
+        self.guest = User.objects.create(username="g_xss", is_guest=True)
+        self.rival = User.objects.create(username="rival")
+        g = services.create_game(self.guest, rated=False)
+        self.game = services.join_game(g, self.rival)
+        seat = self.game.current_seat
+        if seat.player_id != self.guest.pk:  # make sure the guest moves first
+            self.game.turn_index = 1 - self.game.turn_index
+            self.game.save(update_fields=["turn_index"])
+            seat = self.game.current_seat
+        seat.rack = list("CASA") + ["?"] + list(seat.rack)[:2]
+        seat.save()
+
+    def _casa(self, **extra):
+        return [
+            {"letter": "C", "row": 7, "col": 6, "is_blank": False, **extra},
+            {"letter": "A", "row": 7, "col": 7, "is_blank": False},
+            {"letter": "S", "row": 7, "col": 8, "is_blank": False},
+            {"letter": "A", "row": 7, "col": 9, "is_blank": False},
+        ]
+
+    def _page_state(self, html):
+        import json
+        import re
+        m = re.search(
+            r'<script id="bootstrap-state" type="application/json">(.*?)</script>',
+            html, re.S)
+        self.assertIsNotNone(m)
+        return json.loads(m.group(1))
+
+    def test_extra_fields_are_not_stored_nor_rendered(self):
+        import json
+        from game.models import Move
+        c = Client(); c.force_login(self.guest)
+        r = c.post(f"/game/{self.game.pk}/play/",
+                   data=json.dumps({"placements": self._casa(x=self.PAYLOAD)}),
+                   content_type="application/json")
+        self.assertEqual(r.status_code, 200, r.content)
+
+        move = Move.objects.get(game=self.game, kind=Move.PLAY)
+        self.assertEqual(move.placements, [
+            {"letter": "C", "row": 7, "col": 6, "is_blank": False},
+            {"letter": "A", "row": 7, "col": 7, "is_blank": False},
+            {"letter": "S", "row": 7, "col": 8, "is_blank": False},
+            {"letter": "A", "row": 7, "col": 9, "is_blank": False},
+        ])
+
+        viewer = Client(); viewer.force_login(self.rival)
+        html = viewer.get(f"/game/{self.game.pk}/").content.decode()
+        self.assertNotIn("</script><script>", html)
+        self.assertEqual(len(self._page_state(html)["moves"]), 1)
+
+    def test_moves_stored_before_the_fix_are_not_echoed(self):
+        from game.models import Move
+        Move.objects.create(game=self.game, player=self.guest, number=1,
+                            kind=Move.PLAY, placements=self._casa(x=self.PAYLOAD),
+                            words=[["CASA", 12]], points=12)
+        viewer = Client(); viewer.force_login(self.rival)
+        html = viewer.get(f"/game/{self.game.pk}/").content.decode()
+        self.assertNotIn(self.PAYLOAD, html)
+        placed = self._page_state(html)["moves"][0]["placements"]
+        self.assertEqual(set(placed[0]), {"letter", "row", "col", "is_blank"})
+        api = Client().get(f"/api/games/{self.game.pk}/").content.decode()
+        self.assertNotIn("alert(document.cookie)", api)
+
+    def test_game_state_is_escaped_inside_its_script_tag(self):
+        # Any string in the state (here a player name) can't close the tag.
+        self.rival.username = self.PAYLOAD
+        self.rival.save(update_fields=["username"])
+        viewer = Client(); viewer.force_login(self.guest)
+        html = viewer.get(f"/game/{self.game.pk}/").content.decode()
+        self.assertNotIn(self.PAYLOAD, html)
+        names = [p["name"] for p in self._page_state(html)["players"]]
+        self.assertIn(self.PAYLOAD, names)  # intact once parsed as JSON
+
+    def test_malformed_placements_are_rejected(self):
+        from game import services
+        from game.engine import InvalidMove
+        from game.models import Move
+        casa = self._casa()
+        bad_moves = [
+            "CASA",                                                    # not a list
+            casa[:3] + ["A"],                                          # not a dict
+            [dict(casa[0], letter="<b>")] + casa[1:],                  # not a letter
+            [{"letter": "CAS", "row": 7, "col": 7, "is_blank": True},  # blank as 3 letters
+             {"letter": "A", "row": 7, "col": 8, "is_blank": False}],
+            [dict(casa[0], row="7")] + casa[1:],                       # row not an int
+            [dict(casa[0], col=True)] + casa[1:],                      # bool is not an int
+            [dict(casa[0], row=15)] + casa[1:],                        # off the board
+            [dict(casa[0], is_blank="no")] + casa[1:],                 # is_blank not a bool
+            casa * 2,                                                  # more than a rack
+        ]
+        for bad in bad_moves:
+            with self.subTest(bad=bad), self.assertRaises(InvalidMove):
+                services.make_play(self.game, self.guest, bad)
+        self.assertFalse(Move.objects.filter(game=self.game).exists())
+
+    def test_lowercase_and_blank_letters_still_play(self):
+        from game import services
+        from game.models import Move
+        move = self._casa()
+        move[0]["letter"] = "c"
+        move[3] = {"letter": "a", "row": 7, "col": 9, "is_blank": True}
+        services.make_play(self.game, self.guest, move)
+        stored = Move.objects.get(game=self.game).placements
+        self.assertEqual(stored[0]["letter"], "C")
+        self.assertEqual(stored[3], {"letter": "A", "row": 7, "col": 9, "is_blank": True})

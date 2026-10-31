@@ -12,7 +12,9 @@ from collections import Counter
 from django.db import IntegrityError
 
 from . import ai
-from .engine import BLANK, Board, InvalidMove, Placement, get_ruleset, validate_and_score
+from .engine import (
+    BLANK, Board, InvalidMove, Placement, clean_placements, get_ruleset, validate_and_score,
+)
 from .models import Puzzle
 from .services import get_wordlist
 
@@ -99,13 +101,12 @@ def evaluate(puzzle, placements_data):
 
     available = Counter(puzzle.rack)
     placements = []
-    for p in placements_data:
-        is_blank = bool(p.get("is_blank"))
-        tile = BLANK if is_blank else p["letter"]
+    for p in clean_placements(placements_data, ruleset):
+        tile = BLANK if p["is_blank"] else p["letter"]
         if available[tile] <= 0:
             raise InvalidMove("Usaste una ficha que no está en tu atril.")
         available[tile] -= 1
-        placements.append(Placement(p["letter"], int(p["row"]), int(p["col"]), is_blank))
+        placements.append(Placement(**p))
 
     res = validate_and_score(board, placements, wl, ruleset)
     return res.points

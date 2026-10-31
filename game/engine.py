@@ -225,6 +225,42 @@ def _in_bounds(r, c):
     return 0 <= r < BOARD_SIZE and 0 <= c < BOARD_SIZE
 
 
+PLACEMENT_FIELDS = ("letter", "row", "col", "is_blank")
+
+
+def clean_placements(data, ruleset: "Ruleset"):
+    """Turn a client-sent move into canonical placement dicts.
+
+    Each placement keeps only the fields the game uses, with checked types:
+    ``letter`` is one letter of the game's alphabet (a blank's chosen letter
+    too, never a string of several), ``row``/``col`` are ints on the board and
+    ``is_blank`` is a bool. Anything else the client sent is dropped, so it is
+    never stored in the move record nor echoed back to other players.
+    """
+    if not isinstance(data, list) or len(data) > RACK_SIZE:
+        raise InvalidMove("Jugada inválida.")
+    alphabet = {letter for letter in ruleset.points if letter != BLANK}
+    clean = []
+    for item in data:
+        if not isinstance(item, dict):
+            raise InvalidMove("Jugada inválida.")
+        letter = item.get("letter")
+        row, col = item.get("row"), item.get("col")
+        is_blank = item.get("is_blank") or False
+        if not isinstance(letter, str) or letter.upper() not in alphabet:
+            raise InvalidMove("Letra inválida.")
+        for value in (row, col):
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise InvalidMove("Jugada inválida.")
+        if not _in_bounds(row, col):
+            raise InvalidMove("Ficha fuera del tablero.")
+        if not isinstance(is_blank, bool):
+            raise InvalidMove("Jugada inválida.")
+        clean.append({"letter": letter.upper(), "row": row, "col": col,
+                      "is_blank": is_blank})
+    return clean
+
+
 def validate_and_score(board: Board, placements, wordlist: WordList | None = None,
                        ruleset: "Ruleset | None" = None):
     """Validate a move against the board and return its MoveResult.
