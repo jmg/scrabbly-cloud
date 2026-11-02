@@ -4,7 +4,7 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from . import services
-from .models import Game
+from .models import Game, GamePlayer
 from .realtime import broadcast_chat, group_name
 
 
@@ -12,7 +12,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     """Live game socket: pushes board state and relays chat.
 
     Players and spectators share the same group. Each socket computes its own
-    rack on update, so opponents/spectators never receive private tiles.
+    rack on update, so opponents/spectators never receive private tiles. Anyone
+    watching reads the chat; only the game's players write in it.
     """
 
     async def connect(self):
@@ -33,7 +34,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         if data.get("type") == "chat":
             text = (data.get("text") or "").strip()[:500]
             user = self.scope.get("user")
-            if text and user and user.is_authenticated:
+            if text and user and user.is_authenticated and await self._is_player(user):
                 await database_sync_to_async(broadcast_chat)(
                     self.game_id, user.display_name, text
                 )
@@ -50,6 +51,10 @@ class GameConsumer(AsyncWebsocketConsumer):
         payload = await self._load_state()
         if payload is not None:
             await self.send(text_data=json.dumps({"type": "state", **payload}))
+
+    @database_sync_to_async
+    def _is_player(self, user):
+        return GamePlayer.objects.filter(game_id=self.game_id, player=user).exists()
 
     @database_sync_to_async
     def _load_state(self):

@@ -179,6 +179,7 @@ li.challenge { display: flex; justify-content: space-between; align-items: cente
 /* Spectators don't play: hide the rack/controls (no empty bar). */
 .game-layout.spectator .rack,
 .game-layout.spectator .controls,
+.game-layout.spectator .chat-form,
 .game-layout.spectator #feedback { display: none; }
 
 /* Marketing landing */

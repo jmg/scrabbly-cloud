@@ -26,7 +26,8 @@ necesidad de registrarse (cuentas de invitado).
   registrarse, su rating e historial se conservan.
 - **Ratings ELO**: ranking de jugadores y perfiles con estadísticas.
 - **Espectar**: ver partidas en curso en vivo (los atriles rivales nunca se
-  envían a oponentes ni espectadores).
+  envían a oponentes ni espectadores). Los espectadores leen el chat; escriben
+  solo los jugadores de la partida.
 - **Relojes**: controles de tiempo estilo Fischer (3–30 min, con incremento)
   con cuenta regresiva en vivo y derrota por tiempo (flag).
 - **Tablas y revancha**: ofrecer/aceptar tablas durante la partida; pedir

@@ -275,6 +275,68 @@ class ConsumerTests(TransactionTestCase):
         self.assertEqual(len(msg["state"]["players"]), 2)
         await comm.disconnect()
 
+    async def _watch(self, game_id, user=None):
+        from channels.routing import URLRouter
+        from channels.testing import WebsocketCommunicator
+        from game.routing import websocket_urlpatterns
+        comm = WebsocketCommunicator(URLRouter(websocket_urlpatterns), f"/ws/game/{game_id}/")
+        if user is not None:
+            comm.scope["user"] = user
+        connected, _ = await comm.connect()
+        self.assertTrue(connected)
+        await comm.receive_json_from(timeout=2)  # initial state
+        return comm
+
+    async def test_only_the_games_players_can_chat(self):
+        from channels.db import database_sync_to_async
+        from django.contrib.auth.models import AnonymousUser
+        from accounts.models import User
+
+        def setup():
+            game = self._make_game()
+            seat = game.players.select_related("player").first()
+            return (game, seat.player,
+                    User.objects.create(username="guest_q", is_guest=True),
+                    User.objects.create_user("member", password="x"))
+
+        game, player, guest, member = await database_sync_to_async(setup)()
+        seated = await self._watch(game.pk, player)
+        watchers = [await self._watch(game.pk, u) for u in (guest, member, AnonymousUser())]
+
+        for comm in watchers:
+            await comm.send_json_to({"type": "chat", "text": "desde afuera"})
+        self.assertTrue(await seated.receive_nothing(timeout=0.3))
+
+        await seated.send_json_to({"type": "chat", "text": "hola"})
+        for comm in [seated, *watchers]:  # the player writes; anyone watching reads
+            msg = await comm.receive_json_from(timeout=2)
+            self.assertEqual((msg["type"], msg["text"]), ("chat", "hola"))
+            await comm.disconnect()
+
+    async def test_a_seated_guest_can_chat(self):
+        from channels.db import database_sync_to_async
+        from accounts.models import User
+        from game import services
+
+        def setup():
+            guest = User.objects.create(username="guest_s", is_guest=True)
+            game = services.create_game(guest, rated=False)
+            return services.join_game(game, User.objects.create(username="w9")), guest
+
+        game, guest = await database_sync_to_async(setup)()
+        comm = await self._watch(game.pk, guest)
+        await comm.send_json_to({"type": "chat", "text": "hola"})
+        self.assertEqual((await comm.receive_json_from(timeout=2))["text"], "hola")
+        await comm.disconnect()
+
+    def test_a_spectator_doesnt_get_the_chat_box(self):
+        from accounts.models import User
+        game = self._make_game()
+        self.assertContains(Client().get(f"/game/{game.pk}/"), "game-layout spectator")
+        c = Client()
+        c.force_login(User.objects.get(username="w1"))
+        self.assertNotContains(c.get(f"/game/{game.pk}/"), "game-layout spectator")
+
     async def test_update_is_broadcast_to_watchers(self):
         from channels.db import database_sync_to_async
         from asgiref.sync import sync_to_async
