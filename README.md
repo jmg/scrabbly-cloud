@@ -188,7 +188,7 @@ daphne config.asgi:application
 ## Deploy (Docker)
 
 ```bash
-docker compose up --build
+SECRET_KEY=$(openssl rand -hex 32) docker compose up --build
 # Sirve en http://localhost:8000 con Daphne (ASGI), Redis como channel layer
 # y los estáticos servidos por WhiteNoise.
 ```

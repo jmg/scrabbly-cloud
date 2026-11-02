@@ -8,9 +8,9 @@ compiles translations, collects static via WhiteNoise).
 
 | Variable | Notes |
 |---|---|
-| `SECRET_KEY` | Long random string. |
+| `SECRET_KEY` | Long random string. With `DEBUG=0` the app won't start without it. |
 | `DEBUG` | `0` in production. |
-| `ALLOWED_HOSTS` | Comma-separated, e.g. `scrabblycloud.com,www.scrabblycloud.com`. |
+| `ALLOWED_HOSTS` | Comma-separated, e.g. `scrabblycloud.com,www.scrabblycloud.com`. With `DEBUG=0` and no value, every request gets a 400. |
 | `CSRF_TRUSTED_ORIGINS` | Comma-separated `https://…` origins. |
 | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, `POSTGRES_PORT` | Postgres connection. |
 | `REDIS_URL` | Enables the Redis channel layer + cache (needed for multi-worker WebSockets). |

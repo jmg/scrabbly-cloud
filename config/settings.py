@@ -4,13 +4,22 @@ import os
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY", "dev-insecure-key-change-me-in-production"
-)
 DEBUG = os.environ.get("DEBUG", "1") == "1"
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+# The repo is public, so a default key is no secret: with DEBUG off a missing or
+# placeholder key stops the app from starting, and no host is allowed by default.
+_DEV_SECRET_KEY = "dev-insecure-key-change-me-in-production"
+SECRET_KEY = os.environ.get("SECRET_KEY", "")
+if DEBUG:
+    SECRET_KEY = SECRET_KEY or _DEV_SECRET_KEY
+elif SECRET_KEY in ("", _DEV_SECRET_KEY, "change-me-in-production"):
+    raise ImproperlyConfigured("Set SECRET_KEY to a long random value when DEBUG is off.")
+ALLOWED_HOSTS = [
+    h for h in os.environ.get("ALLOWED_HOSTS", "*" if DEBUG else "").split(",") if h
+]
 CSRF_TRUSTED_ORIGINS = [
     o for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if o
 ]
