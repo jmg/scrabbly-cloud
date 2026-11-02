@@ -296,11 +296,9 @@ class LobbyTests(TestCase):
         from game import services
 
         c1, c2 = Client(), Client()
-        c1.get("/puzzles/")  # provisions a guest ("/" doesn't)
-        c2.get("/puzzles/")
-        u1 = User.objects.get(pk=c1.session["_auth_user_id"])
         gid = c1.post("/game/quick/", {"clock": "0,0"}).url.split("/")[-2]
         c2.post("/game/quick/", {"clock": "0,0"})
+        u1 = User.objects.get(pk=c1.session["_auth_user_id"])
 
         # Seat 0 (the creator, u1) is on the move.
         r1 = c1.get("/")
@@ -407,7 +405,6 @@ class MatchmakingTests(TestCase):
 class LandingTests(TestCase):
     def test_new_guest_sees_landing_then_lobby(self):
         c = Client()
-        c.get("/")  # provision a guest
         self.assertTemplateUsed(c.get("/"), "marketing/landing.html")
         c.post("/game/quick/", {"clock": "0,0"})  # now has a game
         self.assertTemplateUsed(c.get("/"), "game/lobby.html")

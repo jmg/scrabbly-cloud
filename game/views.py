@@ -1,4 +1,5 @@
 import json
+from functools import wraps
 
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
@@ -10,6 +11,8 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils.translation import gettext as _
 
+from accounts.views import ensure_guest
+
 from . import services
 from .engine import InvalidMove
 from .models import Challenge, Game
@@ -20,6 +23,20 @@ from .realtime import notify_update
 ACTION_LIMIT = rate_limit("action", limit=40, window=10)
 
 User = get_user_model()
+
+
+def play_as_guest(view):
+    """Taking a seat needs an account: here a visitor becomes a guest."""
+
+    @wraps(view)
+    def wrapped(request, *args, **kwargs):
+        if not ensure_guest(request):
+            return render(request, "game/error.html", {
+                "message": _("Demasiados intentos. Esperá unos minutos."),
+            }, status=429)
+        return view(request, *args, **kwargs)
+
+    return wrapped
 
 
 def lobby(request):
@@ -169,6 +186,8 @@ def arena_join(request, arena_id):
 @ACTION_LIMIT
 def arena_leave(request, arena_id):
     from .models import ArenaPlayer
+    if not request.user.is_authenticated:
+        return redirect("login")
     ArenaPlayer.objects.filter(arena_id=arena_id, user=request.user, games=0).delete()
     return redirect("arena_detail", arena_id=arena_id)
 
@@ -305,6 +324,7 @@ def _clock(request):
 
 @require_POST
 @ACTION_LIMIT
+@play_as_guest
 def create_game(request):
     rated = request.POST.get("rated", "1") == "1"
     initial, increment = _clock(request)
@@ -317,6 +337,7 @@ def create_game(request):
 
 @require_POST
 @ACTION_LIMIT
+@play_as_guest
 def quick_pair(request):
     initial, increment = _clock(request)
     game = services.quick_pair(
@@ -333,6 +354,7 @@ MATCH_BOT_FALLBACK_SECS = 20
 
 @require_POST
 @ACTION_LIMIT
+@play_as_guest
 def matchmaking(request):
     """Find a rating-matched opponent; show a search screen if none yet."""
     initial, increment = _clock(request)
@@ -388,6 +410,7 @@ def match_cancel(request, game_id):
 
 @require_POST
 @ACTION_LIMIT
+@play_as_guest
 def create_ai_game(request):
     level = request.POST.get("level", "medium")
     try:
@@ -428,6 +451,8 @@ def challenge_create(request):
 @ACTION_LIMIT
 def challenge_respond(request):
     user = request.user
+    if not user.is_authenticated:
+        return redirect("login")
     ch = get_object_or_404(
         Challenge, pk=request.POST.get("id"), opponent=user, status=Challenge.PENDING)
     from accounts.notifications import notify
@@ -451,6 +476,8 @@ def challenge_respond(request):
 @require_POST
 @ACTION_LIMIT
 def challenge_cancel(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
     Challenge.objects.filter(
         pk=request.POST.get("id"), challenger=request.user, status=Challenge.PENDING
     ).update(status=Challenge.CANCELED)
@@ -459,6 +486,7 @@ def challenge_cancel(request):
 
 @require_POST
 @ACTION_LIMIT
+@play_as_guest
 def join_game(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     try:

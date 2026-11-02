@@ -272,7 +272,7 @@ class ChallengeTests(TestCase):
     def test_guest_cannot_challenge(self):
         cb, b = _login("bob")
         guest = Client()
-        guest.get("/puzzles/")  # provisions a guest ("/" doesn't)
+        guest.force_login(User.objects.create(username="guest_x", is_guest=True))
         guest.post("/challenge/new/", {"opponent": "bob", "language": "es", "clock": "0,0"})
         self.assertFalse(Challenge.objects.exists())
 
@@ -420,7 +420,17 @@ class PasswordMinimumTests(TestCase):
 
 
 class GuestProvisioningTests(TestCase):
-    """The landing creates no guest; the first real action still does."""
+    """Browsing creates nothing; sitting down to play creates the guest."""
+
+    PLAY = {"create_game", "quick_pair", "matchmaking", "create_ai_game", "join_game"}
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    def _sessions(self):
+        from django.contrib.sessions.models import Session
+        return Session.objects.count()
 
     def test_landing_creates_no_guest(self):
         before = User.objects.count()
@@ -429,10 +439,23 @@ class GuestProvisioningTests(TestCase):
             self.assertEqual(r.status_code, 200)
         self.assertEqual(User.objects.count(), before)
 
-    def test_other_pages_still_provision_a_guest(self):
-        c = Client()
-        c.get("/puzzles/")
-        self.assertTrue(User.objects.get(pk=c.session["_auth_user_id"]).is_guest)
+    def test_browsing_creates_no_guest_and_no_session(self):
+        from game import services
+        game = services.create_game(User.objects.create(username="host"), rated=False)
+        before = User.objects.count()
+        for path in ("/puzzles/", "/arenas/", "/blog/", "/search/", "/terms/", "/premium/",
+                     "/login/", "/register/", f"/game/{game.pk}/", f"/game/{game.pk}/state/",
+                     "/@/host/", "/no-such-page/"):
+            Client().get(path)
+            self.assertEqual(User.objects.count(), before, path)
+            self.assertEqual(self._sessions(), 0, path)
+
+    def test_a_refused_post_creates_no_guest(self):
+        before = User.objects.count()
+        c = Client(enforce_csrf_checks=True)
+        self.assertEqual(c.post("/play/", {"clock": "0,0"}).status_code, 403)
+        self.assertEqual(Client().get("/play/").status_code, 405)
+        self.assertEqual(User.objects.count(), before)
 
     def test_play_from_the_landing_passes_csrf_and_logs_in_a_guest(self):
         # The guest is created (and the CSRF token rotated by login) on the
@@ -442,6 +465,114 @@ class GuestProvisioningTests(TestCase):
         r = c.post("/play/", {"csrfmiddlewaretoken": token, "language": "es", "clock": "0,0"})
         self.assertNotEqual(r.status_code, 403)
         self.assertTrue(User.objects.get(pk=c.session["_auth_user_id"]).is_guest)
+
+    def test_a_visitor_plays_as_a_guest_and_keeps_the_game_on_registering(self):
+        c = Client(enforce_csrf_checks=True)
+        token = str(c.get("/").context["csrf_token"])
+        r = c.post("/play/", {"csrfmiddlewaretoken": token, "language": "es", "clock": "0,0"})
+        self.assertTemplateUsed(r, "game/matchmaking.html")
+        game = r.context["game"]
+        token = str(r.context["csrf_token"])
+        guest = User.objects.get(pk=c.session["_auth_user_id"])
+
+        self.assertEqual(c.get(f"/play/{game.pk}/poll/").json()["status"], "searching")
+        r = c.post(f"/play/{game.pk}/bot/", {"csrfmiddlewaretoken": token})
+        self.assertEqual(r.status_code, 302)
+        r = c.get(r.url)
+        self.assertTrue(r.context["is_player"])
+        self.assertEqual(r.context["me_id"], guest.pk)
+        self.assertEqual(len(r.context["rack"]), 7)
+
+        token = str(r.context["csrf_token"])
+        seat_turn = r.context["state"]["turn_user_id"]
+        if seat_turn == guest.pk:
+            r = c.post(f"/game/{game.pk}/pass/", HTTP_X_CSRFTOKEN=token)
+            self.assertEqual(r.json()["ok"], True)
+
+        c.post("/register/", {"csrfmiddlewaretoken": token, "username": "fromguest",
+                              "password": "guest-pass-1"})
+        guest.refresh_from_db()
+        self.assertEqual(guest.username, "fromguest")
+        self.assertFalse(guest.is_guest)
+        self.assertEqual(User.objects.filter(is_guest=True).count(), 0)
+
+    def test_every_way_to_sit_down_makes_a_guest(self):
+        from django.urls import reverse
+        from game import services
+        for name in self.PLAY:
+            host = User.objects.create(username=f"h_{name}")
+            kwargs = {"game_id": services.create_game(host, rated=False).pk} if name == "join_game" else {}
+            c = Client()
+            r = c.post(reverse(name, kwargs=kwargs), {"clock": "0,0", "level": "easy"})
+            self.assertLess(r.status_code, 400, name)
+            self.assertTrue(User.objects.get(pk=c.session["_auth_user_id"]).is_guest, name)
+
+    def test_a_client_can_only_start_so_many_guests(self):
+        from django.core.cache import cache
+        from accounts.views import GUEST_LIMIT
+
+        def post(ip):
+            cache.delete(f"rl:action:{ip}")  # this is about the guest limit
+            return Client().post("/game/quick/", {"clock": "0,0"}, HTTP_X_FORWARDED_FOR=ip)
+
+        cases = [post("203.0.113.5").status_code for _ in range(GUEST_LIMIT)]
+        self.assertEqual(cases, [302] * GUEST_LIMIT)
+        before = User.objects.count()
+        self.assertEqual(post("203.0.113.5").status_code, 429)
+        self.assertEqual(User.objects.count(), before)
+        self.assertEqual(post("203.0.113.6").status_code, 302)
+
+    def test_a_visitors_first_click_doesnt_share_a_limit_with_everybody(self):
+        for i in range(45):   # past ACTION_LIMIT if all counted under Traefik's address
+            self.assertLess(
+                Client().post("/game/quick/", {"clock": "0,0"},
+                              HTTP_X_FORWARDED_FOR=f"203.0.113.{i}").status_code, 400)
+
+    def test_an_existing_guest_keeps_their_account_and_no_new_one_appears(self):
+        c = Client()
+        c.post("/game/quick/", {"clock": "0,0"})
+        pk = c.session["_auth_user_id"]
+        c.post("/game/quick/", {"clock": "0,0"})
+        self.assertEqual(c.session["_auth_user_id"], pk)
+        self.assertEqual(User.objects.filter(is_guest=True).count(), 1)
+
+    def test_no_route_breaks_for_a_visitor_without_an_account(self):
+        from django.core.cache import cache
+        from django.urls import URLPattern, URLResolver, get_resolver, reverse
+        from game import services
+        from game.models import Arena, Puzzle
+        from django.utils import timezone
+
+        host = User.objects.create(username="host")
+        game = services.create_game(host, rated=False)
+        arena = Arena.objects.create(name="a", starts_at=timezone.now(), duration_min=30,
+                                     clock_initial=300, created_by=host)
+        puzzle = Puzzle.objects.create(language="es", board={}, rack=["A"], best_score=1,
+                                       best_move=[], best_word="A")
+        values = {"game_id": game.pk, "arena_id": arena.pk, "puzzle_id": puzzle.pk,
+                  "username": "host", "slug": "x", "uidb64": "x", "token": "y"}
+
+        def names(patterns):
+            for p in patterns:
+                if isinstance(p, URLResolver):
+                    if not p.namespace:
+                        yield from names(p.url_patterns)
+                elif isinstance(p, URLPattern) and p.name:
+                    yield p.name, list(getattr(p.pattern, "converters", {}))
+
+        seen = 0
+        for name, params in names(get_resolver().url_patterns):
+            url = reverse(name, kwargs={k: values[k] for k in params})
+            for method in ("get", "post"):
+                cache.clear()
+                before = User.objects.filter(is_guest=True).count()
+                c = Client(raise_request_exception=False)
+                r = getattr(c, method)(url)
+                self.assertLess(r.status_code, 500, f"{method} {url}")
+                if name not in self.PLAY:
+                    self.assertEqual(User.objects.filter(is_guest=True).count(), before, f"{method} {url}")
+                seen += 1
+        self.assertGreater(seen, 100)
 
 
 class BotIdentityTests(TestCase):

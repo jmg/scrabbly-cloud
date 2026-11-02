@@ -87,6 +87,8 @@ class Game(models.Model):
         return seats[self.turn_index % len(seats)]
 
     def seat_for(self, user):
+        if not user.is_authenticated:  # a visitor watching, with no account yet
+            return None
         return self.players.filter(player=user).first()
 
     def __str__(self):

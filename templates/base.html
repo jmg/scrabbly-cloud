@@ -68,7 +68,7 @@
         <a href="{% url 'settings' %}" title="{% trans 'Ajustes' %}">⚙</a>
         <a href="{% url 'logout' %}">{% trans "Salir" %}</a>
       {% else %}
-        <span class="guest">{{ user.display_name }} · {{ user.rating }}</span>
+        {% if user.is_authenticated %}<span class="guest">{{ user.display_name }} · {{ user.rating }}</span>{% endif %}
         <a href="{% url 'login' %}">{% trans "Entrar" %}</a>
         <a class="btn-small" href="{% url 'register' %}">{% trans "Crear cuenta" %}</a>
       {% endif %}

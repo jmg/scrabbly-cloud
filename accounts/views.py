@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib import admin, messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.http import HttpResponse
@@ -31,6 +33,32 @@ def _auth_throttled(request, name, limit=30, window=300):
         cache.add(key, 1, window)
         count = 1
     return count > limit
+
+
+# New guests one client can start per hour. One person needs one; this leaves
+# room for a school or an office behind a single address.
+GUEST_LIMIT = 60
+
+
+def ensure_guest(request):
+    """Back a visitor who sits down to play with a guest account.
+
+    Called from the play views, so behind the CSRF check. False when this
+    client has already started too many.
+    """
+    if request.user.is_authenticated:
+        return True
+    if _auth_throttled(request, "guest", limit=GUEST_LIMIT, window=3600):
+        return False
+    user = User.objects.create(
+        username=f"guest_{uuid.uuid4().hex[:12]}",
+        is_guest=True,
+    )
+    user.set_unusable_password()
+    user.save(update_fields=["password"])
+    login(request, user)
+    request.user = user
+    return True
 
 
 def register(request):

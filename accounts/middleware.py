@@ -1,17 +1,14 @@
-"""Auto-provision a guest account for anonymous visitors.
+"""Presence and language, on every request.
 
-Like Lichess, you can browse and play without registering. The first time an
-anonymous visitor hits the site we create a lightweight guest user and log them
-in, so every request is backed by a real (rateable) account.
+Like Lichess, you can browse and play without registering. Browsing needs no
+account at all: a guest is created only when a visitor sits down to play
+(accounts.views.ensure_guest). Creating one per anonymous hit let anything that
+doesn't send the session cookie back (crawlers, monitors, a script) fill the
+users and sessions tables and the DB's connection slots.
 """
 
-import uuid
-
 from django.conf import settings
-from django.contrib.auth import get_user_model, login
 from django.utils import translation
-
-User = get_user_model()
 
 
 class GuestUserMiddleware:
@@ -19,34 +16,6 @@ class GuestUserMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        path = request.path
-        skip = (
-            # The lobby renders the same landing for an anonymous visitor as
-            # for a brand-new guest, so "/" doesn't need one. It is also what
-            # health checks, uptime monitors and most crawlers hit, none of
-            # which send the session cookie back: a guest per hit filled the
-            # users and sessions tables and the DB's connection slots.
-            path == "/"
-            or path.startswith("/static/")
-            or path.startswith("/admin/")
-            or path.startswith("/ws/")
-            or path.startswith("/api/")
-            or path.startswith("/billing/")
-            or path == "/robots.txt"
-            or path == "/sitemap.xml"
-            or path == "/site.webmanifest"
-            or path == "/og.png"
-            or path == "/healthz"
-        )
-        if not skip and not request.user.is_authenticated:
-            user = User.objects.create(
-                username=f"guest_{uuid.uuid4().hex[:12]}",
-                is_guest=True,
-            )
-            user.set_unusable_password()
-            user.save(update_fields=["password"])
-            login(request, user)
-            request.user = user
         if request.user.is_authenticated:
             from .presence import touch
             touch(request.user)
