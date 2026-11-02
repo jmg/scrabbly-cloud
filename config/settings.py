@@ -150,7 +150,7 @@ LOGOUT_REDIRECT_URL = "/"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-     "OPTIONS": {"min_length": 4}},
+     "OPTIONS": {"min_length": 8}},
 ]
 
 LANGUAGE_CODE = "es"

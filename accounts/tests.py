@@ -205,13 +205,13 @@ class SettingsTests(TestCase):
 
     def test_change_password(self):
         c, u = _login("alice")
-        c.post("/settings/password/", {"current": "x", "new": "newpass"})
+        c.post("/settings/password/", {"current": "x", "new": "new-pass-1"})
         u.refresh_from_db()
-        self.assertTrue(u.check_password("newpass"))
+        self.assertTrue(u.check_password("new-pass-1"))
         # wrong current password is rejected
-        c.post("/settings/password/", {"current": "wrong", "new": "another"})
+        c.post("/settings/password/", {"current": "wrong", "new": "another-1"})
         u.refresh_from_db()
-        self.assertTrue(u.check_password("newpass"))
+        self.assertTrue(u.check_password("new-pass-1"))
 
     def test_delete_account_requires_password(self):
         c, u = _login("alice")
@@ -375,6 +375,48 @@ class AdminLoginLimitTests(TestCase):
         r = Client(enforce_csrf_checks=True).post(
             reverse("admin:login"), {"username": "boss", "password": "boss-pass-1234"})
         self.assertEqual(r.status_code, 403)
+
+
+class PasswordMinimumTests(TestCase):
+    """Eight characters for any new password; accounts that already have a shorter one keep it."""
+
+    def test_register(self):
+        Client().post("/register/", {"username": "shorty", "password": "1234567"})
+        self.assertFalse(User.objects.filter(username="shorty").exists())
+        Client().post("/register/", {"username": "longer", "password": "12345678"})
+        self.assertTrue(User.objects.filter(username="longer").exists())
+
+    def test_change_password(self):
+        c, u = _login("alice")
+        r = c.post("/settings/password/", {"current": "x", "new": "1234567"}, follow=True)
+        u.refresh_from_db()
+        self.assertTrue(u.check_password("x"))
+        self.assertIn("8", " ".join(str(m) for m in r.context["messages"]))
+        c.post("/settings/password/", {"current": "x", "new": "12345678"})
+        u.refresh_from_db()
+        self.assertTrue(u.check_password("12345678"))
+
+    def test_password_reset(self):
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.encoding import force_bytes
+        from django.utils.http import urlsafe_base64_encode
+        u = User.objects.create_user("resetme", password="old1")
+        c = Client()
+        url = f"/reset/{urlsafe_base64_encode(force_bytes(u.pk))}/{default_token_generator.make_token(u)}/"
+        form_url = c.get(url).url
+        c.post(form_url, {"new_password1": "1234567", "new_password2": "1234567"})
+        u.refresh_from_db()
+        self.assertTrue(u.check_password("old1"))
+        c.post(form_url, {"new_password1": "12345678", "new_password2": "12345678"})
+        u.refresh_from_db()
+        self.assertTrue(u.check_password("12345678"))
+
+    def test_an_existing_short_password_still_logs_in(self):
+        User.objects.create_user("old", password="abcd")
+        c = Client()
+        r = c.post("/login/", {"username": "old", "password": "abcd"})
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(int(c.session["_auth_user_id"]), User.objects.get(username="old").pk)
 
 
 class GuestProvisioningTests(TestCase):

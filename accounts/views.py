@@ -316,6 +316,8 @@ def update_account(request):
 @require_POST
 def change_password(request):
     from django.contrib.auth import update_session_auth_hash
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError
     user = _real_user(request)
     if user is None:
         return redirect("login")
@@ -323,13 +325,16 @@ def change_password(request):
     new = request.POST.get("new", "")
     if not user.check_password(current):
         messages.error(request, _("La contraseña actual es incorrecta."))
-    elif len(new) < 4:
-        messages.error(request, _("La nueva contraseña es demasiado corta."))
-    else:
-        user.set_password(new)
-        user.save(update_fields=["password"])
-        update_session_auth_hash(request, user)  # keep the user logged in
-        messages.success(request, _("Contraseña actualizada."))
+        return redirect("settings")
+    try:
+        validate_password(new, user)
+    except ValidationError as exc:
+        messages.error(request, " ".join(exc.messages))
+        return redirect("settings")
+    user.set_password(new)
+    user.save(update_fields=["password"])
+    update_session_auth_hash(request, user)  # keep the user logged in
+    messages.success(request, _("Contraseña actualizada."))
     return redirect("settings")
 
 

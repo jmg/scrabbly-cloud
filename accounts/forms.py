@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 
 from .bots import is_reserved_username
 
@@ -7,7 +8,7 @@ User = get_user_model()
 
 
 class RegisterForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, min_length=4)
+    password = forms.CharField(widget=forms.PasswordInput)
     email = forms.EmailField(required=False)
 
     class Meta:
@@ -23,6 +24,11 @@ class RegisterForm(forms.ModelForm):
         if qs.exists():
             raise forms.ValidationError("Ese nombre de usuario ya existe.")
         return username
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        validate_password(password)
+        return password
 
 
 class LoginForm(forms.Form):

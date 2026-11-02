@@ -20,7 +20,7 @@
     <form method="post" action="{% url 'change_password' %}">
       {% csrf_token %}
       <label>{% trans "Contraseña actual" %}<input type="password" name="current" required></label>
-      <label>{% trans "Nueva contraseña" %}<input type="password" name="new" required minlength="4"></label>
+      <label>{% trans "Nueva contraseña" %}<input type="password" name="new" required minlength="8"></label>
       <button class="btn-primary" type="submit">{% trans "Cambiar contraseña" %}</button>
     </form>
   </div>

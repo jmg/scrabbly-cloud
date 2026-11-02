@@ -15,7 +15,7 @@ class PremiumFlowTests(TestCase):
     def _register(self, username):
         c = Client()
         c.get("/")
-        c.post("/register/", {"username": username, "password": "abcd"})
+        c.post("/register/", {"username": username, "password": "abcd1234"})
         return c, User.objects.get(username=username)
 
     def test_subscribe_sets_tier_and_premium(self):
@@ -75,7 +75,7 @@ class MonetizationExtrasTests(TestCase):
     def _register(self, username, email=""):
         c = Client()
         c.get("/")
-        c.post("/register/", {"username": username, "password": "abcd", "email": email})
+        c.post("/register/", {"username": username, "password": "abcd1234", "email": email})
         return c, User.objects.get(username=username)
 
     def test_lifetime_plan_grants_long_premium(self):

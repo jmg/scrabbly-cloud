@@ -11,7 +11,7 @@
     {% csrf_token %}
     <label>{% trans "Usuario" %}<input type="text" name="username" required></label>
     <label>{% trans "Email" %} <span class="muted small">{% trans "(opcional, para recibos)" %}</span><input type="email" name="email"></label>
-    <label>{% trans "Contraseña" %}<input type="password" name="password" required minlength="4"></label>
+    <label>{% trans "Contraseña" %}<input type="password" name="password" required minlength="8"></label>
     {% if form.errors %}<ul class="form-errors">
       {% for field, errors in form.errors.items %}{% for e in errors %}<li>{{ e }}</li>{% endfor %}{% endfor %}
     </ul>{% endif %}
