@@ -14,6 +14,9 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 CSRF_TRUSTED_ORIGINS = [
     o for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if o
 ]
+# Where Django's admin lives. Production sets a random path so the login form
+# isn't sitting at /admin/ for every scanner. Relative, with a trailing slash.
+ADMIN_URL = os.environ.get("ADMIN_URL", "admin/").strip("/") + "/"
 
 INSTALLED_APPS = [
     "daphne",
