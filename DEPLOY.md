@@ -14,7 +14,7 @@ compiles translations, collects static via WhiteNoise).
 | `CSRF_TRUSTED_ORIGINS` | Comma-separated `https://…` origins. |
 | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, `POSTGRES_PORT` | Postgres connection. |
 | `REDIS_URL` | Enables the Redis channel layer + cache (needed for multi-worker WebSockets). |
-| `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Optional; mock billing is used if unset. |
+| `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Needed to sell Premium. Unset with `DEBUG=0`, checkouts are refused (the free mock runs only with `DEBUG=1`). |
 | `EMAIL_*` / `DEFAULT_FROM_EMAIL` | Optional SMTP for transactional email. |
 | `PLAUSIBLE_DOMAIN` | Optional analytics. |
 

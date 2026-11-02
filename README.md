@@ -149,8 +149,9 @@ WebSockets multi-worker, Redis (`REDIS_URL`).
 Niveles y planes (mensual/anual) definidos en `billing/plans.py`. La capa de
 cobro es agnóstica del proveedor:
 
-- Sin `STRIPE_SECRET_KEY`, un proveedor **mock** activa la suscripción al
-  instante (dev/demo y tests), aplicando trial y cupones locales.
+- Sin `STRIPE_SECRET_KEY`, con `DEBUG=1`, un proveedor **mock** activa la
+  suscripción al instante (dev y tests), aplicando trial y cupones locales.
+  Con `DEBUG=0` no hay Premium sin Stripe: el pago se rechaza y no se activa nada.
 - Con `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` y `STRIPE_WEBHOOK_SECRET`,
   se usa **Stripe Checkout** (modo suscripción, con `trial_period_days` y
   códigos promocionales nativos), el **Billing Portal** de Stripe para

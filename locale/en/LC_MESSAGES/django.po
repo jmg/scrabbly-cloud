@@ -103,6 +103,10 @@ msgstr "Create an account to subscribe."
 msgid "Cupón inválido o agotado."
 msgstr "Invalid or exhausted coupon."
 
+#: billing/views.py
+msgid "Los pagos no están disponibles por ahora."
+msgstr "Payments aren't available right now."
+
 #: billing/views.py:79
 msgid "¡Bienvenido a Premium! 👑"
 msgstr "Welcome to Premium! 👑"

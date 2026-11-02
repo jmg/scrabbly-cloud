@@ -1,10 +1,11 @@
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory, TestCase, override_settings
 from django.utils import timezone
 
-from billing.models import Coupon, Subscription
+from billing import service
+from billing.models import Coupon, GiftCode, Subscription
 from game import services
 from game.engine import InvalidMove
 
@@ -69,6 +70,65 @@ class PremiumFlowTests(TestCase):
         c.post("/premium/subscribe/", {"plan": "gold_monthly"})
         r = c.post("/premium/portal/")
         self.assertEqual(r.status_code, 302)  # mock -> manage page
+
+
+@override_settings(MOCK_BILLING=False, STRIPE_SECRET_KEY="")
+class NoStripeOutsideDebugTests(TestCase):
+    """What production gets with no Stripe keys: nothing is given away."""
+
+    def setUp(self):
+        self.u = User.objects.create_user("buyer", password="x")
+        self.c = Client()
+        self.c.force_login(self.u)
+
+    def test_subscribing_grants_nothing_and_keeps_the_trial(self):
+        for data in ({"plan": "gold_monthly"}, {"plan": "gold_monthly", "trial": "1"},
+                     {"plan": "diamond_lifetime"}):
+            r = self.c.post("/premium/subscribe/", data)
+            self.assertRedirects(r, "/premium/", fetch_redirect_response=False)
+        self.u.refresh_from_db()
+        self.assertFalse(self.u.is_premium)
+        self.assertFalse(self.u.has_used_trial)
+        self.assertFalse(self.u.subscriptions.exists())
+
+    def test_a_coupon_isnt_spent(self):
+        Coupon.objects.create(code="FREE", free_days=30, max_redemptions=5)
+        self.c.post("/premium/subscribe/", {"plan": "gold_monthly", "coupon": "FREE"})
+        self.assertEqual(Coupon.objects.get(code="FREE").times_redeemed, 0)
+
+    def test_buying_a_gift_makes_no_code(self):
+        r = self.c.post("/premium/gift/buy/", {"plan": "gift_diamond_year"})
+        self.assertRedirects(r, "/premium/gift/", fetch_redirect_response=False)
+        self.assertFalse(GiftCode.objects.exists())
+
+    def test_the_provider_refuses_if_reached_anyway(self):
+        from billing.providers import BillingUnavailable, get_provider
+        request = RequestFactory().post("/premium/subscribe/")
+        with self.assertRaises(BillingUnavailable):
+            get_provider().create_checkout(self.u, "gold_monthly", request)
+        self.u.refresh_from_db()
+        self.assertFalse(self.u.is_premium)
+
+    def test_someone_who_already_has_it_can_still_manage_it(self):
+        service.activate(self.u, "gold_monthly", "mock")
+        self.assertEqual(self.c.post("/premium/portal/").status_code, 302)
+        self.assertEqual(self.c.post("/premium/cancel/").status_code, 302)
+        self.u.refresh_from_db()
+        self.assertTrue(self.u.is_premium)
+        self.assertTrue(self.u.subscriptions.filter(status=Subscription.CANCELED).exists())
+
+    def test_the_webhook_stays_closed(self):
+        self.assertEqual(Client().post("/billing/stripe/webhook/").status_code, 404)
+
+    @override_settings(STRIPE_SECRET_KEY="sk_test_x")
+    def test_stripe_keys_turn_payments_on(self):
+        from unittest import mock
+        with mock.patch("stripe.checkout.Session.create") as create:
+            create.return_value.url = "https://checkout.example/x"
+            r = self.c.post("/premium/subscribe/", {"plan": "gold_monthly"})
+        self.assertEqual(r["Location"], "https://checkout.example/x")
+        self.u.refresh_from_db()
+        self.assertFalse(self.u.is_premium)  # that's the webhook's job
 
 
 class MonetizationExtrasTests(TestCase):

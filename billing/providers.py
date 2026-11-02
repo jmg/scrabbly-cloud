@@ -3,7 +3,8 @@
 ``get_provider()`` returns the Stripe provider when STRIPE_SECRET_KEY is set,
 otherwise a mock provider that activates the subscription immediately. The mock
 exists so the whole premium flow is usable in development and tests without any
-payment credentials.
+payment credentials; outside them (settings.MOCK_BILLING off) it refuses to
+grant anything, since that would be Premium for free.
 """
 
 from django.conf import settings
@@ -13,12 +14,18 @@ from . import service
 from .plans import TRIAL_DAYS, get_plan
 
 
+class BillingUnavailable(Exception):
+    """No way to charge: Stripe isn't configured and this isn't development."""
+
+
 class MockProvider:
-    """Dev/demo provider: 'paying' instantly grants premium."""
+    """Dev provider: 'paying' instantly grants premium."""
 
     code = "mock"
 
     def create_checkout(self, user, plan_code, request, *, trial=False, coupon=None):
+        if not settings.MOCK_BILLING:
+            raise BillingUnavailable
         bonus = (coupon.free_days if coupon else 0)
         days = TRIAL_DAYS if trial else None
         service.activate(
@@ -137,7 +144,13 @@ class StripeProvider:
         )
 
 
+def can_charge():
+    return bool(getattr(settings, "STRIPE_SECRET_KEY", "")) or settings.MOCK_BILLING
+
+
 def get_provider():
+    """Without Stripe this is the mock even when it can't charge: its portal and
+    cancel grant nothing, and whoever already holds a mock subscription needs them."""
     if getattr(settings, "STRIPE_SECRET_KEY", ""):
         return StripeProvider()
     return MockProvider()

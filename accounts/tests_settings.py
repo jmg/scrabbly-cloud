@@ -9,7 +9,8 @@ from django.test import SimpleTestCase
 
 PROBE = (
     "import json; from config import settings as s; "
-    "print(json.dumps({'hosts': s.ALLOWED_HOSTS, 'dev_key': s.SECRET_KEY.startswith('dev-insecure')}))"
+    "print(json.dumps({'hosts': s.ALLOWED_HOSTS, 'dev_key': s.SECRET_KEY.startswith('dev-insecure'), "
+    "'mock': s.MOCK_BILLING}))"
 )
 
 
@@ -36,11 +37,12 @@ class FailClosedSettingsTests(SimpleTestCase):
 
     def test_production_values_are_honored(self):
         r = load(DEBUG="0", SECRET_KEY="a-real-one", ALLOWED_HOSTS="a.example,b.example")
-        self.assertEqual(json.loads(r.stdout), {"hosts": ["a.example", "b.example"], "dev_key": False})
+        self.assertEqual(json.loads(r.stdout),
+                         {"hosts": ["a.example", "b.example"], "dev_key": False, "mock": False})
 
     def test_development_still_works_with_nothing_set(self):
         r = load()
-        self.assertEqual(json.loads(r.stdout), {"hosts": ["*"], "dev_key": True})
+        self.assertEqual(json.loads(r.stdout), {"hosts": ["*"], "dev_key": True, "mock": True})
 
     def test_the_docker_build_can_run_without_hosts(self):
         # The Dockerfile runs collectstatic with DEBUG=0 and SECRET_KEY=build-only.

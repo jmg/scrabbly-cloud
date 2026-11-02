@@ -11,7 +11,7 @@ from . import service
 from .plans import (
     GIFT_PLANS, PLANS, TIERS, TRIAL_DAYS, get_plan, price_display,
 )
-from .providers import get_provider
+from .providers import can_charge, get_provider
 
 
 def _is_mock():
@@ -53,6 +53,9 @@ def subscribe(request):
         return redirect("register")
     if get_plan(plan_code) is None:
         return HttpResponseBadRequest("Plan inválido")
+    if not can_charge():
+        messages.error(request, _("Los pagos no están disponibles por ahora."))
+        return redirect("pricing")
 
     coupon = None
     code = (request.POST.get("coupon") or "").strip()
@@ -119,6 +122,9 @@ def gift(request):
 def gift_buy(request):
     plan_code = request.POST.get("plan", "")
     if request.user.is_guest or plan_code not in GIFT_PLANS:
+        return redirect("gift")
+    if not can_charge():
+        messages.error(request, _("Los pagos no están disponibles por ahora."))
         return redirect("gift")
     if _is_mock():
         g = service.create_gift(request.user, plan_code)
