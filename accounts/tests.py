@@ -277,6 +277,106 @@ class ChallengeTests(TestCase):
         self.assertFalse(Challenge.objects.exists())
 
 
+class ClientIpTests(TestCase):
+    """Limits count the address Traefik saw, the last X-Forwarded-For entry."""
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    def _ip(self, forwarded=None, remote="10.0.0.1"):
+        from django.test import RequestFactory
+        from game.ratelimit import client_ip
+        extra = {"REMOTE_ADDR": remote}
+        if forwarded is not None:
+            extra["HTTP_X_FORWARDED_FOR"] = forwarded
+        return client_ip(RequestFactory().get("/", **extra))
+
+    def test_reads_the_entry_the_proxy_appended(self):
+        self.assertEqual(self._ip("203.0.113.5"), "203.0.113.5")
+        self.assertEqual(self._ip("9.9.9.9, 203.0.113.5"), "203.0.113.5")
+        self.assertEqual(self._ip("9.9.9.9,8.8.8.8,203.0.113.5"), "203.0.113.5")
+
+    def test_falls_back_to_the_peer(self):
+        self.assertEqual(self._ip(), "10.0.0.1")
+        self.assertEqual(self._ip(""), "10.0.0.1")
+        self.assertEqual(self._ip("9.9.9.9, not-an-ip"), "10.0.0.1")
+
+    def test_ipv6_counts_by_its_64(self):
+        self.assertEqual(self._ip("2001:db8:1:2::1"), self._ip("2001:db8:1:2:ffff::9"))
+        self.assertNotEqual(self._ip("2001:db8:1:2::1"), self._ip("2001:db8:1:3::1"))
+        self.assertEqual(self._ip("::ffff:203.0.113.5"), "203.0.113.5")
+
+    def test_one_client_cant_block_everybodys_login(self):
+        def post(ip):
+            return Client().post("/login/", {"username": "a", "password": "b"},
+                                 HTTP_X_FORWARDED_FOR=ip)
+        for _ in range(30):
+            self.assertNotContains(post("203.0.113.5"), "Demasiados intentos")
+        self.assertContains(post("203.0.113.5"), "Demasiados intentos")
+        self.assertNotContains(post("203.0.113.6"), "Demasiados intentos")
+
+    def test_rotating_the_header_buys_no_new_bucket(self):
+        def post(i):
+            return Client().post("/login/", {"username": "a", "password": "b"},
+                                 HTTP_X_FORWARDED_FOR=f"9.9.9.{i}, 203.0.113.5")
+        for i in range(30):
+            self.assertNotContains(post(i), "Demasiados intentos")
+        self.assertContains(post(99), "Demasiados intentos")
+
+    def test_game_actions_of_visitors_count_per_client(self):
+        from django.test import RequestFactory
+        from django.contrib.auth.models import AnonymousUser
+        from django.http import JsonResponse
+        from game.ratelimit import rate_limit
+
+        @rate_limit("probe", limit=1, window=60)
+        def view(request):
+            return JsonResponse({"ok": True})
+
+        def hit(ip):
+            req = RequestFactory().post("/x", HTTP_X_FORWARDED_FOR=ip)
+            req.user = AnonymousUser()
+            return view(req).status_code
+
+        self.assertEqual([hit("203.0.113.5"), hit("203.0.113.5")], [200, 429])
+        self.assertEqual(hit("203.0.113.6"), 200)
+
+
+class AdminLoginLimitTests(TestCase):
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+        User.objects.create_superuser("boss", password="boss-pass-1234")
+
+    def _post(self, password, ip="203.0.113.5"):
+        from django.urls import reverse
+        return Client().post(reverse("admin:login"),
+                             {"username": "boss", "password": password},
+                             HTTP_X_FORWARDED_FOR=ip)
+
+    def test_limited_per_client_even_with_the_right_password(self):
+        for _ in range(10):
+            self.assertEqual(self._post("wrong").status_code, 200)  # the form again
+        self.assertEqual(self._post("wrong").status_code, 429)
+        self.assertEqual(self._post("boss-pass-1234").status_code, 429)
+        self.assertEqual(self._post("boss-pass-1234", ip="203.0.113.6").status_code, 302)
+
+    def test_the_form_still_shows_and_works(self):
+        from django.urls import reverse
+        self.assertEqual(Client().get(reverse("admin:login")).status_code, 200)
+        c = Client()
+        r = c.post(reverse("admin:login"), {"username": "boss", "password": "boss-pass-1234",
+                                            "next": reverse("admin:index")})
+        self.assertRedirects(r, reverse("admin:index"))
+
+    def test_csrf_still_applies(self):
+        from django.urls import reverse
+        r = Client(enforce_csrf_checks=True).post(
+            reverse("admin:login"), {"username": "boss", "password": "boss-pass-1234"})
+        self.assertEqual(r.status_code, 403)
+
+
 class GuestProvisioningTests(TestCase):
     """The landing creates no guest; the first real action still does."""
 

@@ -18,6 +18,14 @@ compiles translations, collects static via WhiteNoise).
 | `EMAIL_*` / `DEFAULT_FROM_EMAIL` | Optional SMTP for transactional email. |
 | `PLAUSIBLE_DOMAIN` | Optional analytics. |
 
+## Behind a proxy
+
+Rate limits count the **last** `X-Forwarded-For` entry, the one the proxy in
+front appended (`game/ratelimit.py`). That assumes exactly one trusted proxy,
+Traefik on DeployCloud. Don't add Daphne's `--proxy-headers`: it reads the first
+entry, which the client writes. Exposed with no proxy, or behind a second one,
+the limits need adjusting.
+
 ## Fly.io (recommended)
 
 ```bash

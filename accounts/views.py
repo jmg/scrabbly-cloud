@@ -1,11 +1,13 @@
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from game.models import GamePlayer, Move
+from game.ratelimit import client_ip
 
 from django.core.cache import cache
 
@@ -20,8 +22,7 @@ User = get_user_model()
 
 def _auth_throttled(request, name, limit=30, window=300):
     """Per-IP fixed-window throttle for auth endpoints (brute-force guard)."""
-    ip = request.META.get("REMOTE_ADDR", "anon")
-    key = f"rl:auth:{name}:{ip}"
+    key = f"rl:auth:{name}:{client_ip(request)}"
     if cache.add(key, 1, window):
         return False
     try:
@@ -89,6 +90,13 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("lobby")
+
+
+def admin_login(request, extra_context=None):
+    """The admin's login, under its own throttle: tighter than the site's."""
+    if request.method == "POST" and _auth_throttled(request, "admin", limit=10):
+        return HttpResponse(_("Demasiados intentos. Esperá unos minutos."), status=429)
+    return admin.site.login(request, extra_context)
 
 
 def profile(request, username):
