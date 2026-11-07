@@ -9,6 +9,33 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = os.environ.get("DEBUG", "1") == "1"
+
+# Error reporting to Jentry (Sentry-compatible). DeployCloud injects SENTRY_DSN,
+# SENTRY_ENVIRONMENT and SENTRY_RELEASE at runtime; without a DSN nothing is
+# sent (local dev, tests, the Docker build). Initialised here, before anything
+# else, so the web process, websockets (Daphne logs their exceptions, the
+# logging integration sends them) and one-off manage.py commands all report.
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+SENTRY_ENVIRONMENT = os.environ.get(
+    "SENTRY_ENVIRONMENT", "development" if DEBUG else "production"
+)
+SENTRY_RELEASE = os.environ.get("SENTRY_RELEASE", "")
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.logging import ignore_logger
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        environment=SENTRY_ENVIRONMENT,
+        release=SENTRY_RELEASE or None,
+        integrations=[DjangoIntegration()],
+        send_default_pii=False,
+        traces_sample_rate=0,
+    )
+    # Requests with a Host we don't serve are scanners, not bugs.
+    ignore_logger("django.security.DisallowedHost")
+
 # The repo is public, so a default key is no secret: with DEBUG off a missing or
 # placeholder key stops the app from starting, and no host is allowed by default.
 _DEV_SECRET_KEY = "dev-insecure-key-change-me-in-production"
@@ -73,6 +100,7 @@ TEMPLATES = [
                 "django.template.context_processors.i18n",
                 "accounts.context_processors.social_badges",
                 "accounts.context_processors.seo",
+                "accounts.context_processors.error_reporting",
             ],
         },
     },

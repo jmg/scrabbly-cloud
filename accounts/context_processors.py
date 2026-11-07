@@ -1,5 +1,7 @@
 """Template context shared across pages (navigation badges)."""
 
+import re
+
 from game.models import Challenge
 
 from .models import Friendship, Notification
@@ -28,4 +30,22 @@ def seo(request):
         "seo_es": canonical + "?hl=es",
         "seo_en": canonical + "?hl=en",
         "analytics_domain": getattr(settings, "PLAUSIBLE_DOMAIN", ""),
+    }
+
+
+def error_reporting(request):
+    """Browser error reporting to Jentry: same project as the backend.
+
+    Only outside DEBUG and with a DSN, so local runs and tests send nothing.
+    A DSN's public key is meant to be in the page; a legacy secret part, if
+    one were ever configured, is stripped before it gets there.
+    """
+    from django.conf import settings
+    dsn = getattr(settings, "SENTRY_DSN", "")
+    if settings.DEBUG or not dsn:
+        return {}
+    return {
+        "sentry_browser_dsn": re.sub(r"^(https?://[^:@/]+):[^@/]*@", r"\1@", dsn),
+        "sentry_environment": getattr(settings, "SENTRY_ENVIRONMENT", "production"),
+        "sentry_release": getattr(settings, "SENTRY_RELEASE", ""),
     }

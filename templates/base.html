@@ -28,6 +28,26 @@
   <meta name="twitter:card" content="summary_large_image">
   {% endblock %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% if sentry_browser_dsn %}
+  {# JS errors to Jentry, the backend's project. Loaded first and synchronously so #}
+  {# errors from the page's own scripts (game board, puzzles, lobby) are caught.   #}
+  <script src="https://browser.sentry-cdn.com/7.120.0/bundle.min.js"
+          integrity="sha384-IDUZ4TLzLVVJBrAVtnp+7wFfhZCU12V7TY5aTUOF2fYY2U1+uajA2SItOGQudpYE"
+          crossorigin="anonymous"></script>
+  <script>
+    if (window.Sentry) {
+      Sentry.init({
+        dsn: "{{ sentry_browser_dsn|escapejs }}",
+        environment: "{{ sentry_environment|escapejs }}",
+        release: "{{ sentry_release|escapejs }}" || undefined,
+        // Errors thrown by browser extensions and other sites' scripts aren't ours.
+        allowUrls: [window.location.origin, /browser\.sentry-cdn\.com/],
+        ignoreErrors: ["ResizeObserver loop limit exceeded",
+                       "ResizeObserver loop completed with undelivered notifications."]
+      });
+    }
+  </script>
+  {% endif %}
   {% if analytics_domain %}<script defer data-domain="{{ analytics_domain }}" src="https://plausible.io/js/script.js"></script>{% endif %}
   <script type="application/ld+json">
   {

@@ -7,6 +7,7 @@ payment credentials; outside them (settings.MOCK_BILLING off) it refuses to
 grant anything, since that would be Premium for free.
 """
 
+import sentry_sdk
 from django.conf import settings
 from django.urls import reverse
 
@@ -135,7 +136,9 @@ class StripeProvider:
                     sub.provider_subscription_id, cancel_at_period_end=True
                 )
             except Exception:
-                pass
+                # The local subscription is still cancelled below, but Stripe
+                # would keep charging: report it so someone cancels it there.
+                sentry_sdk.capture_exception()
         service.cancel(user)
 
     def construct_event(self, payload, sig_header):

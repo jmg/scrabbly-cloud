@@ -11,3 +11,5 @@ psycopg[binary]>=3.1
 stripe>=9.0
 # Rendering social (Open Graph) share images for blog posts.
 Pillow>=10.0
+# Error reporting to Jentry (Sentry-compatible). Active only when SENTRY_DSN is set.
+sentry-sdk[django]>=2.20,<3

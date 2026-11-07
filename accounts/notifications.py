@@ -1,5 +1,6 @@
 """Create + live-push in-app notifications."""
 
+import sentry_sdk
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
@@ -23,5 +24,7 @@ def notify(user, text, url=""):
                 {"type": "notify", "text": text, "url": url},
             )
         except Exception:
-            pass
+            # The notification is saved; only the live push failed (channel
+            # layer / Redis down). Don't break the caller, but report it.
+            sentry_sdk.capture_exception()
     return note
